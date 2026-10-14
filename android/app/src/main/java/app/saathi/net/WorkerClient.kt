@@ -76,7 +76,7 @@ class WorkerClient(
             request.screenshotB64?.let {
                 File(dir, "$name.jpg").writeBytes(android.util.Base64.decode(it, android.util.Base64.DEFAULT))
             }
-            File(dir, "$name.json").writeText(json.encodeToString(request.copy(audioB64 = null, screenshotB64 = null)))
+            File(dir, "$name.json").writeText(json.encodeToString(request.copy(screenshotB64 = null)))
         }
     }
 }

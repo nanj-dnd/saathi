@@ -32,15 +32,15 @@ class Snapshot(
 interface Eyes { suspend fun look(): Snapshot }
 
 interface Ears {
-    /** Records one utterance. Returns WAV bytes, or null if nothing was said. */
-    suspend fun listen(): ByteArray?
-    /** Ends the current recording early (second tap on the bubble). */
+    /** Listens for one utterance and returns the transcript, or null if nothing was understood. */
+    suspend fun listen(): String?
+    /** Ends the current listening early (second tap on the bubble). */
     fun finish()
 }
 
 interface Mouth {
-    /** Speaks [text], using server audio when present. Suspends until done. */
-    suspend fun say(text: String, audioB64: String?)
+    /** Speaks [text]. Suspends until done. */
+    suspend fun say(text: String)
     fun stop()
 }
 
@@ -96,7 +96,6 @@ class GuideSession(
     private val history = ArrayDeque<PastStep>()
     private var autoTurns = 0
     private var lastSay: String? = null
-    private var lastAudio: String? = null
 
     fun onBubbleTap() {
         if (_state.value == GuideState.LISTENING) {
@@ -115,7 +114,7 @@ class GuideSession(
             setState(GuideState.WATCHING)
             delay(event.settleMs)
             autoTurns++
-            runTurn(wav = null)
+            runTurn(utterance = null)
         }
     }
 
@@ -125,16 +124,15 @@ class GuideSession(
             goal = text
             history.clear()
             autoTurns = 0
-            runTurn(wav = null)
+            runTurn(utterance = null)
         }
     }
 
     fun repeat() {
         val say = lastSay ?: return
-        val audio = lastAudio
         launchPipeline {
             setState(GuideState.SPEAKING)
-            mouth.say(say, audio)
+            mouth.say(say)
             enterWatching()
         }
     }
@@ -149,7 +147,7 @@ class GuideSession(
         launchPipeline {
             pointer.point(null, text, Danger.SCAM)
             setState(GuideState.SPEAKING)
-            mouth.say(text, null)
+            mouth.say(text)
             setState(GuideState.IDLE)
         }
     }
@@ -171,21 +169,21 @@ class GuideSession(
         }
         pointer.clear()
         setState(GuideState.LISTENING)
-        val wav = ears.listen()
-        if (wav == null) {
+        val heard = ears.listen()
+        if (heard == null) {
             speakAndIdle(lines().noSpeech)
             return
         }
         autoTurns = 0
-        runTurn(wav)
+        runTurn(heard)
     }
 
-    private suspend fun runTurn(wav: ByteArray?) {
+    private suspend fun runTurn(utterance: String?) {
         setState(GuideState.THINKING)
         val snap = eyes.look()
         val request = TurnRequest(
             language = language(),
-            audioB64 = wav?.let { java.util.Base64.getEncoder().encodeToString(it) },
+            utterance = utterance,
             goal = goal,
             app = snap.app,
             playbook = playbook(snap.app),
@@ -210,11 +208,10 @@ class GuideSession(
         history.addLast(PastStep(guide.say, guide.label, guide.status, snap.app))
         while (history.size > HISTORY) history.removeFirst()
         lastSay = guide.say
-        lastAudio = response.audioB64
 
         pointer.point(targetBox(guide, snap), guide.say, guide.danger)
         setState(GuideState.SPEAKING)
-        mouth.say(guide.say, response.audioB64)
+        mouth.say(guide.say)
 
         when {
             guide.danger == Danger.SCAM -> setState(GuideState.IDLE) // caption stays until closed
@@ -239,7 +236,7 @@ class GuideSession(
     private suspend fun speakAndIdle(text: String) {
         pointer.point(null, text, Danger.NONE)
         setState(GuideState.SPEAKING)
-        mouth.say(text, null)
+        mouth.say(text)
         setState(GuideState.IDLE)
     }
 

@@ -22,7 +22,6 @@ const supportsFallbacks = (model: string) => !model.startsWith("claude-haiku");
 export async function askGuide(
   cfg: GuideConfig,
   req: TurnRequest,
-  transcript: string,
 ): Promise<Guide> {
   const client = new Anthropic({ apiKey: cfg.apiKey, maxRetries: 1, timeout: 20_000 });
 
@@ -33,7 +32,7 @@ export async function askGuide(
       source: { type: "base64", media_type: "image/jpeg", data: req.screenshot_b64 },
     });
   }
-  content.push({ type: "text", text: buildUserText(req, transcript) });
+  content.push({ type: "text", text: buildUserText(req) });
 
   const response = await client.beta.messages.create({
     model: cfg.model,

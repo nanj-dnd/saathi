@@ -18,8 +18,8 @@ export interface PastStep {
 
 export interface TurnRequest {
   language: Language;
-  /** Base64 16 kHz mono WAV. Absent on auto-advance turns (screen changed, no speech). */
-  audio_b64?: string;
+  /** What the senior said, transcribed on the phone. Absent on auto-advance turns (screen changed, no speech). */
+  utterance?: string;
   /** What the senior is trying to do, as understood on an earlier turn. Empty on the first turn. */
   goal: string;
   /** Foreground app package, e.g. com.grofers.customerapp */
@@ -35,8 +35,6 @@ export interface TurnRequest {
   /** True when the device could not capture because the screen is secure (PIN/OTP). */
   secure_screen: boolean;
   history: PastStep[];
-  /** Whether TTS audio should be generated. */
-  want_audio: boolean;
 }
 
 export type GuideStatus =
@@ -62,9 +60,7 @@ export interface Guide {
 }
 
 export interface TurnResponse {
-  transcript: string;
   guide: Guide;
-  audio_b64: string | null;
   timings_ms: Record<string, number>;
 }
 
@@ -166,7 +162,7 @@ export function parseTurnRequest(body: unknown): TurnRequest {
 
   return {
     language,
-    audio_b64: optStr("audio_b64", 3_000_000),
+    utterance: optStr("utterance", 1000)?.trim(),
     goal: str("goal", 300),
     app: str("app", 120),
     playbook: str("playbook", 4000),
@@ -176,7 +172,6 @@ export function parseTurnRequest(body: unknown): TurnRequest {
     tree: str("tree", 60_000),
     secure_screen: b.secure_screen === true,
     history,
-    want_audio: b.want_audio !== false,
   };
 }
 

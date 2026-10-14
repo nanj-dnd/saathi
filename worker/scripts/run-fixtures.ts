@@ -1,18 +1,19 @@
 // Replays saved screens against a running Worker and prints what Saathi would say.
 //   npm run dev            (in another terminal)
-//   npm run fixtures [-- name] [--lang ta-IN] [--audio]
+//   npm run fixtures [-- name] [--lang ta-IN] [--say "दूध मंगाना है"]
 // A fixture is fixtures/<name>.json (a TurnRequest minus screenshot) plus an optional fixtures/<name>.jpg.
 // Capture new ones on a device with the app's debug "Save fixture" action (see android/README).
 
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const WORKER = process.env.WORKER_URL ?? "http://localhost:8787";
 const args = process.argv.slice(2);
 const langIdx = args.indexOf("--lang");
 const lang = langIdx >= 0 ? args[langIdx + 1] : undefined;
-const wantAudio = args.includes("--audio");
-const only = args.find((a, i) => !a.startsWith("--") && args[i - 1] !== "--lang");
+const sayIdx = args.indexOf("--say");
+const say = sayIdx >= 0 ? args[sayIdx + 1] : undefined;
+const only = args.find((a, i) => !a.startsWith("--") && args[i - 1] !== "--lang" && args[i - 1] !== "--say");
 
 const dir = "fixtures";
 const names = readdirSync(dir)
@@ -21,14 +22,13 @@ const names = readdirSync(dir)
   .filter((n) => !only || n === only);
 
 const { token } = (await (await fetch(`${WORKER}/register`, { method: "POST" })).json()) as { token: string };
-mkdirSync("out", { recursive: true });
 
 for (const name of names) {
   const req = JSON.parse(readFileSync(join(dir, `${name}.json`), "utf8"));
   const jpg = join(dir, `${name}.jpg`);
   if (existsSync(jpg)) req.screenshot_b64 = readFileSync(jpg).toString("base64");
   if (lang) req.language = lang;
-  req.want_audio = wantAudio;
+  if (say) req.utterance = say;
 
   const res = await fetch(`${WORKER}/turn`, {
     method: "POST",
@@ -48,7 +48,4 @@ for (const name of names) {
   console.log(`  say:    ${g.say}`);
   console.log(`  target: ${target} "${g.label}"  status=${g.status} danger=${g.danger}`);
   console.log(`  expect: ${g.expect}`);
-  if (body.audio_b64) {
-    writeFileSync(join("out", `${name}.${req.language}.wav`), Buffer.from(body.audio_b64, "base64"));
-  }
 }

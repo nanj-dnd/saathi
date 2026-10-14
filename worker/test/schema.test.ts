@@ -17,8 +17,7 @@ const base = {
 describe("parseTurnRequest", () => {
   it("accepts a minimal auto-advance turn", () => {
     const r = parseTurnRequest(base);
-    expect(r.audio_b64).toBeUndefined();
-    expect(r.want_audio).toBe(true);
+    expect(r.utterance).toBeUndefined();
     expect(r.secure_screen).toBe(false);
   });
 
@@ -68,9 +67,14 @@ describe("normaliseGuide", () => {
 
 describe("prompt", () => {
   it("marks auto-advance turns", () => {
-    const text = buildUserText(parseTurnRequest(base), "");
+    const text = buildUserText(parseTurnRequest(base));
     expect(text).toContain("the screen changed");
     expect(text).toContain("Hindi");
+  });
+
+  it("quotes what the senior said", () => {
+    const text = buildUserText(parseTurnRequest({ ...base, utterance: "  दूध मंगाना है " }));
+    expect(text).toContain('Senior said: "दूध मंगाना है"');
   });
 });
 

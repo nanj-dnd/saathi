@@ -22,7 +22,7 @@ import app.saathi.safety.ScamGuard
 import app.saathi.session.GuideSession
 import app.saathi.session.Lines
 import app.saathi.session.ScreenEvent
-import app.saathi.voice.Recorder
+import app.saathi.voice.SpeechListener
 import app.saathi.voice.Speaker
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -57,7 +57,12 @@ class BuddyAccessibilityService : AccessibilityService() {
         session = GuideSession(
             scope = scope,
             eyes = ScreenReader(this),
-            ears = Recorder(onStart = { MicService.start(this) }, onEnd = { MicService.stop(this) }),
+            ears = SpeechListener(
+                context = this,
+                language = { prefs.language },
+                onStart = { MicService.start(this) },
+                onEnd = { MicService.stop(this) },
+            ),
             mouth = speaker,
             pointer = overlay,
             brain = WorkerClient(

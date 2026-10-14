@@ -16,7 +16,8 @@ data class PastStep(
 @Serializable
 data class TurnRequest(
     val language: String,
-    @SerialName("audio_b64") val audioB64: String? = null,
+    /** What the senior said, transcribed on the phone. Null on auto-advance turns. */
+    val utterance: String? = null,
     val goal: String,
     val app: String,
     val playbook: String,
@@ -26,7 +27,6 @@ data class TurnRequest(
     val tree: String,
     @SerialName("secure_screen") val secureScreen: Boolean,
     val history: List<PastStep>,
-    @SerialName("want_audio") val wantAudio: Boolean = true,
 )
 
 @Serializable
@@ -59,9 +59,7 @@ object Danger {
 
 @Serializable
 data class TurnResponse(
-    val transcript: String = "",
     val guide: Guide,
-    @SerialName("audio_b64") val audioB64: String? = null,
     @SerialName("timings_ms") val timingsMs: Map<String, Long> = emptyMap(),
 )
 

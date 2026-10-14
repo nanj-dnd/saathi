@@ -38,7 +38,7 @@ class GuideSessionTest {
         val pointed = mutableListOf<Pair<Box?, String>>()
         val replies = ArrayDeque<Guide>()
         var failNext = false
-        var heard: ByteArray? = byteArrayOf(1, 2, 3)
+        var heard: String? = "ब्लिंकिट से दूध मंगाना है"
         var finished = false
 
         val eyes = object : Eyes {
@@ -53,7 +53,7 @@ class GuideSessionTest {
             override fun finish() { finished = true }
         }
         val mouth = object : Mouth {
-            override suspend fun say(text: String, audioB64: String?) { said += text }
+            override suspend fun say(text: String) { said += text }
             override fun stop() {}
         }
         val pointer = object : Pointer {
@@ -91,7 +91,7 @@ class GuideSessionTest {
         assertEquals(listOf("ADD दबाइए"), f.said)
         assertEquals(target, f.pointed.single().first)
         val req = f.requests.single()
-        assertTrue(req.audioB64 != null)
+        assertEquals("ब्लिंकिट से दूध मंगाना है", req.utterance)
         assertEquals("hints", req.playbook)
         assertEquals("", req.goal)
     }
@@ -109,7 +109,7 @@ class GuideSessionTest {
 
         assertEquals(2, f.requests.size)
         val second = f.requests[1]
-        assertNull(second.audioB64)
+        assertNull(second.utterance)
         assertEquals("order milk", second.goal)
         assertEquals(1, second.history.size)
         assertEquals(listOf("ADD दबाइए", "View cart दबाइए"), f.said)
@@ -155,7 +155,7 @@ class GuideSessionTest {
         s.onBubbleTap()
         runCurrent()
         assertEquals(2, f.requests.size)
-        assertTrue(f.requests[1].audioB64 != null)
+        assertTrue(f.requests[1].utterance != null)
     }
 
     @Test fun `silence and network errors are spoken locally`() = runTest {
@@ -165,7 +165,7 @@ class GuideSessionTest {
         advanceUntilIdle()
         assertEquals(listOf("no-speech"), f.said)
 
-        f.heard = byteArrayOf(1)
+        f.heard = "दूध"
         f.failNext = true
         s.onBubbleTap()
         advanceUntilIdle()
@@ -209,7 +209,7 @@ class GuideSessionTest {
         val s = GuideSession(
             this, f.eyes,
             object : Ears {
-                override suspend fun listen(): ByteArray { kotlinx.coroutines.delay(10_000); return byteArrayOf(1) }
+                override suspend fun listen(): String { kotlinx.coroutines.delay(10_000); return "दूध" }
                 override fun finish() { f.finished = true }
             },
             f.mouth, f.pointer, f.brain, { "" }, { "hi-IN" }, { f.lines }, { true },

@@ -3,7 +3,7 @@ import { LANGUAGES, type TurnRequest } from "./schema.ts";
 // Frozen so it caches. Anything per-request goes in the user message.
 export const SYSTEM_PROMPT = `You are Saathi, a patient helper that sits on an Indian senior citizen's Android phone. They are often over 65, may have weak eyesight, and are new to apps like Blinkit, Zepto, Zomato, Swiggy, Uber, Ola, WhatsApp, UPI apps, DigiLocker, UMANG, IRCTC and government pension portals. You cannot tap anything yourself. You look at their screen, tell them the single next thing to do, and the phone draws a big pointer on the button you choose.
 
-Each turn you get: what they said (may be empty when the screen just changed after they tapped), their goal so far, the app in front, short app hints, a screenshot, and a list of on-screen elements with ids and bounds.
+Each turn you get: what they said, as transcribed by the phone (may contain recognition mistakes; may be empty when the screen just changed after they tapped), their goal so far, the app in front, short app hints, a screenshot, and a list of on-screen elements with ids and bounds.
 
 How to answer:
 - Give exactly one action per turn. Under 15 words, in the senior's language, using simple everyday words. Prefer how people actually speak: Hinglish-style English loanwords like "button", "order", "app" are fine in Hindi; do the same in other languages where natural.
@@ -23,7 +23,7 @@ Safety, always:
 
 Write "say" only in the requested language and script. Write "goal", "label" and "expect" so they can be logged: goal and expect in English, label exactly as written on screen.`;
 
-export function buildUserText(req: TurnRequest, transcript: string): string {
+export function buildUserText(req: TurnRequest): string {
   const lang = LANGUAGES[req.language];
   const history = req.history.length
     ? req.history
@@ -33,7 +33,7 @@ export function buildUserText(req: TurnRequest, transcript: string): string {
 
   return [
     `Language for "say": ${lang} (${req.language})`,
-    `Senior said: ${transcript ? `"${transcript}"` : "(nothing — the screen changed after their last tap)"}`,
+    `Senior said: ${req.utterance ? `"${req.utterance}"` : "(nothing — the screen changed after their last tap)"}`,
     `Goal so far: ${req.goal || "(not known yet)"}`,
     `App in front: ${req.app || "(unknown)"}`,
     `secure_screen: ${req.secure_screen}`,
