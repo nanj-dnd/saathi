@@ -7,13 +7,13 @@
     <string name="btn_allow">Allow</string>
     <string name="done">Done</string>
     <string name="step_access">3. Turn on Saathi</string>
-    <string name="disclosure">Saathi reads the text on the screen and takes a picture of it only when the Help button is pressed or while it is guiding a task. These are sent to Saathi\'s server to decide the next step and are not stored. Saathi never taps anything itself, and it cannot see PIN or payment screens.</string>
+    <string name="disclosure">Saathi reads the text on the screen and takes a picture of it only when the Help button is pressed or while it is guiding a task. Common tasks are guided on the phone itself. Otherwise these are sent to Saathi\'s server to decide the next step and are not stored, except that the step given for a screen of a shopping or settings app may be kept for a few days, with nothing that identifies your phone. Saathi never taps anything itself, and it cannot see PIN or payment screens.</string>
     <string name="btn_open_settings">Agree and open settings</string>
     <string name="access_on">Saathi is on</string>
     <string name="access_hint">In Settings, open \"Downloaded apps\" or \"Installed apps\", choose Saathi and turn it on.</string>
     <string name="access_restricted">If the switch is greyed out, open App info, tap ⋮ at the top and choose \"Allow restricted settings\".</string>
     <string name="btn_app_info">App info</string>
-    <string name="step_ready">4. Ready</string>
+    <string name="step_ready">5. Ready</string>
     <string name="ready_body">In any app, press the orange \"Help\" button and say what you want to do. For example: \"I want to order milk on Blinkit\".</string>
     <string name="bubble_help">Help</string>
     <string name="bubble_listening">Listening</string>
@@ -36,4 +36,14 @@
     <string name="notif_channel">Listening</string>
     <string name="notif_listening">Saathi is listening</string>
     <string name="service_desc">Saathi looks at the screen and tells you out loud what to press next. It never presses anything itself.</string>
+    <string name="step_voice">4. Check the voice</string>
+    <string name="voice_test">Play a test</string>
+    <string name="voice_sample">Hello, I am Saathi. I will help you, one step at a time.</string>
+    <string name="voice_missing">This phone has no voice for this language yet. Install it so Saathi can speak.</string>
+    <string name="voice_install">Install voice</string>
+    <string name="voice_ok">Heard it? Then the voice is ready.</string>
+    <string name="speed_slow">Slow</string>
+    <string name="speed_normal">Normal</string>
+    <string name="offline_download">Download speech for use without internet</string>
+    <string name="offline_started">Downloading. Keep the phone on Wi-Fi.</string>
 </resources>

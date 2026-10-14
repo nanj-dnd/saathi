@@ -6,13 +6,13 @@
     <string name="btn_allow">ಅನುಮತಿಸಿ</string>
     <string name="done">ಆಯಿತು</string>
     <string name="step_access">3. ಸಾಥಿಯನ್ನು ಆನ್ ಮಾಡಿ</string>
-    <string name="disclosure">ಸಹಾಯ ಬಟನ್ ಒತ್ತಿದಾಗ ಅಥವಾ ಸಾಥಿ ಒಂದು ಕೆಲಸದಲ್ಲಿ ದಾರಿ ತೋರಿಸುವಾಗ ಮಾತ್ರ, ಅದು ಪರದೆಯ ಮೇಲಿರುವುದನ್ನು ಓದಿ ಅದರ ಚಿತ್ರ ತೆಗೆಯುತ್ತದೆ. ಮುಂದಿನ ಹೆಜ್ಜೆ ನಿರ್ಧರಿಸಲು ಇವನ್ನು ಸಾಥಿಯ ಸರ್ವರ್‌ಗೆ ಕಳುಹಿಸಲಾಗುತ್ತದೆ, ಉಳಿಸಲಾಗುವುದಿಲ್ಲ. ಸಾಥಿ ತಾನಾಗಿ ಏನನ್ನೂ ಒತ್ತುವುದಿಲ್ಲ; PIN ಅಥವಾ ಪಾವತಿ ಪರದೆಗಳನ್ನು ನೋಡಲಾರದು.</string>
+    <string name="disclosure">ಸಹಾಯ ಬಟನ್ ಒತ್ತಿದಾಗ ಅಥವಾ ಸಾಥಿ ಒಂದು ಕೆಲಸದಲ್ಲಿ ದಾರಿ ತೋರಿಸುವಾಗ ಮಾತ್ರ, ಅದು ಪರದೆಯ ಮೇಲಿರುವುದನ್ನು ಓದಿ ಅದರ ಚಿತ್ರ ತೆಗೆಯುತ್ತದೆ. ಸಾಮಾನ್ಯ ಕೆಲಸಗಳಿಗೆ ಫೋನಿನಲ್ಲೇ ದಾರಿ ತೋರಿಸುತ್ತದೆ. ಉಳಿದವಕ್ಕೆ, ಮುಂದಿನ ಹೆಜ್ಜೆ ನಿರ್ಧರಿಸಲು ಇವನ್ನು ಸಾಥಿಯ ಸರ್ವರ್‌ಗೆ ಕಳುಹಿಸಲಾಗುತ್ತದೆ, ಉಳಿಸಲಾಗುವುದಿಲ್ಲ; ಶಾಪಿಂಗ್ ಅಥವಾ ಸೆಟ್ಟಿಂಗ್ಸ್ ಆ್ಯಪ್‌ನ ಒಂದು ಪರದೆಗೆ ಹೇಳಿದ ಹೆಜ್ಜೆಯನ್ನು ಮಾತ್ರ ಕೆಲವು ದಿನ ಇಡಬಹುದು, ನಿಮ್ಮ ಫೋನನ್ನು ಗುರುತಿಸದೆ. ಸಾಥಿ ತಾನಾಗಿ ಏನನ್ನೂ ಒತ್ತುವುದಿಲ್ಲ; PIN ಅಥವಾ ಪಾವತಿ ಪರದೆಗಳನ್ನು ನೋಡಲಾರದು.</string>
     <string name="btn_open_settings">ಒಪ್ಪುತ್ತೇನೆ, ಸೆಟ್ಟಿಂಗ್ಸ್ ತೆರೆಯಿರಿ</string>
     <string name="access_on">ಸಾಥಿ ಆನ್ ಆಗಿದೆ</string>
     <string name="access_hint">ಸೆಟ್ಟಿಂಗ್ಸ್‌ನಲ್ಲಿ \"ಡೌನ್‌ಲೋಡ್ ಮಾಡಿದ ಆ್ಯಪ್‌ಗಳು\" ಅಥವಾ \"ಇನ್‌ಸ್ಟಾಲ್ ಮಾಡಿದ ಆ್ಯಪ್‌ಗಳು\" ತೆರೆದು, ಸಾಥಿಯನ್ನು ಆಯ್ಕೆಮಾಡಿ ಆನ್ ಮಾಡಿ.</string>
     <string name="access_restricted">ಬಟನ್ ಮಸುಕಾಗಿದ್ದರೆ, ಆ್ಯಪ್ ಮಾಹಿತಿ ತೆರೆದು, ಮೇಲೆ ⋮ ಒತ್ತಿ \"ನಿರ್ಬಂಧಿತ ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ಅನುಮತಿಸಿ\" ಆಯ್ಕೆಮಾಡಿ.</string>
     <string name="btn_app_info">ಆ್ಯಪ್ ಮಾಹಿತಿ</string>
-    <string name="step_ready">4. ಸಿದ್ಧ</string>
+    <string name="step_ready">5. ಸಿದ್ಧ</string>
     <string name="ready_body">ಯಾವುದೇ ಆ್ಯಪ್‌ನಲ್ಲಿ ಕಿತ್ತಳೆ ಬಣ್ಣದ \"ಸಹಾಯ\" ಬಟನ್ ಒತ್ತಿ, ನಿಮಗೆ ಏನು ಮಾಡಬೇಕು ಎಂದು ಹೇಳಿ. ಉದಾಹರಣೆ: \"ಬ್ಲಿಂಕಿಟ್‌ನಲ್ಲಿ ಹಾಲು ತರಿಸಬೇಕು\".</string>
     <string name="bubble_help">ಸಹಾಯ</string>
     <string name="bubble_listening">ಕೇಳುತ್ತಿದ್ದೇನೆ</string>
@@ -35,4 +35,14 @@
     <string name="notif_channel">ಕೇಳುವುದು</string>
     <string name="notif_listening">ಸಾಥಿ ಕೇಳುತ್ತಿದೆ</string>
     <string name="service_desc">ಸಾಥಿ ಪರದೆಯನ್ನು ನೋಡಿ ಮುಂದೆ ಏನು ಒತ್ತಬೇಕು ಎಂದು ಹೇಳುತ್ತದೆ. ಅದು ತಾನಾಗಿ ಏನನ್ನೂ ಒತ್ತುವುದಿಲ್ಲ.</string>
+    <string name="step_voice">4. ಧ್ವನಿ ಪರೀಕ್ಷಿಸಿ</string>
+    <string name="voice_test">ಧ್ವನಿ ಕೇಳಿ ನೋಡಿ</string>
+    <string name="voice_sample">ನಮಸ್ಕಾರ, ನಾನು ಸಾಥಿ. ಒಂದೊಂದೇ ಹೆಜ್ಜೆಯಲ್ಲಿ ನಿಮಗೆ ಸಹಾಯ ಮಾಡುತ್ತೇನೆ.</string>
+    <string name="voice_missing">ಈ ಫೋನಿನಲ್ಲಿ ಈ ಭಾಷೆಯ ಧ್ವನಿ ಇಲ್ಲ. ಸಾಥಿ ಮಾತನಾಡಲು ಅದನ್ನು ಇನ್‌ಸ್ಟಾಲ್ ಮಾಡಿ.</string>
+    <string name="voice_install">ಧ್ವನಿ ಇನ್‌ಸ್ಟಾಲ್ ಮಾಡಿ</string>
+    <string name="voice_ok">ಧ್ವನಿ ಕೇಳಿಸಿತೇ? ಹಾಗಾದರೆ ಎಲ್ಲ ಸಿದ್ಧ.</string>
+    <string name="speed_slow">ನಿಧಾನ</string>
+    <string name="speed_normal">ಸಾಮಾನ್ಯ</string>
+    <string name="offline_download">ಇಂಟರ್ನೆಟ್ ಇಲ್ಲದೆ ಕೇಳಲು ಧ್ವನಿ ಗುರುತಿಸುವಿಕೆ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ</string>
+    <string name="offline_started">ಡೌನ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ. ಫೋನನ್ನು Wi-Fi ನಲ್ಲಿ ಇಡಿ.</string>
 </resources>
