@@ -4,7 +4,7 @@ A Clicky-style phone helper for Indian seniors. A big orange **मदद / Help*
 
 Saathi only points and talks; it never taps anything. OTP, PIN and payment screens are always left to the senior. Opening a remote-control app (AnyDesk, TeamViewer…) gets a spoken scam warning.
 
-Most steps never reach Claude. The phone answers common tasks itself with scripted [recipes](shared/recipes) (105 today: WhatsApp calls and photos, Settings switches, UPI balance and bills, Blinkit and other shopping, YouTube, Maps, DigiLocker, spoken tips, scam warnings, reading the screen aloud), and it remembers answers it already got for the same screen. Those steps are free, instant and work offline.
+Most steps never reach Claude. The phone answers common tasks itself with scripted [recipes](shared/recipes) (116 today: WhatsApp calls and photos, Settings switches, UPI balance and bills, Blinkit and other shopping, YouTube, Maps, DigiLocker, spoken tips, scam warnings, reading the screen aloud), and it remembers answers it already got for the same screen. Those steps are free, instant and work offline.
 
 Languages: Hindi, Tamil, Telugu, Kannada, Malayalam. Android 11+ (API 30).
 
