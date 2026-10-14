@@ -52,8 +52,9 @@ let env: Record<string, unknown>;
 let pending: Promise<unknown>[];
 const ctx = () => ({ waitUntil: (p: Promise<unknown>) => pending.push(p), passThroughOnException() {} }) as unknown as ExecutionContext;
 
+let token: string;
+
 async function turn(over: Record<string, unknown> = {}) {
-  const token = await issueToken("secret");
   const res = await worker.fetch(
     new Request("https://w/turn", {
       method: "POST",
@@ -67,7 +68,8 @@ async function turn(over: Record<string, unknown> = {}) {
   return { status: res.status, json: (await res.json()) as Record<string, any> };
 }
 
-beforeEach(() => {
+beforeEach(async () => {
+  token = await issueToken("secret"); // one device per test, so the daily limit adds up
   askGuide.mockClear();
   pending = [];
   env = {
@@ -110,6 +112,14 @@ describe("/turn with the shared cache", () => {
     const [key] = [...kv.data.keys()];
     kv.data.set(key, JSON.stringify({ ...reply, node_id: "n99" }));
     expect((await turn()).json.source).toBe("model");
+  });
+
+  it("serves cached screens after the daily limit, and refuses only new model turns", async () => {
+    env.DAILY_TURN_LIMIT = "1";
+    expect((await turn()).json.source).toBe("model");
+    expect((await turn()).json.source).toBe("cache");
+    expect((await turn({ app: "com.whatsapp" })).status).toBe(429);
+    expect(askGuide).toHaveBeenCalledTimes(1);
   });
 
   it("works without a cache namespace", async () => {

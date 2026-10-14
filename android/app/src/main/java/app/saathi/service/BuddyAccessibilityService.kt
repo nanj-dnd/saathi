@@ -71,7 +71,10 @@ class BuddyAccessibilityService : AccessibilityService() {
             sensitiveLine = { tag -> Languages.context(this, tag).getString(R.string.say_sensitive) },
             log = { if (BuildConfig.DEBUG) Log.d(TAG, it) },
         )
-        refreshRecipes(recipes, worker)
+        scope.launch {
+            withContext(Dispatchers.IO) { recipes.load() }
+            refreshRecipes(recipes, worker)
+        }
         overlay = OverlayController(
             service = this,
             prefs = prefs,

@@ -12,12 +12,14 @@ import java.io.File
 class RecipeSource(private val assets: AssetManager, private val downloaded: File) {
     private val bundled: RecipeBundle by lazy { readBundled() }
 
+    /** Empty until [load] runs; a turn before that just goes to the model. */
     @Volatile
     var book: RecipeBook = RecipeBook.EMPTY
         private set
 
-    init {
-        book = load()
+    /** Reads the bundled and downloaded recipes. A hundred-odd files: call it off the main thread. */
+    fun load() {
+        book = read()
     }
 
     /** Saves a bundle fetched from the Worker if it parses; the merge drops anything invalid. */
@@ -37,7 +39,7 @@ class RecipeSource(private val assets: AssetManager, private val downloaded: Fil
         return true
     }
 
-    private fun load(): RecipeBook {
+    private fun read(): RecipeBook {
         val fetched = runCatching { if (downloaded.exists()) RecipeBook.parseBundle(downloaded.readText()) else null }.getOrNull()
         return if (fetched != null) RecipeBook.merge(bundled, fetched) else RecipeBook.merge(bundled)
     }

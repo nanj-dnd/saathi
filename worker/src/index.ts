@@ -49,9 +49,8 @@ export default {
 
     const deviceId = await verifyToken(env.TOKEN_SECRET, request.headers.get("Authorization"));
     if (!deviceId) return json({ error: "unauthorised" }, 401);
-    if (!(await underDailyLimit(env.USAGE, deviceId, Number(env.DAILY_TURN_LIMIT) || 300))) {
-      return json({ error: "daily limit reached" }, 429);
-    }
+    // The daily limit guards model spend, so it is counted only for turns that reach the model.
+    const allowed = () => underDailyLimit(env.USAGE, deviceId, Number(env.DAILY_TURN_LIMIT) || 300);
 
     try {
       const req = parseTurnRequest(await request.json());
@@ -72,6 +71,7 @@ export default {
           guide = hit;
           source = "cache";
         } else {
+          if (!(await allowed())) return json({ error: "daily limit reached" }, 429);
           guide = await askGuide(
             {
               apiKey: env.ANTHROPIC_API_KEY,
