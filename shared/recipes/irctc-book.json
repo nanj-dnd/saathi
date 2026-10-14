@@ -1,0 +1,131 @@
+{
+  "id": "irctc-book",
+  "version": 1,
+  "goal": "book a train ticket on IRCTC",
+  "apps": [
+    "cris.org.in.prs.ima"
+  ],
+  "app_label": "IRCTC",
+  "app_names": [
+    "IRCTC Rail Connect",
+    "IRCTC"
+  ],
+  "triggers": [
+    {
+      "all": [
+        [
+          "irctc",
+          "आईआरसीटीसी",
+          "ரயில்",
+          "रेल",
+          "train",
+          "ट्रेन",
+          "रेलगाड़ी",
+          "ट्रेन टिकट",
+          "இரயில்",
+          "ட்ரெயின்",
+          "రైలు",
+          "ట్రైన్",
+          "ರೈಲು",
+          "ಟ್ರೈನ್",
+          "ട്രെയിൻ",
+          "തീവണ്ടി"
+        ],
+        [
+          "ticket",
+          "टिकट",
+          "टिकिट",
+          "book",
+          "बुक",
+          "டிக்கெட்",
+          "டிக்கட்",
+          "టికెట్",
+          "ಟಿಕೆಟ್",
+          "ടിക്കറ്റ്"
+        ]
+      ]
+    }
+  ],
+  "unless": [
+    "cancel",
+    "कैंसल",
+    "रद्द",
+    "pnr",
+    "पीएनआर",
+    "refund",
+    "रिफंड",
+    "tatkal agent",
+    "एजेंट"
+  ],
+  "examples": {
+    "hi-IN": [
+      "ट्रेन का टिकट IRCTC से बुक करना है"
+    ],
+    "ta-IN": [
+      "இரயில் டிக்கெட் புக் செய்ய வேண்டும்"
+    ],
+    "te-IN": [
+      "రైలు టికెట్ బుక్ చేయాలి"
+    ],
+    "kn-IN": [
+      "ರೈಲು ಟಿಕೆಟ್ ಬುಕ್ ಮಾಡಬೇಕು"
+    ],
+    "ml-IN": [
+      "ട്രെയിൻ ടിക്കറ്റ് ബുക്ക് ചെയ്യണം"
+    ]
+  },
+  "steps": [
+    {
+      "id": "search",
+      "after": {
+        "step": "from",
+        "min": 1
+      },
+      "target": [
+        "Search Trains",
+        "Search"
+      ],
+      "exact": true,
+      "max_repeats": 2,
+      "say": {
+        "hi-IN": "'Search Trains' पर दबाइए।",
+        "ta-IN": "'Search Trains' ஐ அழுத்துங்கள்.",
+        "te-IN": "'Search Trains' నొక్కండి.",
+        "kn-IN": "'Search Trains' ಒತ್ತಿ.",
+        "ml-IN": "'Search Trains' അമർത്തുക."
+      }
+    },
+    {
+      "id": "from",
+      "after": {
+        "step": "book",
+        "min": 1
+      },
+      "target": [
+        "From"
+      ],
+      "max_repeats": 2,
+      "say": {
+        "hi-IN": "'From' पर दबाकर जहाँ से चलना है उस स्टेशन का नाम लिखिए, फिर 'To' में जहाँ जाना है।",
+        "ta-IN": "'From' ஐ அழுத்தி புறப்படும் நிலையத்தின் பெயரை எழுதுங்கள், பிறகு 'To'-வில் போகும் இடம்.",
+        "te-IN": "'From' నొక్కి బయలుదేరే స్టేషన్ పేరు రాయండి, తర్వాత 'To' లో వెళ్ళే చోటు.",
+        "kn-IN": "'From' ಒತ್ತಿ ಹೊರಡುವ ನಿಲ್ದಾಣದ ಹೆಸರು ಬರೆಯಿರಿ, ನಂತರ 'To' ನಲ್ಲಿ ಹೋಗುವ ಸ್ಥಳ.",
+        "ml-IN": "'From' അമർത്തി പുറപ്പെടുന്ന സ്റ്റേഷന്റെ പേര് എഴുതുക, പിന്നെ 'To'-ൽ പോകേണ്ട സ്ഥലം."
+      }
+    },
+    {
+      "id": "book",
+      "target": [
+        "Book Ticket",
+        "Book Tickets"
+      ],
+      "say": {
+        "hi-IN": "'Book Ticket' पर दबाइए।",
+        "ta-IN": "'Book Ticket' ஐ அழுத்துங்கள்.",
+        "te-IN": "'Book Ticket' నొక్కండి.",
+        "kn-IN": "'Book Ticket' ಒತ್ತಿ.",
+        "ml-IN": "'Book Ticket' അമർത്തുക."
+      }
+    }
+  ]
+}

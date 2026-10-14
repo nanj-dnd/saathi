@@ -1,0 +1,160 @@
+{
+  "id": "settings-dnd-off",
+  "version": 1,
+  "goal": "turn off Do Not Disturb",
+  "apps": [
+    "com.android.settings"
+  ],
+  "app_label": "Settings",
+  "app_names": [
+    "Settings",
+    "सेटिंग",
+    "सेटिंग्स",
+    "அமைப்புகள்",
+    "సెట్టింగ్‌లు",
+    "ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
+    "ക്രമീകരണങ്ങൾ"
+  ],
+  "triggers": [
+    {
+      "all": [
+        [
+          "do not disturb",
+          "dnd",
+          "डू नॉट डिस्टर्ब",
+          "डीएनडी",
+          "தொந்தரவு செய்ய வேண்டாம்",
+          "டூ நாட் டிஸ்டர்ப்",
+          "డూ నాట్ డిస్టర్బ్",
+          "ಡೂ ನಾಟ್ ಡಿಸ್ಟರ್ಬ್",
+          "ಅಡಚಣೆ ಮಾಡಬೇಡಿ",
+          "ഡു നോട്ട് ഡിസ്റ്റർബ്",
+          "ശല്യപ്പെടുത്തരുത്"
+        ]
+      ]
+    }
+  ],
+  "unless": [
+    "चालू कर",
+    "ऑन कर",
+    "लगाना"
+  ],
+  "examples": {
+    "hi-IN": [
+      "डू नॉट डिस्टर्ब हटाना है",
+      "DND band karna hai"
+    ],
+    "ta-IN": [
+      "டூ நாட் டிஸ்டர்ப் அணைக்க வேண்டும்"
+    ],
+    "te-IN": [
+      "డూ నాట్ డిస్టర్బ్ ఆఫ్ చేయాలి"
+    ],
+    "kn-IN": [
+      "ಡೂ ನಾಟ್ ಡಿಸ್ಟರ್ಬ್ ಆಫ್ ಮಾಡಬೇಕು"
+    ],
+    "ml-IN": [
+      "ഡു നോട്ട് ഡിസ്റ്റർബ് ഓഫാക്കണം"
+    ]
+  },
+  "steps": [
+    {
+      "id": "done",
+      "switch": [
+        "Do Not Disturb",
+        "Do not disturb",
+        "Use Do Not Disturb"
+      ],
+      "switch_is": "off",
+      "status": "done",
+      "say": {
+        "hi-IN": "डू नॉट डिस्टर्ब बंद है। अब घंटी बजेगी।",
+        "ta-IN": "Do Not Disturb அணைந்துள்ளது. இனி மணி ஒலிக்கும்.",
+        "te-IN": "Do Not Disturb ఆఫ్‌లో ఉంది. ఇక రింగ్ వస్తుంది.",
+        "kn-IN": "Do Not Disturb ಆಫ್ ಆಗಿದೆ. ಇನ್ನು ರಿಂಗ್ ಆಗುತ್ತದೆ.",
+        "ml-IN": "Do Not Disturb ഓഫാണ്. ഇനി റിംഗ് ചെയ്യും."
+      }
+    },
+    {
+      "id": "switch",
+      "switch": [
+        "Do Not Disturb",
+        "Do not disturb",
+        "Use Do Not Disturb"
+      ],
+      "switch_is": "on",
+      "tap_switch": true,
+      "say": {
+        "hi-IN": "'{label}' के सामने वाला बटन दबाकर बंद कीजिए।",
+        "ta-IN": "'{label}' அருகே உள்ள பொத்தானை அழுத்தி அணையுங்கள்.",
+        "te-IN": "'{label}' పక్కన ఉన్న బటన్ నొక్కి ఆఫ్ చేయండి.",
+        "kn-IN": "'{label}' ಪಕ್ಕದ ಬಟನ್ ಒತ್ತಿ ಆಫ್ ಮಾಡಿ.",
+        "ml-IN": "'{label}'-ന് അടുത്തുള്ള ബട്ടൺ അമർത്തി ഓഫാക്കുക."
+      }
+    },
+    {
+      "id": "dnd",
+      "target": [
+        "Do Not Disturb",
+        "Do not disturb"
+      ],
+      "say": {
+        "hi-IN": "'{label}' पर दबाइए।",
+        "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
+        "te-IN": "'{label}' నొక్కండి.",
+        "kn-IN": "'{label}' ಒತ್ತಿ.",
+        "ml-IN": "'{label}' അമർത്തുക."
+      }
+    },
+    {
+      "id": "open",
+      "screen_has": [
+        [
+          "Network & internet",
+          "Connections",
+          "Connected devices",
+          "Battery",
+          "Notifications",
+          "Sound & vibration",
+          "Sounds and vibration",
+          "Apps"
+        ]
+      ],
+      "target": [
+        "Sound & vibration",
+        "Sounds and vibration",
+        "Notifications"
+      ],
+      "say": {
+        "hi-IN": "'{label}' पर दबाइए।",
+        "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
+        "te-IN": "'{label}' నొక్కండి.",
+        "kn-IN": "'{label}' ಒತ್ತಿ.",
+        "ml-IN": "'{label}' അമർത്തുക."
+      }
+    },
+    {
+      "id": "scroll",
+      "screen_has": [
+        [
+          "Network & internet",
+          "Connections",
+          "Connected devices",
+          "Battery",
+          "Notifications",
+          "Sound & vibration",
+          "Sounds and vibration",
+          "Apps"
+        ]
+      ],
+      "max_repeats": 4,
+      "say": {
+        "hi-IN": "स्क्रीन पर उंगली रखकर ऊपर की ओर सरकाइए।",
+        "ta-IN": "திரையில் விரலை வைத்து மேலே தள்ளுங்கள்.",
+        "te-IN": "స్క్రీన్‌పై వేలు పెట్టి పైకి జరపండి.",
+        "kn-IN": "ಪರದೆಯ ಮೇಲೆ ಬೆರಳಿಟ್ಟು ಮೇಲಕ್ಕೆ ಸರಿಸಿ.",
+        "ml-IN": "സ്ക്രീനിൽ വിരൽ വെച്ച് മുകളിലേക്ക് നീക്കുക."
+      }
+    }
+  ]
+}

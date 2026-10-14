@@ -20,7 +20,8 @@ class RecipeEngine(private val book: RecipeBook) {
         if (book.recipes.isEmpty()) return null
         val recipe = active(req) ?: return null
         val screen = ScreenText.parse(req.tree)
-        return if (recipe.anyApp || req.app in recipe.apps) inApp(recipe, req, screen) else outside(recipe, req, screen)
+        val home = recipe.anyApp || req.app in recipe.apps
+        return steps(recipe, req, screen, home) ?: if (home) null else outside(recipe, req, screen)
     }
 
     /** The recipe this turn belongs to, if any. */
@@ -36,10 +37,10 @@ class RecipeEngine(private val book: RecipeBook) {
     internal fun match(said: String, app: String): Recipe? {
         val text = ScreenText.norm(said)
         if (text.isEmpty()) return null
-        val negated = book.common.unless.any { contains(text, it) }
+        val negated = book.common.unless.any { contains(text, it, wordStart = false) }
         val scored = book.recipes.mapNotNull { r ->
             if (negated && !r.skipCommonUnless) return@mapNotNull null
-            if (r.unless.any { contains(text, it) }) return@mapNotNull null
+            if (r.unless.any { contains(text, it, wordStart = false) }) return@mapNotNull null
             // More matched groups is a more specific fit. On a tie, the recipe for the app that is
             // already open wins: "call" inside WhatsApp is a WhatsApp call, not the phone dialler.
             val best = r.triggers
@@ -52,8 +53,10 @@ class RecipeEngine(private val book: RecipeBook) {
         return scored.filter { it.second == top }.singleOrNull()?.first
     }
 
-    private fun inApp(recipe: Recipe, req: TurnRequest, screen: ScreenText): Guide? {
+    /** The first step that fits this screen. [home] is true when the recipe's own app is in front. */
+    private fun steps(recipe: Recipe, req: TurnRequest, screen: ScreenText, home: Boolean): Guide? {
         for (step in recipe.steps) {
+            if (if (step.apps.isEmpty()) !home else req.app !in step.apps) continue
             if (!step.screenHas.all { group -> group.any { screen.has(it, step.exact) } }) continue
             if (step.screenLacks.any { screen.has(it, step.exact) }) continue
             val after = step.after
@@ -112,12 +115,37 @@ class RecipeEngine(private val book: RecipeBook) {
         /** Home-screen apps: com.google.android.apps.nexuslauncher, com.sec.android.app.launcher, com.miui.home… */
         fun isLauncher(pkg: String) = "launcher" in pkg || pkg.endsWith(".home")
 
-        private fun contains(text: String, phrase: String): Boolean {
+        /**
+         * True if [phrase] (or its stem) is in [text]. Trigger phrases must start a word, so Hindi
+         * गाना (song) doesn't fire inside लगाना (to set). "Unless" phrases match anywhere, because
+         * Dravidian negations are word endings: Tamil செய்யவில்லை, Malayalam വരുന്നില്ല.
+         */
+        fun contains(text: String, phrase: String, wordStart: Boolean = true): Boolean {
             val p = ScreenText.norm(phrase)
             if (p.isEmpty()) return false
-            if (p in text) return true
+            if (found(text, p, wordStart)) return true
             val s = stem(p)
-            return s != p && s in text
+            return s != p && found(text, s, wordStart)
+        }
+
+        private fun found(text: String, p: String, wordStart: Boolean): Boolean {
+            if (!wordStart) return p in text
+            var i = text.indexOf(p)
+            while (i >= 0) {
+                if (i == 0 || isBoundary(text[i - 1])) return true
+                i = text.indexOf(p, i + 1)
+            }
+            return false
+        }
+
+        private fun isBoundary(c: Char): Boolean {
+            if (c.isWhitespace()) return true
+            if (c.isLetterOrDigit()) return false
+            // Vowel signs and viramas are part of the word they follow.
+            return when (Character.getType(c).toByte()) {
+                Character.NON_SPACING_MARK, Character.COMBINING_SPACING_MARK, Character.ENCLOSING_MARK -> false
+                else -> true
+            }
         }
 
         /**

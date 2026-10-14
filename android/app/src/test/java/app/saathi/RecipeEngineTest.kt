@@ -243,11 +243,13 @@ class RecipeEngineTest {
             "மின்சார கட்டணம் செலுத்த வேண்டும்", "కరెంట్ బిల్లు కట్టాలి", "ವಿದ್ಯುತ್ ಬಿಲ್ ಕಟ್ಟಬೇಕು", "കറന്റ് ബിൽ അടയ്ക്കണം",
             // Similar words, different wish.
             "WhatsApp पर वीडियो भेजना है", "Blinkit का मेरा ऑर्डर कहाँ है", "flight ticket book karna hai",
-            "ट्रेन का टिकट बुक करना है", "मेरी आवाज़ रिकॉर्ड करनी है", "अक्षर छोटे करने हैं", "WhatsApp पर अपना स्टेटस डालना है",
-            "वाईफाई का पासवर्ड बदलना है", "लोकेशन WhatsApp पर भेजनी है", "बैटरी जल्दी खत्म हो जाती है",
+            "मेरी आवाज़ रिकॉर्ड करनी है", "अक्षर छोटे करने हैं", "WhatsApp पर अपना स्टेटस डालना है",
+            "वाईफाई का पासवर्ड बदलना है", "बैटरी जल्दी खत्म हो जाती है", "अस्पताल का रास्ता बताओ",
             // Problems and questions.
             "वीडियो कॉल में आवाज़ नहीं आ रही", "फ़ोन क्यों गरम हो रहा है", "இன்டர்நெட் வேலை செய்யவில்லை",
-            "आज मौसम कैसा है", "दवाई का समय याद दिलाना",
+            "आज मौसम कैसा है", "दवाई का समय याद दिलाना", "एक बात पूछनी है", "मेरी स्क्रीन पर काला धब्बा है",
+            // Words that contain a trigger word inside them.
+            "अलार्म के लिए गाना लगाना नहीं",
         )
         val wrong = forModel.mapNotNull { said ->
             engine.match(said, "com.google.android.apps.nexuslauncher")?.let { "\"$said\" -> ${it.id}" }
@@ -301,6 +303,33 @@ class RecipeEngineTest {
         assertEquals("tip-screenshot", engine.match("స్క్రీన్షాట్ ఎలా తీయాలి", "x")?.id) // no ZWNJ
         assertEquals("tip-screenshot", engine.match("స్క్రీన్\u200Cషాట్ ఎలా తీయాలి", "x")?.id)
         assertEquals("settings-wifi", engine.match("Wi‑Fi on karna hai", "x")?.id) // non-breaking hyphen
+    }
+
+    @Test fun `a recipe can follow the senior from the gallery through the share sheet into WhatsApp`() {
+        val photo = "n1 ImageView \"Photo\" [0,0,1080,1800]\nn2 ImageButton \"Share\" [100,2000,200,2100] click\nn3 ImageButton \"Edit\" [300,2000,400,2100] click"
+        val share = engine.guide(req(photo, app = "com.google.android.apps.photos", utterance = "गैलरी से फोटो भेजनी है"))!!
+        assertEquals("n2", share.nodeId)
+
+        val sheet = "n1 TextView \"Share with\" [0,1200,1080,1300]\nn2 LinearLayout \"WhatsApp\" [40,1400,260,1600] click\nn3 LinearLayout \"Gmail\" [300,1400,520,1600] click"
+        val wa = engine.guide(req(sheet, app = "com.android.intentresolver", goal = share.goal, history = listOf(past(share))))!!
+        assertEquals("n2", wa.nodeId)
+
+        val contacts = "n1 TextView \"Send to…\" [0,100,1080,200]\nn2 LinearLayout \"Ramesh\" [0,300,1080,450] click"
+        val to = engine.guide(req(contacts, app = "com.whatsapp", goal = share.goal, history = listOf(past(share), past(wa, "com.android.intentresolver"))))!!
+        assertTrue(to.say.contains("नाम"))
+
+        // Another app altogether still gets "open the Gallery".
+        val lost = engine.guide(req(contacts, app = "com.google.android.youtube", goal = share.goal, history = listOf(past(share))))!!
+        assertTrue(lost.say.contains("Gallery"))
+    }
+
+    @Test fun `trigger words must start a word`() {
+        assertTrue(RecipeEngine.contains("गाना लगा दो", "गाना"))
+        assertTrue(!RecipeEngine.contains("अलार्म लगाना है", "गाना"))
+        assertTrue(RecipeEngine.contains("சத்தத்தை கூட்ட", "சத்த"))
+        assertTrue(!RecipeEngine.contains("வெளிச்சத்தை கூட்ட", "சத்த"))
+        // Negations are word endings in Tamil and Malayalam, so "unless" words match anywhere.
+        assertTrue(RecipeEngine.contains("வேலை செய்யவில்லை", "வில்லை", wordStart = false))
     }
 
     @Test fun `ambiguous requests go to the model`() {

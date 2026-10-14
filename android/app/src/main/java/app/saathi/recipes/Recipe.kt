@@ -26,6 +26,11 @@ data class After(val step: String, val min: Int = 1, val max: Int = Int.MAX_VALU
 @Serializable
 data class Step(
     val id: String,
+    /**
+     * Packages this step runs in, when it is not the recipe's own app: the share sheet, or
+     * WhatsApp when sharing from the gallery. Empty means the recipe's apps.
+     */
+    val apps: List<String> = emptyList(),
     /** Every group needs one of its phrases on screen. */
     @SerialName("screen_has") val screenHas: List<List<String>> = emptyList(),
     /** None of these may be on screen. */
@@ -162,6 +167,7 @@ class RecipeBook(val common: Common, val recipes: List<Recipe>) {
                 if (s.tapSwitch && s.target.isNotEmpty()) add("$at: tap_switch and target both set")
                 s.target.filter(ScreenSafety::isSensitiveTarget).forEach { add("$at: target '$it' is for the senior alone") }
                 if (s.screenHas.any { it.isEmpty() }) add("$at: empty screen_has group")
+                if (s.apps.any { it.isBlank() || it == ANY_APP }) add("$at: step apps must be package names")
             }
         }
 
