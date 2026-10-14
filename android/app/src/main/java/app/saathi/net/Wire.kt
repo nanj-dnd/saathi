@@ -80,3 +80,15 @@ object Source {
 
 @Serializable
 data class RegisterResponse(val token: String)
+
+/** Why a turn could not be answered, so the senior hears the real reason, not always "no internet". */
+class TurnFailure(val kind: Kind, message: String) : java.io.IOException(message) {
+    enum class Kind {
+        /** No connection, or it dropped. */
+        OFFLINE,
+        /** The Worker or the model is overloaded; worth trying again in a minute. */
+        BUSY,
+        /** This phone used up its daily allowance of model turns. */
+        LIMIT,
+    }
+}

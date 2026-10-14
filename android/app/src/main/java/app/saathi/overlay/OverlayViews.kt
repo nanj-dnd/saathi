@@ -15,6 +15,7 @@ import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
+import android.view.accessibility.AccessibilityNodeInfo
 import android.view.animation.DecelerateInterpolator
 import android.widget.Button
 import android.widget.LinearLayout
@@ -136,13 +137,26 @@ internal class BubbleView(
                 }
             }
             MotionEvent.ACTION_UP -> {
-                if (dragging) onDragEnd() else { performClick(); onTap() }
+                if (dragging) onDragEnd() else performClick()
             }
         }
         return true
     }
 
-    override fun performClick(): Boolean = super.performClick()
+    // TalkBack's double-tap arrives here, not through onTouchEvent, so the tap action lives here.
+    override fun performClick(): Boolean {
+        super.performClick()
+        onTap()
+        return true
+    }
+
+    override fun getAccessibilityClassName(): CharSequence = Button::class.java.name
+
+    override fun onInitializeAccessibilityNodeInfo(info: AccessibilityNodeInfo) {
+        super.onInitializeAccessibilityNodeInfo(info)
+        info.isClickable = true
+        info.addAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_CLICK)
+    }
 }
 
 /**
@@ -156,6 +170,14 @@ internal class PointerView(context: Context) : View(context) {
         strokeWidth = context.dp(6f)
         color = Palette.RING
     }
+    // A dark edge under the yellow ring keeps it visible on yellow and white screens.
+    private val ringEdge = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = context.dp(10f)
+        color = 0xCC1B1B1F.toInt()
+    }
+    /** Small targets (a 24dp icon) get a spotlight at least this big, so they're easy to find. */
+    private val minSide = context.dp(64f)
     private val pulse = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeWidth = context.dp(4f)
@@ -190,6 +212,8 @@ internal class PointerView(context: Context) : View(context) {
             target.left - loc[0] - pad, target.top - loc[1] - pad,
             target.right - loc[0] + pad, target.bottom - loc[1] + pad,
         )
+        if (next.width() < minSide) next.inset(-(minSide - next.width()) / 2, 0f)
+        if (next.height() < minSide) next.inset(0f, -(minSide - next.height()) / 2)
         from = if (to != null) RectF(current) else RectF(
             origin.left - loc[0].toFloat(), origin.top - loc[1].toFloat(),
             origin.right - loc[0].toFloat(), origin.bottom - loc[1].toFloat(),
@@ -225,6 +249,7 @@ internal class PointerView(context: Context) : View(context) {
         path.addRect(0f, 0f, width.toFloat(), height.toFloat(), Path.Direction.CW)
         path.addRoundRect(current, corner, corner, Path.Direction.CW)
         canvas.drawPath(path, dim)
+        canvas.drawRoundRect(current, corner, corner, ringEdge)
         canvas.drawRoundRect(current, corner, corner, ring)
 
         if (travel >= 1f) {
@@ -252,9 +277,11 @@ internal class CaptionView(
     onRepeat: () -> Unit,
     onClose: () -> Unit,
 ) : LinearLayout(context) {
+    // Large system font sizes are common among seniors; past 1.3× the caption would cover the screen.
+    private val fontScale = context.resources.configuration.fontScale.coerceIn(1f, 1.3f)
     private val text = TextView(context).apply {
         setTextColor(Color.WHITE)
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 26f)
+        setTextSize(TypedValue.COMPLEX_UNIT_DIP, 26f * fontScale)
         setLineSpacing(0f, 1.15f)
         maxLines = 5
         ellipsize = TextUtils.TruncateAt.END
@@ -285,11 +312,14 @@ internal class CaptionView(
         bg.setColor(color)
         repeat.text = "🔁  $repeatLabel"
         close.text = "✕  $closeLabel"
+        // Screen readers should say "Repeat", not "counterclockwise arrows button Repeat".
+        repeat.contentDescription = repeatLabel
+        close.contentDescription = closeLabel
     }
 
     private fun pill(context: Context, onClick: () -> Unit) = Button(context).apply {
         isAllCaps = false
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f)
+        setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20f * fontScale)
         setTextColor(Palette.CARD)
         minHeight = context.dp(56f).toInt()
         val pad = context.dp(18f).toInt()

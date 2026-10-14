@@ -24,6 +24,14 @@
     <string name="say_mic_denied">पहले साथी को माइक की अनुमति दीजिए।</string>
     <string name="say_scam_remote">सावधान! यह ऐप किसी अजनबी को आपका फ़ोन चलाने देता है। अगर फ़ोन पर किसी ने इसे खोलने को कहा है, तो इसे बंद कीजिए और घरवालों को फ़ोन कीजिए।</string>
     <string name="say_sensitive">यह हिस्सा आप खुद कीजिए। यह नंबर किसी को मत बताइए, फ़ोन पर भी नहीं।</string>
+    <string name="say_in_call">आप अभी फ़ोन पर हैं। अगर कोई OTP, PIN या पैसे मांग रहा है तो फ़ोन काट दीजिए। कॉल के बाद मदद बटन फिर दबाइए।</string>
+    <string name="say_mic_busy">माइक कोई दूसरा ऐप चला रहा है। उसे बंद करके मदद बटन फिर दबाइए।</string>
+    <string name="say_speech_offline">आपकी बात समझने के लिए इंटरनेट चाहिए। मोबाइल डेटा या वाई-फाई चालू कीजिए, या घरवालों से ऑफ़लाइन आवाज़ डाउनलोड करवाइए।</string>
+    <string name="say_speech_unavailable">यह फ़ोन अभी सुन नहीं पा रहा। घरवालों से Google ऐप इंस्टॉल या अपडेट करवाइए।</string>
+    <string name="say_no_speech_again">फ़ोन मुँह के पास लाकर थोड़ा ज़ोर से बोलिए। मदद बटन दबाकर फिर कोशिश कीजिए।</string>
+    <string name="say_wait">एक पल, देख रहा हूँ।</string>
+    <string name="say_busy">साथी अभी व्यस्त है। एक मिनट बाद फिर कोशिश कीजिए।</string>
+    <string name="say_limit">आज आपने बहुत सवाल पूछ लिए हैं। आसान काम अब भी होंगे, बाकी के लिए कल फिर पूछिए।</string>
     <string name="notif_channel">सुनना</string>
     <string name="notif_listening">साथी सुन रहा है</string>
     <string name="service_desc">साथी स्क्रीन देखकर बोलकर बताता है कि आगे क्या दबाना है। यह खुद कुछ नहीं दबाता।</string>

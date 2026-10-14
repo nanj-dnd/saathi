@@ -5,12 +5,14 @@ import app.saathi.net.Danger
 import app.saathi.net.Guide
 import app.saathi.net.Status
 import app.saathi.net.TurnRequest
+import app.saathi.net.TurnFailure
 import app.saathi.net.TurnResponse
 import app.saathi.session.Brain
 import app.saathi.session.Ears
 import app.saathi.session.Eyes
 import app.saathi.session.GuideSession
 import app.saathi.session.GuideState
+import app.saathi.session.Heard
 import app.saathi.session.Lines
 import app.saathi.session.Mouth
 import app.saathi.session.Pointer
@@ -38,8 +40,10 @@ class GuideSessionTest {
         val pointed = mutableListOf<Pair<Box?, String>>()
         val replies = ArrayDeque<Guide>()
         var failNext = false
-        var heard: String? = "ब्लिंकिट से दूध मंगाना है"
+        var heard: Heard = Heard.Words("ब्लिंकिट से दूध मंगाना है")
         var finished = false
+        var calling = false
+        val slowSaid = mutableListOf<String>()
         var tree = "n2 Button \"ADD\" [800,300,1000,380] click"
         var looks = 0
 
@@ -57,7 +61,10 @@ class GuideSessionTest {
             override fun finish() { finished = true }
         }
         val mouth = object : Mouth {
-            override suspend fun say(text: String) { said += text }
+            override suspend fun say(text: String, slow: Boolean) {
+                said += text
+                if (slow) slowSaid += text
+            }
             override fun stop() {}
         }
         val pointer = object : Pointer {
@@ -76,10 +83,18 @@ class GuideSessionTest {
             override val noSpeech = "no-speech"
             override val network = "network"
             override val micDenied = "mic"
+            override val noSpeechAgain = "louder"
+            override val micBusy = "mic-busy"
+            override val inCall = "in-call"
+            override val speechOffline = "speech-offline"
+            override val speechUnavailable = "speech-unavailable"
+            override val wait = "wait"
+            override val busy = "busy"
+            override val limit = "limit"
         }
 
         fun session(scope: TestScope, mic: Boolean = true) = GuideSession(
-            scope, eyes, ears, mouth, pointer, brain, { "hints" }, { "hi-IN" }, { lines }, { mic },
+            scope, eyes, ears, mouth, pointer, brain, { "hints" }, { "hi-IN" }, { lines }, { mic }, { calling },
         )
     }
 
@@ -206,13 +221,13 @@ class GuideSessionTest {
     }
 
     @Test fun `silence and network errors are spoken locally`() = runTest {
-        val f = Fakes().apply { heard = null }
+        val f = Fakes().apply { heard = Heard.Silence }
         val s = f.session(this)
         s.onBubbleTap()
         advanceUntilIdle()
         assertEquals(listOf("no-speech"), f.said)
 
-        f.heard = "दूध"
+        f.heard = Heard.Words("दूध")
         f.failNext = true
         s.onBubbleTap()
         advanceUntilIdle()
@@ -256,7 +271,7 @@ class GuideSessionTest {
         val s = GuideSession(
             this, f.eyes,
             object : Ears {
-                override suspend fun listen(): String { kotlinx.coroutines.delay(10_000); return "दूध" }
+                override suspend fun listen(): Heard { kotlinx.coroutines.delay(10_000); return Heard.Words("दूध") }
                 override fun finish() { f.finished = true }
             },
             f.mouth, f.pointer, f.brain, { "" }, { "hi-IN" }, { f.lines }, { true },
@@ -266,5 +281,96 @@ class GuideSessionTest {
         assertEquals(GuideState.LISTENING, s.state.value)
         s.onBubbleTap()
         assertTrue(f.finished)
+    }
+
+    @Test fun `each listening failure gets its own explanation`() = runTest {
+        val f = Fakes()
+        val s = f.session(this)
+        for (h in listOf(Heard.MicBusy, Heard.Offline, Heard.Unavailable)) {
+            f.heard = h
+            s.onBubbleTap()
+            advanceUntilIdle()
+        }
+        assertEquals(listOf("mic-busy", "speech-offline", "speech-unavailable"), f.said)
+        assertTrue(f.requests.isEmpty())
+    }
+
+    @Test fun `a second silence in a row explains how to be heard`() = runTest {
+        val f = Fakes().apply { heard = Heard.Silence }
+        val s = f.session(this)
+        repeat(3) { s.onBubbleTap(); advanceUntilIdle() }
+        assertEquals(listOf("no-speech", "louder", "louder"), f.said)
+    }
+
+    @Test fun `help during a call gives the scam reminder without listening`() = runTest {
+        val f = Fakes().apply { calling = true }
+        val s = f.session(this)
+        s.onBubbleTap()
+        advanceUntilIdle()
+        assertEquals(listOf("in-call"), f.said)
+        assertTrue(f.requests.isEmpty())
+    }
+
+    @Test fun `a call starting mid-task clears the overlay instead of narrating`() = runTest {
+        val f = Fakes().apply { replies += step("कैमरा दबाइए") }
+        val s = f.session(this)
+        s.onBubbleTap()
+        runCurrent()
+        f.calling = true
+        s.onScreenEvent(ScreenEvent.NAVIGATED)
+        advanceUntilIdle()
+        assertEquals(GuideState.IDLE, s.state.value)
+        assertEquals(1, f.requests.size)
+    }
+
+    @Test fun `a slow answer gets a spoken one moment first`() = runTest {
+        val f = Fakes().apply { replies += step("ADD दबाइए") }
+        val slowBrain = object : Brain {
+            override suspend fun turn(request: TurnRequest): TurnResponse {
+                kotlinx.coroutines.delay(6_000)
+                return f.brain.turn(request)
+            }
+        }
+        val s = GuideSession(this, f.eyes, f.ears, f.mouth, f.pointer, slowBrain, { "" }, { "hi-IN" }, { f.lines }, { true })
+        s.onBubbleTap()
+        advanceTimeBy(7_000)
+        runCurrent()
+        assertEquals(listOf("wait", "ADD दबाइए"), f.said)
+
+        // A quick answer says nothing extra.
+        val g = Fakes().apply { replies += step("x") }
+        val quick = g.session(this)
+        quick.onBubbleTap()
+        runCurrent()
+        assertEquals(listOf("x"), g.said)
+    }
+
+    @Test fun `busy and limit failures are explained, not called a network problem`() = runTest {
+        for ((kind, line) in listOf(TurnFailure.Kind.BUSY to "busy", TurnFailure.Kind.LIMIT to "limit", TurnFailure.Kind.OFFLINE to "network")) {
+            val f = Fakes()
+            val failing = object : Brain {
+                override suspend fun turn(request: TurnRequest): TurnResponse = throw TurnFailure(kind, "x")
+            }
+            val s = GuideSession(this, f.eyes, f.ears, f.mouth, f.pointer, failing, { "" }, { "hi-IN" }, { f.lines }, { true })
+            s.onBubbleTap()
+            advanceUntilIdle()
+            assertEquals(listOf(line), f.said)
+        }
+    }
+
+    @Test fun `repeat speaks the last step more slowly`() = runTest {
+        val f = Fakes().apply { replies += step("ADD दबाइए") }
+        val s = f.session(this)
+        s.onBubbleTap()
+        runCurrent()
+        s.repeat()
+        runCurrent()
+        assertEquals(listOf("ADD दबाइए"), f.slowSaid)
+    }
+
+    @Test fun `finished steps stay up long enough to read`() {
+        assertEquals(3_000L, GuideSession.readingTimeMs("हो गया"))
+        assertTrue(GuideSession.readingTimeMs("x".repeat(120)) > 9_000L)
+        assertEquals(12_000L, GuideSession.readingTimeMs("x".repeat(1_000)))
     }
 }

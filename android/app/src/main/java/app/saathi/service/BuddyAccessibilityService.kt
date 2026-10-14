@@ -7,6 +7,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.content.res.Configuration
+import android.media.AudioManager
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityManager
@@ -53,7 +55,7 @@ class BuddyAccessibilityService : AccessibilityService() {
 
     override fun onServiceConnected() {
         prefs = Prefs(this)
-        speaker = Speaker(this) { prefs.language }
+        speaker = Speaker(this, language = { prefs.language }, rate = { prefs.speechRate })
         val playbooks = PlaybookStore(assets)
         val recipes = RecipeSource(assets, File(filesDir, "recipes.json"))
         val worker = WorkerClient(
@@ -86,6 +88,7 @@ class BuddyAccessibilityService : AccessibilityService() {
                 language = { prefs.language },
                 onStart = { MicService.start(this) },
                 onEnd = { MicService.stop(this) },
+                onReady = { overlay.listeningCue() },
             ),
             mouth = speaker,
             pointer = overlay,
@@ -98,16 +101,46 @@ class BuddyAccessibilityService : AccessibilityService() {
                     override val noSpeech = res.getString(R.string.say_no_speech)
                     override val network = res.getString(R.string.say_network)
                     override val micDenied = res.getString(R.string.say_mic_denied)
+                    override val noSpeechAgain = res.getString(R.string.say_no_speech_again)
+                    override val micBusy = res.getString(R.string.say_mic_busy)
+                    override val inCall = res.getString(R.string.say_in_call)
+                    override val speechOffline = res.getString(R.string.say_speech_offline)
+                    override val speechUnavailable = res.getString(R.string.say_speech_unavailable)
+                    override val wait = res.getString(R.string.say_wait)
+                    override val busy = res.getString(R.string.say_busy)
+                    override val limit = res.getString(R.string.say_limit)
                 }
             },
             hasMic = { checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED },
+            inCall = ::inCall,
         )
+        // A screen that turns off mid-task means the senior put the phone down: stop talking.
+        registerReceiver(screenOff, IntentFilter(Intent.ACTION_SCREEN_OFF))
         overlay.show()
         if (BuildConfig.DEBUG) {
             // adb shell "am broadcast -a app.saathi.DEBUG_ASK --es text 'how do I make text bigger'"
             // adb shell "am broadcast -a app.saathi.DEBUG_OPENED --es pkg com.anydesk.anydeskandroid"
             registerReceiver(debugAsk, IntentFilter().apply { addAction(DEBUG_ASK); addAction(DEBUG_OPENED) }, RECEIVER_EXPORTED)
         }
+    }
+
+    private fun inCall(): Boolean {
+        val mode = getSystemService(AudioManager::class.java)?.mode ?: return false
+        return mode == AudioManager.MODE_IN_CALL || mode == AudioManager.MODE_IN_COMMUNICATION
+    }
+
+    private val screenOff = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (::session.isInitialized) session.stop()
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (!::session.isInitialized) return
+        // Rotation moves every button: re-measure the overlay and look at the screen again.
+        overlay.onScreenResized()
+        session.onScreenEvent(ScreenEvent.NAVIGATED)
     }
 
     /** At most once a day, picks up recipe fixes from the Worker. Failure just means trying tomorrow. */
@@ -163,6 +196,7 @@ class BuddyAccessibilityService : AccessibilityService() {
 
     override fun onDestroy() {
         if (BuildConfig.DEBUG && ::session.isInitialized) runCatching { unregisterReceiver(debugAsk) }
+        if (::session.isInitialized) runCatching { unregisterReceiver(screenOff) }
         if (::overlay.isInitialized) overlay.remove()
         if (::speaker.isInitialized) speaker.shutdown()
         scope.cancel()

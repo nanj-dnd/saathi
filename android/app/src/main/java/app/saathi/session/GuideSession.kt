@@ -6,12 +6,14 @@ import app.saathi.net.Danger
 import app.saathi.net.Guide
 import app.saathi.net.PastStep
 import app.saathi.net.Status
+import app.saathi.net.TurnFailure
 import app.saathi.net.TurnRequest
 import app.saathi.net.TurnResponse
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,16 +34,29 @@ class Snapshot(
 
 interface Eyes { suspend fun look(): Snapshot }
 
+/** What came of one attempt to listen. Each failure gets its own explanation. */
+sealed interface Heard {
+    data class Words(val text: String) : Heard
+    /** Nothing was said, or nothing could be made out. */
+    data object Silence : Heard
+    /** The microphone is in use by something else (often a phone call). */
+    data object MicBusy : Heard
+    /** The speech service needs the internet and there is none. */
+    data object Offline : Heard
+    /** The phone has no speech service for this language. */
+    data object Unavailable : Heard
+}
+
 interface Ears {
-    /** Listens for one utterance and returns the transcript, or null if nothing was understood. */
-    suspend fun listen(): String?
+    /** Listens for one utterance. */
+    suspend fun listen(): Heard
     /** Ends the current listening early (second tap on the bubble). */
     fun finish()
 }
 
 interface Mouth {
-    /** Speaks [text]. Suspends until done. */
-    suspend fun say(text: String)
+    /** Speaks [text]. Suspends until done. [slow] is for a repeat: the senior didn't catch it. */
+    suspend fun say(text: String, slow: Boolean = false)
     fun stop()
 }
 
@@ -58,6 +73,17 @@ interface Lines {
     val noSpeech: String
     val network: String
     val micDenied: String
+    /** Second silence in a row: how to be heard. */
+    val noSpeechAgain: String get() = noSpeech
+    val micBusy: String get() = noSpeech
+    /** Help pressed during a call: a scam reminder, since that is when fraudsters strike. */
+    val inCall: String get() = micBusy
+    val speechOffline: String get() = network
+    val speechUnavailable: String get() = noSpeech
+    /** Said when an answer is slow, so silence doesn't feel like Saathi gave up. */
+    val wait: String get() = ""
+    val busy: String get() = network
+    val limit: String get() = network
 }
 
 enum class GuideState { IDLE, LISTENING, THINKING, SPEAKING, WATCHING }
@@ -89,12 +115,19 @@ class GuideSession(
     private val language: () -> String,
     private val lines: () -> Lines,
     private val hasMic: () -> Boolean,
+    /** True during a phone or video call: the mic is taken and narrating over a call helps no one. */
+    private val inCall: () -> Boolean = { false },
 ) {
     companion object {
         const val MAX_AUTO_TURNS = 15
         const val WATCH_TIMEOUT_MS = 120_000L
         const val HISTORY = 8
         const val POINT_RADIUS_PX = 90
+        /** After this long without an answer, say "one moment". */
+        const val WAIT_HINT_MS = 3_500L
+
+        /** How long a finished step stays up: long enough for a slow reader, not forever. */
+        fun readingTimeMs(text: String): Long = (2_500L + text.length * 60L).coerceIn(3_000L, 12_000L)
     }
 
     private val _state = MutableStateFlow(GuideState.IDLE)
@@ -109,6 +142,7 @@ class GuideSession(
     /** The last answered screen and its step, to re-show it when an event changed nothing. */
     private var lastLook: Snapshot? = null
     private var lastGuide: Guide? = null
+    private var silences = 0
 
     fun onBubbleTap() {
         if (_state.value == GuideState.LISTENING) {
@@ -122,6 +156,11 @@ class GuideSession(
         val s = _state.value
         // Only re-look while we are waiting on the senior, or if they acted before we finished talking.
         if (s != GuideState.WATCHING && s != GuideState.SPEAKING) return
+        if (inCall()) {
+            // A call started (often the one the senior was just helped to make): get out of the way.
+            stop()
+            return
+        }
         if (autoTurns >= MAX_AUTO_TURNS) return
         // The senior acted, so the old spotlight is probably pointing at something that moved or is gone.
         pointer.clear()
@@ -162,7 +201,7 @@ class GuideSession(
         val say = lastSay ?: return
         launchPipeline {
             setState(GuideState.SPEAKING)
-            mouth.say(say)
+            mouth.say(say, slow = true)
             enterWatching()
         }
     }
@@ -197,15 +236,24 @@ class GuideSession(
             speakAndIdle(lines().micDenied)
             return
         }
+        if (inCall()) {
+            speakAndIdle(lines().inCall, Danger.SCAM)
+            return
+        }
         pointer.clear()
         setState(GuideState.LISTENING)
         val heard = ears.listen()
-        if (heard == null) {
-            speakAndIdle(lines().noSpeech)
-            return
+        if (heard !is Heard.Silence) silences = 0
+        when (heard) {
+            is Heard.Words -> {
+                autoTurns = 0
+                runTurn(heard.text)
+            }
+            Heard.Silence -> speakAndIdle(if (++silences >= 2) lines().noSpeechAgain else lines().noSpeech)
+            Heard.MicBusy -> speakAndIdle(if (inCall()) lines().inCall else lines().micBusy)
+            Heard.Offline -> speakAndIdle(lines().speechOffline)
+            Heard.Unavailable -> speakAndIdle(lines().speechUnavailable)
         }
-        autoTurns = 0
-        runTurn(heard)
     }
 
     private suspend fun runTurn(utterance: String?, seen: Snapshot? = null) {
@@ -225,11 +273,11 @@ class GuideSession(
             history = history.toList(),
         )
         val response = try {
-            brain.turn(request)
+            withWaitHint { brain.turn(request) }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            speakAndIdle(lines().network)
+            speakAndIdle(failureLine(e))
             return
         }
 
@@ -249,7 +297,7 @@ class GuideSession(
             guide.danger == Danger.SCAM -> setState(GuideState.IDLE) // caption stays until closed
             guide.status == Status.NEED_INFO -> spokenTurn()
             guide.status == Status.DONE || guide.status == Status.CANNOT_HELP -> {
-                delay(2500)
+                delay(readingTimeMs(guide.say))
                 reset()
             }
             else -> enterWatching() // next_step, user_must_do
@@ -265,8 +313,31 @@ class GuideSession(
         }
     }
 
-    private suspend fun speakAndIdle(text: String) {
-        pointer.point(null, text, Danger.NONE)
+    /** Runs [block]; if it is slow, says "one moment" meanwhile and stops saying it once it returns. */
+    private suspend fun <T> withWaitHint(block: suspend () -> T): T = coroutineScope {
+        val hint = launch {
+            delay(WAIT_HINT_MS)
+            val wait = lines().wait
+            if (wait.isNotBlank()) {
+                pointer.point(null, wait, Danger.NONE)
+                mouth.say(wait)
+            }
+        }
+        try {
+            block()
+        } finally {
+            hint.cancel()
+        }
+    }
+
+    private fun failureLine(e: Exception): String = when ((e as? TurnFailure)?.kind) {
+        TurnFailure.Kind.BUSY -> lines().busy
+        TurnFailure.Kind.LIMIT -> lines().limit
+        else -> lines().network
+    }
+
+    private suspend fun speakAndIdle(text: String, danger: String = Danger.NONE) {
+        pointer.point(null, text, danger)
         setState(GuideState.SPEAKING)
         mouth.say(text)
         setState(GuideState.IDLE)
@@ -281,6 +352,7 @@ class GuideSession(
         autoTurns = 0
         lastLook = null
         lastGuide = null
+        silences = 0
         setState(GuideState.IDLE)
     }
 

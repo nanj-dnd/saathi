@@ -44,7 +44,11 @@ class WorkerClient(
             res = post("/turn", body, token)
         }
         res.use {
-            if (!it.isSuccessful) throw IOException("worker ${it.code}")
+            when {
+                it.code == 429 -> throw TurnFailure(TurnFailure.Kind.LIMIT, "daily limit")
+                it.code >= 500 -> throw TurnFailure(TurnFailure.Kind.BUSY, "worker ${it.code}")
+                !it.isSuccessful -> throw IOException("worker ${it.code}")
+            }
             json.decodeFromString<TurnResponse>(it.body!!.string())
         }
     }

@@ -25,6 +25,14 @@
     <string name="say_mic_denied">First, please allow the microphone for Saathi.</string>
     <string name="say_scam_remote">Careful! This app lets a stranger control your phone. If someone on a call asked you to open it, close it now and call your family.</string>
     <string name="say_sensitive">This part you do yourself. Never tell this number to anyone, even on the phone.</string>
+    <string name="say_in_call">You are on a call. If anyone asks for an OTP, PIN or money, cut the call now. Press Help again after the call.</string>
+    <string name="say_mic_busy">Another app is using the microphone. Close it and press Help again.</string>
+    <string name="say_speech_offline">To understand you I need the internet. Turn on mobile data or Wi-Fi, or ask your family to download offline speech.</string>
+    <string name="say_speech_unavailable">This phone cannot listen yet. Ask your family to install or update the Google app.</string>
+    <string name="say_no_speech_again">Hold the phone near your mouth and speak a little louder. Press Help and try again.</string>
+    <string name="say_wait">One moment, I am looking.</string>
+    <string name="say_busy">Saathi is busy right now. Please try again in a minute.</string>
+    <string name="say_limit">You have asked many questions today. Simple tasks still work; for others, please ask again tomorrow.</string>
     <string name="notif_channel">Listening</string>
     <string name="notif_listening">Saathi is listening</string>
     <string name="service_desc">Saathi looks at the screen and tells you out loud what to press next. It never presses anything itself.</string>
