@@ -61,7 +61,22 @@ object Danger {
 data class TurnResponse(
     val guide: Guide,
     @SerialName("timings_ms") val timingsMs: Map<String, Long> = emptyMap(),
+    /** Who answered: see [Source]. */
+    val source: String = Source.MODEL,
 )
+
+/** Where a step came from, for logs and for measuring how many turns never reach Claude. */
+object Source {
+    const val MODEL = "model"
+    /** The Worker's cache, shared between phones. */
+    const val SHARED_CACHE = "cache"
+    const val DEMO = "demo"
+    const val MOCK = "mock"
+    /** Decided on the phone: scripted recipe, this phone's cache, or a fixed safety line. */
+    const val RECIPE = "recipe"
+    const val CACHE = "device-cache"
+    const val LOCAL = "local"
+}
 
 @Serializable
 data class RegisterResponse(val token: String)

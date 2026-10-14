@@ -40,13 +40,17 @@ class GuideSessionTest {
         var failNext = false
         var heard: String? = "ब्लिंकिट से दूध मंगाना है"
         var finished = false
+        var tree = "n2 Button \"ADD\" [800,300,1000,380] click"
+        var looks = 0
 
         val eyes = object : Eyes {
-            override suspend fun look() = Snapshot(
-                app = "com.grofers.customerapp", screenshotB64 = "jpg", screenW = 1080, screenH = 2400,
-                tree = "n2 Button \"ADD\" [800,300,1000,380] click",
-                boxes = mapOf("n2" to Box(800, 300, 1000, 380)), secure = false,
-            )
+            override suspend fun look(): Snapshot {
+                looks++
+                return Snapshot(
+                    app = "com.grofers.customerapp", screenshotB64 = "jpg", screenW = 1080, screenH = 2400,
+                    tree = tree, boxes = mapOf("n2" to Box(800, 300, 1000, 380)), secure = false,
+                )
+            }
         }
         val ears = object : Ears {
             override suspend fun listen() = heard
@@ -113,6 +117,49 @@ class GuideSessionTest {
         assertEquals("order milk", second.goal)
         assertEquals(1, second.history.size)
         assertEquals(listOf("ADD दबाइए", "View cart दबाइए"), f.said)
+    }
+
+    private val fullScreen = (1..6).joinToString("\n") { "n$it TextView \"Item $it\" [0,${it * 100},500,${it * 100 + 80}]" } +
+        "\nn2 Button \"ADD\" [800,300,1000,380] click"
+
+    @Test fun `a scroll that changed nothing keeps the step without asking or speaking again`() = runTest {
+        val f = Fakes().apply { tree = fullScreen; replies += step("ADD दबाइए") }
+        val s = f.session(this)
+        s.onBubbleTap()
+        runCurrent()
+        s.onScreenEvent(ScreenEvent.SCROLLED)
+        advanceTimeBy(ScreenEvent.SCROLLED.settleMs + 1)
+        runCurrent()
+        assertEquals(1, f.requests.size)
+        assertEquals(listOf("ADD दबाइए"), f.said)
+        assertEquals(2, f.pointed.size) // shown again after the look
+        assertEquals(target, f.pointed.last().first)
+        assertEquals(GuideState.WATCHING, s.state.value)
+    }
+
+    @Test fun `a tap is answered even when the screen text did not change`() = runTest {
+        // Pressing "+" on a slider moves the task on without changing any label.
+        val f = Fakes().apply { tree = fullScreen; replies += step("+ दबाइए"); replies += step("एक बार और") }
+        val s = f.session(this)
+        s.onBubbleTap()
+        runCurrent()
+        s.onScreenEvent(ScreenEvent.CLICK)
+        advanceTimeBy(ScreenEvent.CLICK.settleMs + 1)
+        runCurrent()
+        assertEquals(2, f.requests.size)
+        assertEquals(2, f.looks) // the look before deciding is reused for the turn
+    }
+
+    @Test fun `a scroll that changed the screen asks again`() = runTest {
+        val f = Fakes().apply { tree = fullScreen; replies += step("a"); replies += step("b") }
+        val s = f.session(this)
+        s.onBubbleTap()
+        runCurrent()
+        f.tree = fullScreen.replace("Item 6", "Item 7")
+        s.onScreenEvent(ScreenEvent.SCROLLED)
+        advanceTimeBy(ScreenEvent.SCROLLED.settleMs + 1)
+        runCurrent()
+        assertEquals(2, f.requests.size)
     }
 
     @Test fun `screen events are ignored while idle or listening`() = runTest {

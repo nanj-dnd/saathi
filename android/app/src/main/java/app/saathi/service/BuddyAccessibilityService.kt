@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityManager
 import android.accessibilityservice.AccessibilityServiceInfo
@@ -14,18 +15,26 @@ import app.saathi.BuildConfig
 import app.saathi.Languages
 import app.saathi.Prefs
 import app.saathi.R
+import app.saathi.brain.FileCacheStore
+import app.saathi.brain.LocalFirstBrain
+import app.saathi.brain.TurnCache
 import app.saathi.capture.ScreenReader
 import app.saathi.net.WorkerClient
 import app.saathi.overlay.OverlayController
 import app.saathi.playbooks.PlaybookStore
+import app.saathi.recipes.RecipeSource
 import app.saathi.safety.ScamGuard
 import app.saathi.session.GuideSession
 import app.saathi.session.Lines
 import app.saathi.session.ScreenEvent
 import app.saathi.voice.SpeechListener
 import app.saathi.voice.Speaker
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
@@ -46,6 +55,21 @@ class BuddyAccessibilityService : AccessibilityService() {
         prefs = Prefs(this)
         speaker = Speaker(this) { prefs.language }
         val playbooks = PlaybookStore(assets)
+        val recipes = RecipeSource(assets, File(filesDir, "recipes.json"))
+        val worker = WorkerClient(
+            baseUrl = BuildConfig.WORKER_URL,
+            prefs = prefs,
+            fixtureDir = if (BuildConfig.DEBUG) File(getExternalFilesDir(null), "fixtures") else null,
+        )
+        // Scripted recipes, then answers this phone already got, then the Worker.
+        val brain = LocalFirstBrain(
+            recipes = { recipes.book },
+            cache = TurnCache(FileCacheStore(File(cacheDir, "turn-cache.json"))),
+            remote = worker,
+            sensitiveLine = { tag -> Languages.context(this, tag).getString(R.string.say_sensitive) },
+            log = { if (BuildConfig.DEBUG) Log.d(TAG, it) },
+        )
+        refreshRecipes(recipes, worker)
         overlay = OverlayController(
             service = this,
             prefs = prefs,
@@ -65,11 +89,7 @@ class BuddyAccessibilityService : AccessibilityService() {
             ),
             mouth = speaker,
             pointer = overlay,
-            brain = WorkerClient(
-                baseUrl = BuildConfig.WORKER_URL,
-                prefs = prefs,
-                fixtureDir = if (BuildConfig.DEBUG) File(getExternalFilesDir(null), "fixtures") else null,
-            ),
+            brain = brain,
             playbook = playbooks::forApp,
             language = { prefs.language },
             lines = {
@@ -87,6 +107,22 @@ class BuddyAccessibilityService : AccessibilityService() {
             // adb shell "am broadcast -a app.saathi.DEBUG_ASK --es text 'how do I make text bigger'"
             // adb shell "am broadcast -a app.saathi.DEBUG_OPENED --es pkg com.anydesk.anydeskandroid"
             registerReceiver(debugAsk, IntentFilter().apply { addAction(DEBUG_ASK); addAction(DEBUG_OPENED) }, RECEIVER_EXPORTED)
+        }
+    }
+
+    /** At most once a day, picks up recipe fixes from the Worker. Failure just means trying tomorrow. */
+    private fun refreshRecipes(recipes: RecipeSource, worker: WorkerClient) {
+        val now = System.currentTimeMillis()
+        if (now - prefs.recipesCheckedAt < RECIPE_REFRESH_MS) return
+        scope.launch {
+            try {
+                val json = worker.fetchRecipes()
+                if (withContext(Dispatchers.IO) { recipes.install(json) }) prefs.recipesCheckedAt = now
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.i(TAG, "recipes not refreshed: ${e.message}")
+            }
         }
     }
 
@@ -134,6 +170,8 @@ class BuddyAccessibilityService : AccessibilityService() {
     }
 
     companion object {
+        private const val TAG = "Saathi"
+        private const val RECIPE_REFRESH_MS = 24 * 60 * 60 * 1000L
         private val IGNORED = setOf("com.android.systemui")
         private const val DEBUG_ASK = "app.saathi.DEBUG_ASK"
         private const val DEBUG_OPENED = "app.saathi.DEBUG_OPENED"

@@ -24,6 +24,7 @@
     <string name="say_network">The internet is not working. Please try again in a little while.</string>
     <string name="say_mic_denied">First, please allow the microphone for Saathi.</string>
     <string name="say_scam_remote">Careful! This app lets a stranger control your phone. If someone on a call asked you to open it, close it now and call your family.</string>
+    <string name="say_sensitive">This part you do yourself. Never tell this number to anyone, even on the phone.</string>
     <string name="notif_channel">Listening</string>
     <string name="notif_listening">Saathi is listening</string>
     <string name="service_desc">Saathi looks at the screen and tells you out loud what to press next. It never presses anything itself.</string>

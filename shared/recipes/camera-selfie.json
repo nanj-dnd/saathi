@@ -1,0 +1,128 @@
+{
+  "id": "camera-selfie",
+  "version": 1,
+  "goal": "take a selfie",
+  "apps": [
+    "com.android.camera",
+    "com.android.camera2",
+    "com.google.android.GoogleCamera",
+    "com.sec.android.app.camera",
+    "com.motorola.camera3",
+    "com.oneplus.camera",
+    "com.oppo.camera",
+    "com.vivo.camera",
+    "com.transsion.camera"
+  ],
+  "app_label": "Camera",
+  "app_names": [
+    "Camera",
+    "कैमरा",
+    "கேமரா",
+    "కెమెరా",
+    "ಕ್ಯಾಮೆರಾ",
+    "ക്യാമറ"
+  ],
+  "triggers": [
+    {
+      "all": [
+        [
+          "selfie",
+          "सेल्फी",
+          "सेल्फ़ी",
+          "செல்ஃபி",
+          "செல்பி",
+          "సెల్ఫీ",
+          "ಸೆಲ್ಫಿ",
+          "സെൽഫി"
+        ]
+      ]
+    }
+  ],
+  "examples": {
+    "hi-IN": [
+      "सेल्फी लेनी है"
+    ],
+    "ta-IN": [
+      "செல்ஃபி எடுக்க வேண்டும்"
+    ],
+    "te-IN": [
+      "సెల్ఫీ తీయాలి"
+    ],
+    "kn-IN": [
+      "ಸೆಲ್ಫಿ ತೆಗೆಯಬೇಕು"
+    ],
+    "ml-IN": [
+      "സെൽഫി എടുക്കണം"
+    ]
+  },
+  "steps": [
+    {
+      "id": "ready",
+      "screen_has": [
+        [
+          "Switch to rear camera",
+          "Switch to back camera"
+        ]
+      ],
+      "target": [
+        "Shutter",
+        "Take photo",
+        "Take picture",
+        "Capture",
+        "Shutter button",
+        "Camera shutter"
+      ],
+      "exact": true,
+      "status": "done",
+      "say": {
+        "hi-IN": "नीचे बीच वाला बड़ा गोल बटन दबाइए। फोटो खिंच जाएगी।",
+        "ta-IN": "கீழே நடுவில் உள்ள பெரிய வட்ட பொத்தானை அழுத்துங்கள். புகைப்படம் எடுக்கப்படும்.",
+        "te-IN": "కింద మధ్యలో ఉన్న పెద్ద గుండ్రని బటన్ నొక్కండి. ఫోటో తీయబడుతుంది.",
+        "kn-IN": "ಕೆಳಗೆ ಮಧ್ಯದಲ್ಲಿರುವ ದೊಡ್ಡ ವೃತ್ತದ ಬಟನ್ ಒತ್ತಿ. ಫೋಟೋ ತೆಗೆಯಲಾಗುತ್ತದೆ.",
+        "ml-IN": "താഴെ നടുവിലുള്ള വലിയ വട്ട ബട്ടൺ അമർത്തുക. ഫോട്ടോ എടുക്കും."
+      }
+    },
+    {
+      "id": "shutter",
+      "after": {
+        "step": "flip",
+        "min": 1
+      },
+      "target": [
+        "Shutter",
+        "Take photo",
+        "Take picture",
+        "Capture",
+        "Shutter button",
+        "Camera shutter"
+      ],
+      "exact": true,
+      "status": "done",
+      "say": {
+        "hi-IN": "नीचे बीच वाला बड़ा गोल बटन दबाइए। फोटो खिंच जाएगी।",
+        "ta-IN": "கீழே நடுவில் உள்ள பெரிய வட்ட பொத்தானை அழுத்துங்கள். புகைப்படம் எடுக்கப்படும்.",
+        "te-IN": "కింద మధ్యలో ఉన్న పెద్ద గుండ్రని బటన్ నొక్కండి. ఫోటో తీయబడుతుంది.",
+        "kn-IN": "ಕೆಳಗೆ ಮಧ್ಯದಲ್ಲಿರುವ ದೊಡ್ಡ ವೃತ್ತದ ಬಟನ್ ಒತ್ತಿ. ಫೋಟೋ ತೆಗೆಯಲಾಗುತ್ತದೆ.",
+        "ml-IN": "താഴെ നടുവിലുള്ള വലിയ വട്ട ബട്ടൺ അമർത്തുക. ഫോട്ടോ എടുക്കും."
+      }
+    },
+    {
+      "id": "flip",
+      "target": [
+        "Switch to front camera",
+        "Switch camera",
+        "Flip camera",
+        "Switch to selfie camera",
+        "Switch to front"
+      ],
+      "exact": true,
+      "say": {
+        "hi-IN": "घूमते तीरों वाला बटन दबाइए। कैमरा आपकी ओर हो जाएगा।",
+        "ta-IN": "சுழலும் அம்புக்குறி பொத்தானை அழுத்துங்கள். கேமரா உங்கள் பக்கம் திரும்பும்.",
+        "te-IN": "తిరిగే బాణాల బటన్ నొక్కండి. కెమెరా మీ వైపు తిరుగుతుంది.",
+        "kn-IN": "ತಿರುಗುವ ಬಾಣಗಳ ಬಟನ್ ಒತ್ತಿ. ಕ್ಯಾಮೆರಾ ನಿಮ್ಮ ಕಡೆ ತಿರುಗುತ್ತದೆ.",
+        "ml-IN": "കറങ്ങുന്ന അമ്പടയാളമുള്ള ബട്ടൺ അമർത്തുക. ക്യാമറ നിങ്ങളുടെ നേരെ തിരിയും."
+      }
+    }
+  ]
+}

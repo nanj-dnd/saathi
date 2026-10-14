@@ -1,8 +1,10 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { issueToken, underDailyLimit, verifyToken } from "./auth.ts";
 import { demoGuide } from "./demo.ts";
+import { readShared, shareable, sharedKey, writeShared } from "./cache.ts";
 import { askGuide, mockGuide } from "./guide.ts";
-import { BadRequest, parseTurnRequest, type TurnResponse } from "./schema.ts";
+import recipeBundle from "./recipe-bundle.json";
+import { BadRequest, parseTurnRequest, type Guide, type Source, type TurnResponse } from "./schema.ts";
 
 // Speech is handled on the phone (Android SpeechRecognizer + TextToSpeech), so a turn is one
 // model call: screen + what the senior said in, the next step out.
@@ -16,6 +18,8 @@ export interface Env {
   /** "1" = scripted Settings walkthrough for recording demos (src/demo.ts). Local only. */
   DEMO?: string;
   USAGE: KVNamespace;
+  /** Answers shared between phones (src/cache.ts). Optional: without it every turn asks the model. */
+  GUIDE_CACHE?: KVNamespace;
 }
 
 const json = (body: unknown, status = 200) =>
@@ -24,9 +28,17 @@ const json = (body: unknown, status = 200) =>
     headers: { "Content-Type": "application/json; charset=utf-8" },
   });
 
+const RECIPES = JSON.stringify(recipeBundle);
+
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    if (request.method === "GET" && url.pathname === "/recipes") {
+      // Scripted guides from shared/recipes, so a recipe can be fixed without an app update.
+      return new Response(RECIPES, {
+        headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "public, max-age=3600" },
+      });
+    }
     if (request.method !== "POST") return json({ error: "not found" }, 404);
 
     if (url.pathname === "/register") {
@@ -44,11 +56,23 @@ export default {
     try {
       const req = parseTurnRequest(await request.json());
       const t0 = Date.now();
-      const guide = env.DEMO === "1"
-        ? demoGuide(req)
-        : !env.ANTHROPIC_API_KEY
-          ? mockGuide(req)
-          : await askGuide(
+      let guide: Guide;
+      let source: Source;
+      if (env.DEMO === "1") {
+        guide = demoGuide(req);
+        source = "demo";
+      } else if (!env.ANTHROPIC_API_KEY) {
+        guide = mockGuide(req);
+        source = "mock";
+      } else {
+        const cache = env.GUIDE_CACHE;
+        const key = cache ? await sharedKey(req) : null;
+        const hit = cache && key ? await readShared(cache, key, req) : null;
+        if (hit) {
+          guide = hit;
+          source = "cache";
+        } else {
+          guide = await askGuide(
             {
               apiKey: env.ANTHROPIC_API_KEY,
               model: env.GUIDE_MODEL || "claude-haiku-5-5",
@@ -56,10 +80,14 @@ export default {
             },
             req,
           );
+          source = "model";
+          if (cache && key && shareable(guide)) ctx.waitUntil(writeShared(cache, key, guide));
+        }
+      }
       const timings = { guide: Date.now() - t0 };
 
-      console.log(JSON.stringify({ deviceId, app: req.app, status: guide.status, danger: guide.danger, timings }));
-      const body: TurnResponse = { guide, timings_ms: timings };
+      console.log(JSON.stringify({ deviceId, app: req.app, source, status: guide.status, danger: guide.danger, timings }));
+      const body: TurnResponse = { guide, timings_ms: timings, source };
       return json(body);
     } catch (err) {
       if (err instanceof BadRequest) return json({ error: err.message }, 400);

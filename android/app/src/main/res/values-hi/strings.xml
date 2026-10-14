@@ -23,6 +23,7 @@
     <string name="say_network">इंटरनेट नहीं चल रहा। थोड़ी देर बाद फिर कोशिश कीजिए।</string>
     <string name="say_mic_denied">पहले साथी को माइक की अनुमति दीजिए।</string>
     <string name="say_scam_remote">सावधान! यह ऐप किसी अजनबी को आपका फ़ोन चलाने देता है। अगर फ़ोन पर किसी ने इसे खोलने को कहा है, तो इसे बंद कीजिए और घरवालों को फ़ोन कीजिए।</string>
+    <string name="say_sensitive">यह हिस्सा आप खुद कीजिए। यह नंबर किसी को मत बताइए, फ़ोन पर भी नहीं।</string>
     <string name="notif_channel">सुनना</string>
     <string name="notif_listening">साथी सुन रहा है</string>
     <string name="service_desc">साथी स्क्रीन देखकर बोलकर बताता है कि आगे क्या दबाना है। यह खुद कुछ नहीं दबाता।</string>

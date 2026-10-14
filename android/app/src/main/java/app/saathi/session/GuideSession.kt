@@ -1,5 +1,6 @@
 package app.saathi.session
 
+import app.saathi.brain.ScreenKey
 import app.saathi.capture.Box
 import app.saathi.net.Danger
 import app.saathi.net.Guide
@@ -61,8 +62,17 @@ interface Lines {
 
 enum class GuideState { IDLE, LISTENING, THINKING, SPEAKING, WATCHING }
 
-/** How the senior changed the screen. Each has its own settle time before we look again. */
-enum class ScreenEvent(val settleMs: Long) { CLICK(1200), NAVIGATED(1200), SCROLLED(1500), TYPED(3000) }
+/**
+ * How the senior changed the screen. Each has its own settle time before we look again.
+ * [progress] events can move the task on without changing the screen's text (pressing "+" on a
+ * font slider), so they are always answered; the others are skipped if nothing visibly changed.
+ */
+enum class ScreenEvent(val settleMs: Long, val progress: Boolean) {
+    CLICK(1200, true),
+    NAVIGATED(1200, false),
+    SCROLLED(1500, false),
+    TYPED(3000, false),
+}
 
 /**
  * The guide loop: listen → look → ask → speak + point → watch for the senior's tap → look again.
@@ -96,6 +106,9 @@ class GuideSession(
     private val history = ArrayDeque<PastStep>()
     private var autoTurns = 0
     private var lastSay: String? = null
+    /** The last answered screen and its step, to re-show it when an event changed nothing. */
+    private var lastLook: Snapshot? = null
+    private var lastGuide: Guide? = null
 
     fun onBubbleTap() {
         if (_state.value == GuideState.LISTENING) {
@@ -115,9 +128,24 @@ class GuideSession(
         launchPipeline {
             setState(GuideState.WATCHING)
             delay(event.settleMs)
+            setState(GuideState.THINKING)
+            val snap = eyes.look()
+            if (!event.progress && unchanged(snap)) {
+                // A scroll that went nowhere or a dialog that flickered: keep the same step on
+                // screen, without asking again or repeating it out loud.
+                val guide = lastGuide!!
+                pointer.point(targetBox(guide, snap), guide.say, guide.danger)
+                enterWatching()
+                return@launchPipeline
+            }
             autoTurns++
-            runTurn(utterance = null)
+            runTurn(utterance = null, seen = snap)
         }
+    }
+
+    private fun unchanged(snap: Snapshot): Boolean {
+        val last = lastLook ?: return false
+        return lastGuide != null && snap.app == last.app && snap.tree == last.tree && ScreenKey.informative(snap.tree)
     }
 
     /** A typed request instead of a spoken one (debug broadcast today; a text box later). */
@@ -180,9 +208,9 @@ class GuideSession(
         runTurn(heard)
     }
 
-    private suspend fun runTurn(utterance: String?) {
+    private suspend fun runTurn(utterance: String?, seen: Snapshot? = null) {
         setState(GuideState.THINKING)
-        val snap = eyes.look()
+        val snap = seen ?: eyes.look()
         val request = TurnRequest(
             language = language(),
             utterance = utterance,
@@ -210,6 +238,8 @@ class GuideSession(
         history.addLast(PastStep(guide.say, guide.label, guide.status, snap.app))
         while (history.size > HISTORY) history.removeFirst()
         lastSay = guide.say
+        lastLook = snap
+        lastGuide = guide
 
         pointer.point(targetBox(guide, snap), guide.say, guide.danger)
         setState(GuideState.SPEAKING)
@@ -249,6 +279,8 @@ class GuideSession(
         goal = ""
         history.clear()
         autoTurns = 0
+        lastLook = null
+        lastGuide = null
         setState(GuideState.IDLE)
     }
 

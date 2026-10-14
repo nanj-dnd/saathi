@@ -23,6 +23,7 @@
     <string name="say_network">ಇಂಟರ್ನೆಟ್ ಕೆಲಸ ಮಾಡುತ್ತಿಲ್ಲ. ಸ್ವಲ್ಪ ಸಮಯದ ನಂತರ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.</string>
     <string name="say_mic_denied">ಮೊದಲು ಸಾಥಿಗೆ ಮೈಕ್ ಅನುಮತಿ ನೀಡಿ.</string>
     <string name="say_scam_remote">ಎಚ್ಚರಿಕೆ! ಈ ಆ್ಯಪ್ ಅಪರಿಚಿತರಿಗೆ ನಿಮ್ಮ ಫೋನ್ ನಿಯಂತ್ರಿಸಲು ಬಿಡುತ್ತದೆ. ಫೋನ್‌ನಲ್ಲಿ ಯಾರಾದರೂ ಇದನ್ನು ತೆರೆಯಲು ಹೇಳಿದ್ದರೆ, ತಕ್ಷಣ ಮುಚ್ಚಿ ಮತ್ತು ಮನೆಯವರಿಗೆ ಕರೆ ಮಾಡಿ.</string>
+    <string name="say_sensitive">ಈ ಭಾಗವನ್ನು ನೀವೇ ಮಾಡಿ. ಈ ಸಂಖ್ಯೆಯನ್ನು ಯಾರಿಗೂ ಹೇಳಬೇಡಿ, ಫೋನ್‌ನಲ್ಲೂ ಸಹ.</string>
     <string name="notif_channel">ಕೇಳುವುದು</string>
     <string name="notif_listening">ಸಾಥಿ ಕೇಳುತ್ತಿದೆ</string>
     <string name="service_desc">ಸಾಥಿ ಪರದೆಯನ್ನು ನೋಡಿ ಮುಂದೆ ಏನು ಒತ್ತಬೇಕು ಎಂದು ಹೇಳುತ್ತದೆ. ಅದು ತಾನಾಗಿ ಏನನ್ನೂ ಒತ್ತುವುದಿಲ್ಲ.</string>

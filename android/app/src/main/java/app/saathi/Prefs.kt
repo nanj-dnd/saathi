@@ -15,6 +15,11 @@ class Prefs(context: Context) {
         get() = sp.getString("token", null)
         set(v) = sp.edit().putString("token", v).apply()
 
+    /** When recipes were last fetched from the Worker, in epoch ms. */
+    var recipesCheckedAt: Long
+        get() = sp.getLong("recipes_checked_at", 0L)
+        set(v) = sp.edit().putLong("recipes_checked_at", v).apply()
+
     var bubbleX: Int
         get() = sp.getInt("bubble_x", -1)
         set(v) = sp.edit().putInt("bubble_x", v).apply()

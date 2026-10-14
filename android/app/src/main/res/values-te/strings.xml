@@ -23,6 +23,7 @@
     <string name="say_network">ఇంటర్నెట్ పని చేయడం లేదు. కొంచెం సేపటి తర్వాత మళ్ళీ ప్రయత్నించండి.</string>
     <string name="say_mic_denied">ముందుగా సాథీకి మైక్ అనుమతి ఇవ్వండి.</string>
     <string name="say_scam_remote">జాగ్రత్త! ఈ యాప్ ఒక అపరిచితుడికి మీ ఫోన్‌ను నడిపే అవకాశం ఇస్తుంది. ఫోన్‌లో ఎవరైనా దీన్ని తెరవమని చెబితే, వెంటనే మూసివేసి మీ కుటుంబ సభ్యులకు ఫోన్ చేయండి.</string>
+    <string name="say_sensitive">ఈ భాగం మీరే చేయండి. ఈ నంబర్ ఎవరికీ చెప్పకండి, ఫోన్‌లో కూడా.</string>
     <string name="notif_channel">వినడం</string>
     <string name="notif_listening">సాథీ వింటోంది</string>
     <string name="service_desc">సాథీ స్క్రీన్ చూసి తర్వాత ఏమి నొక్కాలో చెబుతుంది. అది తనంతట తాను ఏదీ నొక్కదు.</string>

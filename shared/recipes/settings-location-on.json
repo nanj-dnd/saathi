@@ -1,0 +1,158 @@
+{
+  "id": "settings-location-on",
+  "version": 1,
+  "goal": "turn on location",
+  "apps": [
+    "com.android.settings"
+  ],
+  "app_label": "Settings",
+  "app_names": [
+    "Settings",
+    "सेटिंग",
+    "सेटिंग्स",
+    "அமைப்புகள்",
+    "సెట్టింగ్‌లు",
+    "ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
+    "ക്രമീകരണങ്ങൾ"
+  ],
+  "triggers": [
+    {
+      "all": [
+        [
+          "location",
+          "gps",
+          "लोकेशन",
+          "जीपीएस",
+          "இருப்பிட",
+          "லொகேஷன்",
+          "லோகேஷன்",
+          "లొకేషన్",
+          "లోకేషన్",
+          "ಲೊಕೇಶನ್",
+          "ಸ್ಥಳ",
+          "ലൊക്കേഷൻ",
+          "ലൊക്കേഷന്"
+        ]
+      ]
+    }
+  ],
+  "unless": [
+    "off",
+    "बंद",
+    "ऑफ",
+    "ஆஃப்",
+    "அணை",
+    "నిలిపి",
+    "ఆఫ్",
+    "ಆಫ್",
+    "ഓഫ്",
+    "share",
+    "शेयर",
+    "भेज",
+    "send",
+    "அனுப்ப",
+    "పంప",
+    "ಕಳುಹಿಸ",
+    "അയക്ക"
+  ],
+  "examples": {
+    "hi-IN": [
+      "लोकेशन चालू करनी है",
+      "GPS on karna hai"
+    ],
+    "ta-IN": [
+      "லொகேஷன் ஆன் செய்ய வேண்டும்"
+    ],
+    "te-IN": [
+      "లొకేషన్ ఆన్ చేయాలి"
+    ],
+    "kn-IN": [
+      "ಲೊಕೇಶನ್ ಆನ್ ಮಾಡಬೇಕು"
+    ],
+    "ml-IN": [
+      "ലൊക്കേഷൻ ഓണാക്കണം"
+    ]
+  },
+  "steps": [
+    {
+      "id": "done",
+      "switch": [
+        "Use location",
+        "Location"
+      ],
+      "switch_is": "on",
+      "status": "done",
+      "say": {
+        "hi-IN": "लोकेशन चालू है।",
+        "ta-IN": "இருப்பிடம் இயக்கத்தில் உள்ளது.",
+        "te-IN": "లొకేషన్ ఆన్‌లో ఉంది.",
+        "kn-IN": "ಲೊಕೇಶನ್ ಆನ್ ಆಗಿದೆ.",
+        "ml-IN": "ലൊക്കേഷൻ ഓണാണ്."
+      }
+    },
+    {
+      "id": "switch",
+      "switch": [
+        "Use location",
+        "Location"
+      ],
+      "switch_is": "off",
+      "tap_switch": true,
+      "say": {
+        "hi-IN": "'{label}' के सामने वाला बटन दबाइए, वह चालू हो जाएगा।",
+        "ta-IN": "'{label}' அருகே உள்ள பொத்தானை அழுத்துங்கள், அது இயங்கும்.",
+        "te-IN": "'{label}' పక్కన ఉన్న బటన్ నొక్కండి, అది ఆన్ అవుతుంది.",
+        "kn-IN": "'{label}' ಪಕ್ಕದ ಬಟನ್ ಒತ್ತಿ, ಅದು ಆನ್ ಆಗುತ್ತದೆ.",
+        "ml-IN": "'{label}'-ന് അടുത്തുള്ള ബട്ടൺ അമർത്തുക, അത് ഓണാകും."
+      }
+    },
+    {
+      "id": "open",
+      "screen_has": [
+        [
+          "Network & internet",
+          "Connections",
+          "Connected devices",
+          "Battery",
+          "Notifications",
+          "Sound & vibration",
+          "Sounds and vibration",
+          "Apps"
+        ]
+      ],
+      "target": [
+        "Location"
+      ],
+      "say": {
+        "hi-IN": "'{label}' पर दबाइए।",
+        "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
+        "te-IN": "'{label}' నొక్కండి.",
+        "kn-IN": "'{label}' ಒತ್ತಿ.",
+        "ml-IN": "'{label}' അമർത്തുക."
+      }
+    },
+    {
+      "id": "scroll",
+      "screen_has": [
+        [
+          "Network & internet",
+          "Connections",
+          "Connected devices",
+          "Battery",
+          "Notifications",
+          "Sound & vibration",
+          "Sounds and vibration",
+          "Apps"
+        ]
+      ],
+      "max_repeats": 4,
+      "say": {
+        "hi-IN": "स्क्रीन पर उंगली रखकर ऊपर की ओर सरकाइए।",
+        "ta-IN": "திரையில் விரலை வைத்து மேலே தள்ளுங்கள்.",
+        "te-IN": "స్క్రీన్‌పై వేలు పెట్టి పైకి జరపండి.",
+        "kn-IN": "ಪರದೆಯ ಮೇಲೆ ಬೆರಳಿಟ್ಟು ಮೇಲಕ್ಕೆ ಸರಿಸಿ.",
+        "ml-IN": "സ്ക്രീനിൽ വിരൽ വെച്ച് മുകളിലേക്ക് നീക്കുക."
+      }
+    }
+  ]
+}

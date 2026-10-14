@@ -49,6 +49,15 @@ class WorkerClient(
         }
     }
 
+    /** The Worker's current recipe bundle (shared/recipes), as JSON. */
+    suspend fun fetchRecipes(): String = withContext(Dispatchers.IO) {
+        val req = Request.Builder().url(baseUrl.trimEnd('/') + "/recipes").get().build()
+        http.newCall(req).await().use {
+            if (!it.isSuccessful) throw IOException("recipes ${it.code}")
+            it.body!!.string()
+        }
+    }
+
     private suspend fun register(): String {
         val res = post("/register", "{}", null)
         val token = res.use {
