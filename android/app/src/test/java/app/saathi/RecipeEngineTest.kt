@@ -239,7 +239,7 @@ class RecipeEngineTest {
     @Test fun `requests no script should answer reach the model`() {
         val forModel = listOf(
             // Money and bills: always the model, which knows the safety rules for payments.
-            "बिजली का बिल भरना है", "बेटे को पैसे भेजने हैं", "UPI PIN बदलना है", "Paytm से मोबाइल रिचार्ज करना है",
+            "बिजली का बिल भरना है", "बेटे को पैसे भेजने हैं", "UPI PIN बदलना है", "बिजली कटने का मैसेज आया है",
             "மின்சார கட்டணம் செலுத்த வேண்டும்", "కరెంట్ బిల్లు కట్టాలి", "ವಿದ್ಯುತ್ ಬಿಲ್ ಕಟ್ಟಬೇಕು", "കറന്റ് ബിൽ അടയ്ക്കണം",
             // Similar words, different wish.
             "WhatsApp पर वीडियो भेजना है", "Blinkit का मेरा ऑर्डर कहाँ है", "flight ticket book karna hai",
@@ -330,6 +330,21 @@ class RecipeEngineTest {
         assertTrue(!RecipeEngine.contains("வெளிச்சத்தை கூட்ட", "சத்த"))
         // Negations are word endings in Tamil and Malayalam, so "unless" words match anywhere.
         assertTrue(RecipeEngine.contains("வேலை செய்யவில்லை", "வில்லை", wordStart = false))
+    }
+
+    @Test fun `the screen can be read aloud without leaving the phone`() {
+        val chat = """
+            n1 TextView "Ramesh" [200,100,600,180]
+            n2 ImageButton "Video call" [800,100,900,180] click
+            n3 TextView "Papa, I will reach by 7 pm." [40,400,900,480]
+            n4 TextView "Papa, I will reach by 7 pm." [40,500,900,580]
+            n5 EditText "Message" [100,2200,680,2280] click edit
+        """.trimIndent()
+        val g = engine.guide(req(chat, app = "com.whatsapp", utterance = "ये मैसेज पढ़ दो"))!!
+        assertEquals("स्क्रीन पर लिखा है: Ramesh. Papa, I will reach by 7 pm.", g.say) // buttons and repeats skipped
+        assertEquals(Status.DONE, g.status)
+        val blank = engine.guide(req("n1 ImageView \"\" [0,0,1080,2400] click", app = "com.android.chrome", utterance = "पढ़कर सुनाओ"))!!
+        assertTrue(blank.say.contains("कुछ लिखा नहीं"))
     }
 
     @Test fun `ambiguous requests go to the model`() {

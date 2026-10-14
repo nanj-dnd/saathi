@@ -44,6 +44,8 @@ data class Step(
     @SerialName("switch_is") val switchIs: String = "",
     /** Point at the switch itself, so the senior flips it. */
     @SerialName("tap_switch") val tapSwitch: Boolean = false,
+    /** "{screen}" in the line becomes the text on screen, read aloud for seniors who can't read it. */
+    @SerialName("read_screen") val readScreen: Boolean = false,
     val after: After? = null,
     /** Language tag to spoken line. "{label}" becomes the matched element's text. */
     val say: Map<String, String>,
@@ -165,6 +167,7 @@ class RecipeBook(val common: Common, val recipes: List<Recipe>) {
                 if (s.switch.isNotEmpty() && s.switchIs !in setOf("on", "off")) add("$at: switch_is must be on or off")
                 if (s.tapSwitch && s.switch.isEmpty()) add("$at: tap_switch without a switch")
                 if (s.tapSwitch && s.target.isNotEmpty()) add("$at: tap_switch and target both set")
+                if (s.readScreen != s.say.values.all { "{screen}" in it }) add("$at: read_screen needs {screen} in every line, and only then")
                 s.target.filter(ScreenSafety::isSensitiveTarget).forEach { add("$at: target '$it' is for the senior alone") }
                 if (s.screenHas.any { it.isEmpty() }) add("$at: empty screen_has group")
                 if (s.apps.any { it.isBlank() || it == ANY_APP }) add("$at: step apps must be package names")

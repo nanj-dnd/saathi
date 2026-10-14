@@ -1,0 +1,152 @@
+{
+  "id": "settings-storage",
+  "version": 1,
+  "goal": "free up space on the phone",
+  "apps": [
+    "com.android.settings"
+  ],
+  "app_label": "Settings",
+  "app_names": [
+    "Settings",
+    "सेटिंग",
+    "सेटिंग्स",
+    "அமைப்புகள்",
+    "సెట్టింగ్‌లు",
+    "ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
+    "ക്രമീകരണങ്ങൾ"
+  ],
+  "triggers": [
+    {
+      "all": [
+        [
+          "storage",
+          "स्टोरेज",
+          "memory",
+          "मेमोरी",
+          "जगह भर",
+          "जगह नहीं",
+          "phone full",
+          "फ़ोन भर गया",
+          "फोन भर गया",
+          "ஸ்டோரேஜ்",
+          "மெமரி",
+          "இடம் இல்லை",
+          "స్టోరేజ్",
+          "మెమరీ",
+          "ಸ್ಟೋರೇಜ್",
+          "ಮೆಮೊರಿ",
+          "സ്റ്റോറേജ്",
+          "മെമ്മറി"
+        ]
+      ]
+    }
+  ],
+  "unless": [
+    "card",
+    "कार्ड",
+    "sd",
+    "pen drive"
+  ],
+  "skip_common_unless": true,
+  "examples": {
+    "hi-IN": [
+      "फ़ोन की जगह भर गई है",
+      "storage full ho gaya"
+    ],
+    "ta-IN": [
+      "போனில் இடம் இல்லை, ஸ்டோரேஜ் நிரம்பிவிட்டது"
+    ],
+    "te-IN": [
+      "ఫోన్ స్టోరేజ్ నిండిపోయింది"
+    ],
+    "kn-IN": [
+      "ಫೋನ್ ಸ್ಟೋರೇಜ್ ತುಂಬಿದೆ"
+    ],
+    "ml-IN": [
+      "ഫോൺ സ്റ്റോറേജ് നിറഞ്ഞു"
+    ]
+  },
+  "steps": [
+    {
+      "id": "free",
+      "target": [
+        "Free up space",
+        "Free up storage",
+        "Clean up",
+        "Free up"
+      ],
+      "status": "done",
+      "say": {
+        "hi-IN": "'{label}' दबाइए। फ़ोन बताएगा कि कौन सी पुरानी फाइलें हटाई जा सकती हैं; हटाने से पहले देख लीजिए।",
+        "ta-IN": "'{label}' ஐ அழுத்துங்கள். எந்த பழைய கோப்புகளை நீக்கலாம் என்று போன் காட்டும்; நீக்கும் முன் பாருங்கள்.",
+        "te-IN": "'{label}' నొక్కండి. ఏ పాత ఫైళ్ళను తీసేయవచ్చో ఫోన్ చూపిస్తుంది; తీసేసే ముందు చూడండి.",
+        "kn-IN": "'{label}' ಒತ್ತಿ. ಯಾವ ಹಳೆಯ ಫೈಲ್‌ಗಳನ್ನು ತೆಗೆಯಬಹುದು ಎಂದು ಫೋನ್ ತೋರಿಸುತ್ತದೆ; ತೆಗೆಯುವ ಮುನ್ನ ನೋಡಿ.",
+        "ml-IN": "'{label}' അമർത്തുക. ഏതൊക്കെ പഴയ ഫയലുകൾ നീക്കാമെന്ന് ഫോൺ കാണിക്കും; നീക്കുന്നതിന് മുമ്പ് നോക്കുക."
+      }
+    },
+    {
+      "id": "storage",
+      "target": [
+        "Storage",
+        "Battery and device care",
+        "Device care"
+      ],
+      "say": {
+        "hi-IN": "'{label}' पर दबाइए।",
+        "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
+        "te-IN": "'{label}' నొక్కండి.",
+        "kn-IN": "'{label}' ಒತ್ತಿ.",
+        "ml-IN": "'{label}' അമർത്തുക."
+      }
+    },
+    {
+      "id": "open",
+      "screen_has": [
+        [
+          "Network & internet",
+          "Connections",
+          "Connected devices",
+          "Battery",
+          "Notifications",
+          "Sound & vibration",
+          "Sounds and vibration",
+          "Apps"
+        ]
+      ],
+      "target": [
+        "Storage",
+        "Battery and device care"
+      ],
+      "say": {
+        "hi-IN": "'{label}' पर दबाइए।",
+        "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
+        "te-IN": "'{label}' నొక్కండి.",
+        "kn-IN": "'{label}' ಒತ್ತಿ.",
+        "ml-IN": "'{label}' അമർത്തുക."
+      }
+    },
+    {
+      "id": "scroll",
+      "screen_has": [
+        [
+          "Network & internet",
+          "Connections",
+          "Connected devices",
+          "Battery",
+          "Notifications",
+          "Sound & vibration",
+          "Sounds and vibration",
+          "Apps"
+        ]
+      ],
+      "max_repeats": 4,
+      "say": {
+        "hi-IN": "स्क्रीन पर उंगली रखकर ऊपर की ओर सरकाइए।",
+        "ta-IN": "திரையில் விரலை வைத்து மேலே தள்ளுங்கள்.",
+        "te-IN": "స్క్రీన్‌పై వేలు పెట్టి పైకి జరపండి.",
+        "kn-IN": "ಪರದೆಯ ಮೇಲೆ ಬೆರಳಿಟ್ಟು ಮೇಲಕ್ಕೆ ಸರಿಸಿ.",
+        "ml-IN": "സ്ക്രീനിൽ വിരൽ വെച്ച് മുകളിലേക്ക് നീക്കുക."
+      }
+    }
+  ]
+}

@@ -77,7 +77,8 @@ class RecipeEngine(private val book: RecipeBook) {
             }
             if (node != null && ScreenSafety.isSensitiveTarget(node.label)) continue
             val template = step.say[req.language] ?: return null
-            val say = template.replace("{label}", label)
+            var say = template.replace("{label}", label)
+            if (step.readScreen) say = say.replace("{screen}", readable(screen) ?: continue)
             if (repeats(req.history, say) >= step.maxRepeats) continue
             return guide(recipe, step.id, say, node, label, step.status, step.danger)
         }
@@ -111,6 +112,30 @@ class RecipeEngine(private val book: RecipeBook) {
 
     internal companion object {
         const val OUTSIDE_REPEATS = 3
+
+        private const val READ_LIMIT = 700
+
+        /**
+         * The screen's text in reading order, for reading aloud: plain text rather than buttons,
+         * each line once, short enough to listen to. Null when there is nothing worth reading.
+         * Codes were already masked when the tree was built, and none of this leaves the phone.
+         */
+        fun readable(screen: ScreenText): String? {
+            val seen = HashSet<String>()
+            val parts = screen.nodes.asSequence()
+                .filter { !it.clickable && it.label.length >= 2 && it.label != "(hidden)" }
+                .map { it.label.trim() }
+                .filter { seen.add(ScreenText.norm(it)) }
+                .toList()
+            if (parts.isEmpty()) return null
+            val out = StringBuilder()
+            for (p in parts) {
+                if (out.length + p.length > READ_LIMIT) break
+                if (out.isNotEmpty()) out.append(if (out.last() in ".!?।") " " else ". ")
+                out.append(p)
+            }
+            return out.toString().ifBlank { null }
+        }
 
         /** Home-screen apps: com.google.android.apps.nexuslauncher, com.sec.android.app.launcher, com.miui.home… */
         fun isLauncher(pkg: String) = "launcher" in pkg || pkg.endsWith(".home")
