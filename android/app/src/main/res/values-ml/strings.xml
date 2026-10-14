@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onb_subtitle">ഈ ആപ്പ് നിങ്ങളുടെ മാതാപിതാക്കളെ ഫോൺ ഉപയോഗിക്കാൻ, ഓരോ ഘട്ടവും പറഞ്ഞുകൊടുത്ത് സഹായിക്കുന്നു. സജ്ജമാക്കാൻ 2 മിനിറ്റ് മതി.</string>
+    <string name="step_language">1. ഭാഷ തിരഞ്ഞെടുക്കുക</string>
+    <string name="step_mic">2. മൈക്ക് അനുമതി നൽകുക</string>
+    <string name="btn_allow">അനുവദിക്കുക</string>
+    <string name="done">കഴിഞ്ഞു</string>
+    <string name="step_access">3. സാഥി ഓൺ ചെയ്യുക</string>
+    <string name="disclosure">സഹായം ബട്ടൺ അമർത്തുമ്പോഴോ സാഥി ഒരു ജോലിയിൽ വഴികാട്ടുമ്പോഴോ മാത്രം, അത് സ്ക്രീനിലുള്ളത് വായിച്ച് അതിന്റെ ചിത്രം എടുക്കുന്നു. അടുത്ത ഘട്ടം തീരുമാനിക്കാൻ ഇവ സാഥിയുടെ സെർവറിലേക്ക് അയയ്ക്കും, സൂക്ഷിക്കില്ല. സാഥി സ്വയം ഒന്നും അമർത്തില്ല; PIN അല്ലെങ്കിൽ പണമടയ്ക്കൽ സ്ക്രീനുകൾ കാണാനാവില്ല.</string>
+    <string name="btn_open_settings">സമ്മതിക്കുന്നു, ക്രമീകരണങ്ങൾ തുറക്കുക</string>
+    <string name="access_on">സാഥി ഓണാണ്</string>
+    <string name="access_hint">ക്രമീകരണങ്ങളിൽ \"ഡൗൺലോഡ് ചെയ്ത ആപ്പുകൾ\" അല്ലെങ്കിൽ \"ഇൻസ്റ്റാൾ ചെയ്ത ആപ്പുകൾ\" തുറന്ന്, സാഥി തിരഞ്ഞെടുത്ത് ഓൺ ചെയ്യുക.</string>
+    <string name="access_restricted">ബട്ടൺ മങ്ങിയതാണെങ്കിൽ, ആപ്പ് വിവരം തുറന്ന്, മുകളിൽ ⋮ അമർത്തി \"നിയന്ത്രിത ക്രമീകരണങ്ങൾ അനുവദിക്കുക\" തിരഞ്ഞെടുക്കുക.</string>
+    <string name="btn_app_info">ആപ്പ് വിവരം</string>
+    <string name="step_ready">4. തയ്യാർ</string>
+    <string name="ready_body">ഏത് ആപ്പിലും ഓറഞ്ച് \"സഹായം\" ബട്ടൺ അമർത്തി, എന്താണ് ചെയ്യേണ്ടതെന്ന് പറയുക. ഉദാഹരണം: \"ബ്ലിങ്കിറ്റിൽ പാൽ ഓർഡർ ചെയ്യണം\".</string>
+    <string name="bubble_help">സഹായം</string>
+    <string name="bubble_listening">കേൾക്കുന്നു</string>
+    <string name="bubble_looking">നോക്കുന്നു</string>
+    <string name="btn_repeat">വീണ്ടും കേൾക്കുക</string>
+    <string name="btn_close">അടയ്ക്കുക</string>
+    <string name="say_no_speech">എനിക്ക് ശബ്ദം കേട്ടില്ല. സഹായം ബട്ടൺ അമർത്തി വീണ്ടും പറയൂ.</string>
+    <string name="say_network">ഇന്റർനെറ്റ് പ്രവർത്തിക്കുന്നില്ല. കുറച്ച് കഴിഞ്ഞ് വീണ്ടും ശ്രമിക്കൂ.</string>
+    <string name="say_mic_denied">ആദ്യം സാഥിക്ക് മൈക്ക് അനുമതി നൽകൂ.</string>
+    <string name="say_scam_remote">ശ്രദ്ധിക്കുക! ഈ ആപ്പ് ഒരു അപരിചിതന് നിങ്ങളുടെ ഫോൺ നിയന്ത്രിക്കാൻ അവസരം നൽകുന്നു. ഫോണിൽ ആരെങ്കിലും ഇത് തുറക്കാൻ പറഞ്ഞെങ്കിൽ, ഉടൻ അടച്ച് വീട്ടുകാരെ വിളിക്കൂ.</string>
+    <string name="notif_channel">കേൾക്കൽ</string>
+    <string name="notif_listening">സാഥി കേൾക്കുന്നു</string>
+    <string name="service_desc">സാഥി സ്ക്രീൻ നോക്കി അടുത്തതായി എന്ത് അമർത്തണമെന്ന് പറയുന്നു. അത് സ്വയം ഒന്നും അമർത്തില്ല.</string>
+</resources>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Saathi</string>
+    <string name="onb_subtitle">Saathi helps your parent use their phone, one spoken step at a time. Setup takes 2 minutes.</string>
+    <string name="step_language">1. Choose language</string>
+    <string name="step_mic">2. Allow the microphone</string>
+    <string name="btn_allow">Allow</string>
+    <string name="done">Done</string>
+    <string name="step_access">3. Turn on Saathi</string>
+    <string name="disclosure">Saathi reads the text on the screen and takes a picture of it only when the Help button is pressed or while it is guiding a task. These are sent to Saathi\'s server to decide the next step and are not stored. Saathi never taps anything itself, and it cannot see PIN or payment screens.</string>
+    <string name="btn_open_settings">Agree and open settings</string>
+    <string name="access_on">Saathi is on</string>
+    <string name="access_hint">In Settings, open \"Downloaded apps\" or \"Installed apps\", choose Saathi and turn it on.</string>
+    <string name="access_restricted">If the switch is greyed out, open App info, tap ⋮ at the top and choose \"Allow restricted settings\".</string>
+    <string name="btn_app_info">App info</string>
+    <string name="step_ready">4. Ready</string>
+    <string name="ready_body">In any app, press the orange \"Help\" button and say what you want to do. For example: \"I want to order milk on Blinkit\".</string>
+    <string name="bubble_help">Help</string>
+    <string name="bubble_listening">Listening</string>
+    <string name="bubble_looking">Looking</string>
+    <string name="btn_repeat">Repeat</string>
+    <string name="btn_close">Close</string>
+    <string name="say_no_speech">I could not hear you. Press Help and speak again.</string>
+    <string name="say_network">The internet is not working. Please try again in a little while.</string>
+    <string name="say_mic_denied">First, please allow the microphone for Saathi.</string>
+    <string name="say_scam_remote">Careful! This app lets a stranger control your phone. If someone on a call asked you to open it, close it now and call your family.</string>
+    <string name="notif_channel">Listening</string>
+    <string name="notif_listening">Saathi is listening</string>
+    <string name="service_desc">Saathi looks at the screen and tells you out loud what to press next. It never presses anything itself.</string>
+</resources>

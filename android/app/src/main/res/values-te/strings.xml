@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onb_subtitle">ఈ యాప్ మీ తల్లిదండ్రులకు ఫోన్ వాడటంలో, ఒక్కో అడుగు చెబుతూ సహాయం చేస్తుంది. సెటప్‌కి 2 నిమిషాలు పడుతుంది.</string>
+    <string name="step_language">1. భాషను ఎంచుకోండి</string>
+    <string name="step_mic">2. మైక్ అనుమతి ఇవ్వండి</string>
+    <string name="btn_allow">అనుమతించు</string>
+    <string name="done">పూర్తయింది</string>
+    <string name="step_access">3. సాథీని ఆన్ చేయండి</string>
+    <string name="disclosure">సహాయం బటన్ నొక్కినప్పుడు లేదా సాథీ ఒక పనిలో దారి చూపుతున్నప్పుడు మాత్రమే, అది స్క్రీన్‌పై ఉన్నది చదివి దాని ఫోటో తీస్తుంది. తదుపరి అడుగు నిర్ణయించడానికి ఇవి సాథీ సర్వర్‌కు పంపబడతాయి, దాచబడవు. సాథీ తనంతట తాను ఏదీ నొక్కదు; PIN లేదా చెల్లింపు స్క్రీన్‌లను చూడలేదు.</string>
+    <string name="btn_open_settings">అంగీకరిస్తున్నాను, సెట్టింగ్స్ తెరవండి</string>
+    <string name="access_on">సాథీ ఆన్‌లో ఉంది</string>
+    <string name="access_hint">సెట్టింగ్స్‌లో \"డౌన్‌లోడ్ చేసిన యాప్‌లు\" లేదా \"ఇన్‌స్టాల్ చేసిన యాప్‌లు\" తెరిచి, సాథీని ఎంచుకుని ఆన్ చేయండి.</string>
+    <string name="access_restricted">బటన్ మసకగా ఉంటే, యాప్ సమాచారం తెరిచి, పైన ⋮ నొక్కి \"పరిమిత సెట్టింగ్‌లను అనుమతించు\" ఎంచుకోండి.</string>
+    <string name="btn_app_info">యాప్ సమాచారం</string>
+    <string name="step_ready">4. సిద్ధం</string>
+    <string name="ready_body">ఏ యాప్‌లోనైనా ఆరెంజ్ \"సహాయం\" బటన్ నొక్కి, మీకు ఏమి చేయాలో చెప్పండి. ఉదాహరణ: \"బ్లింకిట్‌లో పాలు ఆర్డర్ చేయాలి\".</string>
+    <string name="bubble_help">సహాయం</string>
+    <string name="bubble_listening">వింటున్నాను</string>
+    <string name="bubble_looking">చూస్తున్నాను</string>
+    <string name="btn_repeat">మళ్ళీ వినండి</string>
+    <string name="btn_close">మూసివేయి</string>
+    <string name="say_no_speech">నాకు మీ మాట వినిపించలేదు. సహాయం బటన్ నొక్కి మళ్ళీ చెప్పండి.</string>
+    <string name="say_network">ఇంటర్నెట్ పని చేయడం లేదు. కొంచెం సేపటి తర్వాత మళ్ళీ ప్రయత్నించండి.</string>
+    <string name="say_mic_denied">ముందుగా సాథీకి మైక్ అనుమతి ఇవ్వండి.</string>
+    <string name="say_scam_remote">జాగ్రత్త! ఈ యాప్ ఒక అపరిచితుడికి మీ ఫోన్‌ను నడిపే అవకాశం ఇస్తుంది. ఫోన్‌లో ఎవరైనా దీన్ని తెరవమని చెబితే, వెంటనే మూసివేసి మీ కుటుంబ సభ్యులకు ఫోన్ చేయండి.</string>
+    <string name="notif_channel">వినడం</string>
+    <string name="notif_listening">సాథీ వింటోంది</string>
+    <string name="service_desc">సాథీ స్క్రీన్ చూసి తర్వాత ఏమి నొక్కాలో చెబుతుంది. అది తనంతట తాను ఏదీ నొక్కదు.</string>
+</resources>

@@ -1,0 +1,92 @@
+package app.saathi.net
+
+import app.saathi.Prefs
+import app.saathi.session.Brain
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
+import java.io.File
+import java.io.IOException
+import java.util.concurrent.TimeUnit
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+
+class WorkerClient(
+    private val baseUrl: String,
+    private val prefs: Prefs,
+    /** Debug builds save each request here so it can be replayed with `npm run fixtures`. */
+    private val fixtureDir: File? = null,
+) : Brain {
+    private val http = OkHttpClient.Builder()
+        .connectTimeout(10, TimeUnit.SECONDS)
+        .callTimeout(45, TimeUnit.SECONDS)
+        .build()
+    private val json = Json { ignoreUnknownKeys = true; explicitNulls = false }
+    private val jsonType = "application/json; charset=utf-8".toMediaType()
+
+    override suspend fun turn(request: TurnRequest): TurnResponse = withContext(Dispatchers.IO) {
+        val body = json.encodeToString(request)
+        saveFixture(request)
+        var token = prefs.token ?: register()
+        var res = post("/turn", body, token)
+        if (res.code == 401) {
+            res.close()
+            token = register()
+            res = post("/turn", body, token)
+        }
+        res.use {
+            if (!it.isSuccessful) throw IOException("worker ${it.code}")
+            json.decodeFromString<TurnResponse>(it.body!!.string())
+        }
+    }
+
+    private suspend fun register(): String {
+        val res = post("/register", "{}", null)
+        val token = res.use {
+            if (!it.isSuccessful) throw IOException("register ${it.code}")
+            json.decodeFromString<RegisterResponse>(it.body!!.string()).token
+        }
+        prefs.token = token
+        return token
+    }
+
+    private suspend fun post(path: String, body: String, token: String?): Response {
+        val req = Request.Builder()
+            .url(baseUrl.trimEnd('/') + path)
+            .post(body.toRequestBody(jsonType))
+            .apply { if (token != null) header("Authorization", "Bearer $token") }
+            .build()
+        return http.newCall(req).await()
+    }
+
+    private fun saveFixture(request: TurnRequest) {
+        val dir = fixtureDir ?: return
+        runCatching {
+            dir.mkdirs()
+            val name = "turn-" + System.currentTimeMillis()
+            request.screenshotB64?.let {
+                File(dir, "$name.jpg").writeBytes(android.util.Base64.decode(it, android.util.Base64.DEFAULT))
+            }
+            File(dir, "$name.json").writeText(json.encodeToString(request.copy(audioB64 = null, screenshotB64 = null)))
+        }
+    }
+}
+
+private suspend fun Call.await(): Response = suspendCancellableCoroutine { cont ->
+    enqueue(object : Callback {
+        override fun onResponse(call: Call, response: Response) = cont.resume(response)
+        override fun onFailure(call: Call, e: IOException) {
+            if (cont.isActive) cont.resumeWithException(e)
+        }
+    })
+    cont.invokeOnCancellation { cancel() }
+}

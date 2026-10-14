@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onb_subtitle">இந்த செயலி உங்கள் பெற்றோர் போனைப் பயன்படுத்த, ஒவ்வொரு படியையும் சொல்லி உதவுகிறது. அமைக்க 2 நிமிடம் ஆகும்.</string>
+    <string name="step_language">1. மொழியைத் தேர்ந்தெடுக்கவும்</string>
+    <string name="step_mic">2. மைக் அனுமதி கொடுக்கவும்</string>
+    <string name="btn_allow">அனுமதி</string>
+    <string name="done">முடிந்தது</string>
+    <string name="step_access">3. சாத்தியை இயக்கவும்</string>
+    <string name="disclosure">உதவி பொத்தானை அழுத்தும்போது அல்லது சாத்தி ஒரு வேலையில் வழிகாட்டும்போது மட்டும், அது திரையில் உள்ளதைப் படித்து அதன் படம் எடுக்கிறது. அடுத்த படியை முடிவு செய்ய இவை சாத்தியின் சர்வருக்கு அனுப்பப்படும், சேமிக்கப்படாது. சாத்தி தானாக எதையும் அழுத்தாது; PIN அல்லது பணம் செலுத்தும் திரைகளைப் பார்க்க முடியாது.</string>
+    <string name="btn_open_settings">ஒப்புக்கொள்கிறேன், அமைப்புகளைத் திற</string>
+    <string name="access_on">சாத்தி இயக்கத்தில் உள்ளது</string>
+    <string name="access_hint">அமைப்புகளில் \"பதிவிறக்கிய ஆப்ஸ்\" அல்லது \"நிறுவிய ஆப்ஸ்\" திறந்து, சாத்தியைத் தேர்ந்தெடுத்து இயக்கவும்.</string>
+    <string name="access_restricted">பொத்தான் மங்கலாக இருந்தால், ஆப் தகவலைத் திறந்து, மேலே ⋮ அழுத்தி \"கட்டுப்படுத்தப்பட்ட அமைப்புகளை அனுமதி\" என்பதைத் தேர்ந்தெடுக்கவும்.</string>
+    <string name="btn_app_info">ஆப் தகவல்</string>
+    <string name="step_ready">4. தயார்</string>
+    <string name="ready_body">எந்த ஆப்பிலும் ஆரஞ்சு \"உதவி\" பொத்தானை அழுத்தி, என்ன செய்ய வேண்டும் என்று சொல்லுங்கள். உதாரணம்: \"பிளிங்கிட்டில் பால் வாங்க வேண்டும்\".</string>
+    <string name="bubble_help">உதவி</string>
+    <string name="bubble_listening">கேட்கிறேன்</string>
+    <string name="bubble_looking">பார்க்கிறேன்</string>
+    <string name="btn_repeat">மீண்டும் கேள்</string>
+    <string name="btn_close">மூடு</string>
+    <string name="say_no_speech">எனக்கு குரல் கேட்கவில்லை. உதவி பொத்தானை அழுத்தி மீண்டும் சொல்லுங்கள்.</string>
+    <string name="say_network">இணையம் வேலை செய்யவில்லை. சிறிது நேரம் கழித்து முயற்சிக்கவும்.</string>
+    <string name="say_mic_denied">முதலில் சாத்திக்கு மைக் அனுமதி கொடுங்கள்.</string>
+    <string name="say_scam_remote">கவனம்! இந்த ஆப் ஒரு அந்நியர் உங்கள் போனை இயக்க அனுமதிக்கிறது. போனில் யாராவது இதைத் திறக்கச் சொன்னால், உடனே மூடிவிட்டு குடும்பத்தினரை அழையுங்கள்.</string>
+    <string name="notif_channel">கேட்பது</string>
+    <string name="notif_listening">சாத்தி கேட்கிறது</string>
+    <string name="service_desc">சாத்தி திரையைப் பார்த்து அடுத்து எதை அழுத்த வேண்டும் என்று சொல்கிறது. அது தானாக எதையும் அழுத்தாது.</string>
+</resources>

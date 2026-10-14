@@ -1,0 +1,20 @@
+name = "saathi-worker"
+main = "src/index.ts"
+compatibility_date = "2025-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# claude-opus-5-5 at low effort is the default. Set GUIDE_MODEL=claude-haiku-5-5
+# to trade some pointing accuracy for lower latency and cost.
+GUIDE_MODEL = "claude-opus-5-5"
+GUIDE_EFFORT = "low"
+DAILY_TURN_LIMIT = "300"
+TTS_PACE = "0.85"
+
+# Per-device daily counters. Create with: npx wrangler kv namespace create USAGE
+[[kv_namespaces]]
+binding = "USAGE"
+id = "REPLACE_WITH_KV_ID"
+
+# Secrets (npx wrangler secret put <NAME>, or .dev.vars locally):
+#   ANTHROPIC_API_KEY  SARVAM_API_KEY  TOKEN_SECRET
