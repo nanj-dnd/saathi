@@ -11,6 +11,7 @@ import android.view.Display
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityWindowInfo
+import app.saathi.safety.ScreenSafety
 import app.saathi.session.Eyes
 import app.saathi.session.Snapshot
 import kotlinx.coroutines.Dispatchers
@@ -42,7 +43,9 @@ class ScreenReader(private val service: AccessibilityService) : Eyes {
             root?.let { TreeSerializer.serialize(toRaw(it, 0), w, h) } ?: SerializedTree("", emptyMap())
         }
 
-        val shot = capture(window, Box(0, 0, w, h))
+        // The tree already masks one-time codes, but a picture of an SMS with an OTP would show it.
+        // When codes or passwords are mentioned, the masked tree goes alone.
+        val shot = if (ScreenSafety.sensitive(tree.text)) Shot(null, false, Box(0, 0, w, h)) else capture(window, Box(0, 0, w, h))
         return Snapshot(
             app = app,
             screenshotB64 = shot.jpegB64,
