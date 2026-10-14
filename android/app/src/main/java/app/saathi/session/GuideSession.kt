@@ -62,7 +62,8 @@ interface Mouth {
 
 interface Pointer {
     fun state(state: GuideState)
-    fun point(target: Box?, caption: String, danger: String)
+    /** Shows [caption] and spotlights [target]. [done] marks a finished task, shown as a success. */
+    fun point(target: Box?, caption: String, danger: String, done: Boolean = false)
     fun clear()
 }
 
@@ -289,7 +290,7 @@ class GuideSession(
         lastLook = snap
         lastGuide = guide
 
-        pointer.point(targetBox(guide, snap), guide.say, guide.danger)
+        pointer.point(targetBox(guide, snap), guide.say, guide.danger, done = guide.status == Status.DONE)
         setState(GuideState.SPEAKING)
         mouth.say(guide.say)
 

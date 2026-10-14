@@ -69,7 +69,7 @@ class GuideSessionTest {
         }
         val pointer = object : Pointer {
             override fun state(state: GuideState) {}
-            override fun point(target: Box?, caption: String, danger: String) { pointed += target to caption }
+            override fun point(target: Box?, caption: String, danger: String, done: Boolean) { pointed += target to caption }
             override fun clear() {}
         }
         val brain = object : Brain {

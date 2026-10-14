@@ -48,6 +48,12 @@ internal class BubbleView(
     private val size = context.dp(84f).toInt()
     private val fill = Paint(Paint.ANTI_ALIAS_FLAG)
     private val halo = Paint(Paint.ANTI_ALIAS_FLAG)
+    // A white rim keeps the bubble visible on orange and red apps (Swiggy, Zomato, PhonePe).
+    private val rim = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = context.dp(3f)
+        color = Color.WHITE
+    }
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.WHITE
         textAlign = Paint.Align.CENTER
@@ -102,6 +108,7 @@ internal class BubbleView(
         }
         fill.setShadowLayer(context.dp(6f), 0f, context.dp(2f), 0x66000000)
         canvas.drawCircle(cx, cy, r, fill)
+        canvas.drawCircle(cx, cy, r - rim.strokeWidth / 2, rim)
         if (state == GuideState.THINKING) {
             val inset = context.dp(7f)
             canvas.drawArc(cx - r + inset, cy - r + inset, cx + r - inset, cy + r - inset, phase * 360f, 100f, false, arc)

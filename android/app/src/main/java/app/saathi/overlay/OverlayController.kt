@@ -97,15 +97,17 @@ class OverlayController(
         }
     }
 
-    override fun point(target: Box?, caption: String, danger: String) {
+    override fun point(target: Box?, caption: String, danger: String, done: Boolean) {
         if (!attached) return
         val res = strings()
-        val color = when (danger) {
-            Danger.SCAM -> Palette.SCAM
-            Danger.SENSITIVE -> Palette.SENSITIVE
+        val color = when {
+            danger == Danger.SCAM -> Palette.SCAM
+            danger == Danger.SENSITIVE -> Palette.SENSITIVE
+            done -> Palette.SPEAK
             else -> Palette.CARD
         }
-        this.caption.render(caption, color, res.getString(R.string.btn_repeat), res.getString(R.string.btn_close))
+        val shown = if (done && danger == Danger.NONE) "✓  $caption" else caption
+        this.caption.render(shown, color, res.getString(R.string.btn_repeat), res.getString(R.string.btn_close))
         placeCaption(target)
         this.caption.visibility = View.VISIBLE
 
