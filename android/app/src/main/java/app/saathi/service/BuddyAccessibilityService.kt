@@ -84,14 +84,19 @@ class BuddyAccessibilityService : AccessibilityService() {
         )
         overlay.show()
         if (BuildConfig.DEBUG) {
-            // adb shell am broadcast -a app.saathi.DEBUG_ASK --es text "how do I make text bigger"
-            registerReceiver(debugAsk, IntentFilter(DEBUG_ASK), RECEIVER_EXPORTED)
+            // adb shell "am broadcast -a app.saathi.DEBUG_ASK --es text 'how do I make text bigger'"
+            // adb shell "am broadcast -a app.saathi.DEBUG_OPENED --es pkg com.anydesk.anydeskandroid"
+            registerReceiver(debugAsk, IntentFilter().apply { addAction(DEBUG_ASK); addAction(DEBUG_OPENED) }, RECEIVER_EXPORTED)
         }
     }
 
     private val debugAsk = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            intent.getStringExtra("text")?.let(session::ask)
+            when (intent.action) {
+                DEBUG_ASK -> intent.getStringExtra("text")?.let(session::ask)
+                // Pretend an app came to the front, to exercise the scam guard without installing it.
+                DEBUG_OPENED -> intent.getStringExtra("pkg")?.let(::onAppOpened)
+            }
         }
     }
 
@@ -101,17 +106,19 @@ class BuddyAccessibilityService : AccessibilityService() {
         if (pkg == packageName || pkg in IGNORED || "inputmethod" in pkg) return
 
         when (event.eventType) {
-            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
-                if (scamGuard.shouldWarn(pkg)) {
-                    session.warn(localized().getString(R.string.say_scam_remote))
-                    return
-                }
-                session.onScreenEvent(ScreenEvent.NAVIGATED)
-            }
+            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> onAppOpened(pkg)
             AccessibilityEvent.TYPE_VIEW_CLICKED -> session.onScreenEvent(ScreenEvent.CLICK)
             AccessibilityEvent.TYPE_VIEW_SCROLLED -> session.onScreenEvent(ScreenEvent.SCROLLED)
             AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED -> session.onScreenEvent(ScreenEvent.TYPED)
         }
+    }
+
+    private fun onAppOpened(pkg: String) {
+        if (scamGuard.shouldWarn(pkg)) {
+            session.warn(localized().getString(R.string.say_scam_remote))
+            return
+        }
+        session.onScreenEvent(ScreenEvent.NAVIGATED)
     }
 
     override fun onInterrupt() {
@@ -129,6 +136,7 @@ class BuddyAccessibilityService : AccessibilityService() {
     companion object {
         private val IGNORED = setOf("com.android.systemui")
         private const val DEBUG_ASK = "app.saathi.DEBUG_ASK"
+        private const val DEBUG_OPENED = "app.saathi.DEBUG_OPENED"
 
         fun isEnabled(context: Context): Boolean {
             val am = context.getSystemService(AccessibilityManager::class.java)

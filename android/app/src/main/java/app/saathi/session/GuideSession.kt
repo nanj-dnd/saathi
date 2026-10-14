@@ -110,6 +110,8 @@ class GuideSession(
         // Only re-look while we are waiting on the senior, or if they acted before we finished talking.
         if (s != GuideState.WATCHING && s != GuideState.SPEAKING) return
         if (autoTurns >= MAX_AUTO_TURNS) return
+        // The senior acted, so the old spotlight is probably pointing at something that moved or is gone.
+        pointer.clear()
         launchPipeline {
             setState(GuideState.WATCHING)
             delay(event.settleMs)

@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { issueToken, underDailyLimit, verifyToken } from "./auth.ts";
+import { demoGuide } from "./demo.ts";
 import { askGuide, mockGuide } from "./guide.ts";
 import { BadRequest, parseTurnRequest, type TurnResponse } from "./schema.ts";
 
@@ -12,6 +13,8 @@ export interface Env {
   GUIDE_MODEL: string;
   GUIDE_EFFORT: string;
   DAILY_TURN_LIMIT: string;
+  /** "1" = scripted Settings walkthrough for recording demos (src/demo.ts). Local only. */
+  DEMO?: string;
   USAGE: KVNamespace;
 }
 
@@ -41,9 +44,11 @@ export default {
     try {
       const req = parseTurnRequest(await request.json());
       const t0 = Date.now();
-      const guide = !env.ANTHROPIC_API_KEY
-        ? mockGuide(req)
-        : await askGuide(
+      const guide = env.DEMO === "1"
+        ? demoGuide(req)
+        : !env.ANTHROPIC_API_KEY
+          ? mockGuide(req)
+          : await askGuide(
             {
               apiKey: env.ANTHROPIC_API_KEY,
               model: env.GUIDE_MODEL || "claude-haiku-5-5",
