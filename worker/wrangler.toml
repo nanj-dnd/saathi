@@ -2,6 +2,10 @@ name = "saathi-worker"
 main = "src/index.ts"
 compatibility_date = "2025-09-01"
 compatibility_flags = ["nodejs_compat"]
+# Served at https://saathi-worker.nanj-dnd.workers.dev. Per-version preview URLs stay off: they
+# would keep every old version (including any without the spend cap) reachable.
+workers_dev = true
+preview_urls = false
 
 [vars]
 # Haiku keeps a step well under a rupee. If it misplaces the pointer on real apps,
