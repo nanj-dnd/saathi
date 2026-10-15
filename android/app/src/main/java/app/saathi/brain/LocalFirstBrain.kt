@@ -23,7 +23,8 @@ import kotlinx.coroutines.CancellationException
  * 4. The Worker, whose answer is then saved for step 3.
  *
  * Steps 1–3 work offline. A screen that shows signs of a scam skips 2 and 3 so the model, which
- * knows how to warn, always sees it.
+ * knows how to warn, always sees it; if the model can't be reached, a scripted scam warning that
+ * fits is still given.
  */
 class LocalFirstBrain(
     private val recipes: () -> RecipeBook,
@@ -68,11 +69,21 @@ class LocalFirstBrain(
         } catch (e: Exception) {
             // Offline: an old answer for this exact screen is still better than "no internet".
             key?.let { cache.get(it, allowStale = true) }?.takeIf { fits(it, request) }?.let { return local(it, Source.CACHE) }
+            // A scam-looking turn skipped the recipes for the model; without it, a scripted warning
+            // is still far better than silence.
+            if (risky) scamWarning(request)?.let { return local(it, Source.RECIPE) }
             throw e
         }
         if (key != null && worthKeeping(response.guide)) cache.put(key, response.guide)
         log("turn ${request.app} via ${response.source}: ${response.guide.label}")
         return response
+    }
+
+    /** The scripted scam warning that fits what was said, ignoring ordinary scripts that might outrank it in this app. */
+    private fun scamWarning(request: TurnRequest): Guide? {
+        val book = recipes()
+        val warnings = book.recipes.filter { r -> r.steps.isNotEmpty() && r.steps.all { it.danger == Danger.SCAM } }
+        return RecipeEngine(RecipeBook(book.common, warnings)).guide(request)
     }
 
     internal companion object {
