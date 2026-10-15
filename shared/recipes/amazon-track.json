@@ -1,6 +1,6 @@
 {
   "id": "amazon-track",
-  "version": 1,
+  "version": 2,
   "goal": "track an order on Amazon",
   "apps": [
     "in.amazon.mShop.android.shopping"
@@ -127,5 +127,21 @@
         "ml-IN": "താഴെ '{label}' അമർത്തുക."
       }
     }
+  ],
+  "unless": [
+    "music",
+    "म्यूजिक",
+    "म्यूज़िक",
+    "மியூசிக்",
+    "మ్యూజిక్",
+    "ಮ್ಯೂಸಿಕ್",
+    "മ്യൂസിക്",
+    "prime",
+    "प्राइम",
+    "ப்ரைம்",
+    "பிரைம்",
+    "ప్రైమ్",
+    "ಪ್ರೈಮ್",
+    "പ്രൈം"
   ]
 }
