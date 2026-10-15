@@ -1,0 +1,676 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-15T10:13:31+00:00",
+  "title": "Design System: Saathi",
+  "extensions": {
+    "colorMeta": {
+      "metro-blue": {
+        "role": "primary",
+        "displayName": "Metro Blue",
+        "canonical": "#0858A8",
+        "tonalRamp": [
+          "#000B1F",
+          "#02234A",
+          "#073F7A",
+          "#105DAD",
+          "#387ED1",
+          "#5AA1F7",
+          "#9DC7FD",
+          "#E4F0FE"
+        ]
+      },
+      "metro-blue-night-line": {
+        "role": "primary",
+        "displayName": "Night Line Blue",
+        "canonical": "#6AB2F2",
+        "tonalRamp": [
+          "#000C1B",
+          "#022642",
+          "#08426D",
+          "#12619C",
+          "#3A82BF",
+          "#5DA5E4",
+          "#93CAFD",
+          "#E2F0FE"
+        ]
+      },
+      "metro-blue-night-fill": {
+        "role": "primary",
+        "displayName": "Night Fill Blue",
+        "canonical": "#1E6CC0",
+        "tonalRamp": [
+          "#000B1E",
+          "#032448",
+          "#013F7B",
+          "#055DAF",
+          "#337ED4",
+          "#56A1F9",
+          "#9BC8FF",
+          "#E4F0FF"
+        ]
+      },
+      "enamel-white": {
+        "role": "neutral",
+        "displayName": "Enamel White",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#242424",
+          "#404040",
+          "#5D5D5D",
+          "#7D7D7D",
+          "#9E9E9E",
+          "#C4C4C4",
+          "#EEEEEE"
+        ]
+      },
+      "graphite-panel": {
+        "role": "neutral",
+        "displayName": "Graphite Panel",
+        "canonical": "#1C1E22",
+        "tonalRamp": [
+          "#090B0F",
+          "#222428",
+          "#3D4044",
+          "#5B5E62",
+          "#7B7D82",
+          "#9C9EA4",
+          "#C1C4CA",
+          "#ECEEF4"
+        ]
+      },
+      "graphite-raised": {
+        "role": "neutral",
+        "displayName": "Graphite Raised",
+        "canonical": "#2A2D33",
+        "tonalRamp": [
+          "#090B10",
+          "#21242A",
+          "#3D4046",
+          "#5A5E64",
+          "#7A7D84",
+          "#9B9EA6",
+          "#C0C4CC",
+          "#EAEFF7"
+        ]
+      },
+      "night-ground": {
+        "role": "neutral",
+        "displayName": "Night Ground",
+        "canonical": "#111215",
+        "tonalRamp": [
+          "#0A0B0E",
+          "#232427",
+          "#3E4043",
+          "#5C5D61",
+          "#7C7D81",
+          "#9D9EA2",
+          "#C2C4C8",
+          "#EDEEF3"
+        ]
+      },
+      "ring-edge-night": {
+        "role": "neutral",
+        "displayName": "Ring Edge Night",
+        "canonical": "#0B0C0E",
+        "tonalRamp": [
+          "#0A0B0D",
+          "#232426",
+          "#3E4042",
+          "#5C5E60",
+          "#7C7D80",
+          "#9D9EA1",
+          "#C2C4C7",
+          "#EDEEF2"
+        ]
+      },
+      "signage-ink": {
+        "role": "neutral",
+        "displayName": "Signage Ink",
+        "canonical": "#111214",
+        "tonalRamp": [
+          "#0A0B0D",
+          "#232426",
+          "#3E4042",
+          "#5C5E60",
+          "#7C7D80",
+          "#9D9EA1",
+          "#C3C4C7",
+          "#EDEEF1"
+        ]
+      },
+      "signage-ink-soft": {
+        "role": "neutral",
+        "displayName": "Signage Ink Soft",
+        "canonical": "#3B3F45",
+        "tonalRamp": [
+          "#080B10",
+          "#21242A",
+          "#3C4046",
+          "#5A5E64",
+          "#797E84",
+          "#9A9FA6",
+          "#C0C4CC",
+          "#EAEFF6"
+        ]
+      },
+      "night-ink": {
+        "role": "neutral",
+        "displayName": "Night Ink",
+        "canonical": "#F4F5F7",
+        "tonalRamp": [
+          "#0B0B0C",
+          "#232425",
+          "#3F4041",
+          "#5D5E5F",
+          "#7C7D7F",
+          "#9D9EA0",
+          "#C3C4C6",
+          "#EDEEF0"
+        ]
+      },
+      "night-ink-soft": {
+        "role": "neutral",
+        "displayName": "Night Ink Soft",
+        "canonical": "#C3C7CE",
+        "tonalRamp": [
+          "#090B10",
+          "#212429",
+          "#3D4046",
+          "#5A5E64",
+          "#7A7D84",
+          "#9B9FA5",
+          "#C0C4CB",
+          "#EBEFF6"
+        ]
+      },
+      "veil-day": {
+        "role": "neutral",
+        "displayName": "Veil (day)",
+        "canonical": "#0000005C",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#242424",
+          "#404040",
+          "#5D5D5D",
+          "#7D7D7D",
+          "#9E9E9E",
+          "#C4C4C4",
+          "#EEEEEE"
+        ],
+        "note": "Alpha black over the app; ramp shows the opaque hue only."
+      },
+      "veil-night": {
+        "role": "neutral",
+        "displayName": "Veil (night)",
+        "canonical": "#00000080",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#242424",
+          "#404040",
+          "#5D5D5D",
+          "#7D7D7D",
+          "#9E9E9E",
+          "#C4C4C4",
+          "#EEEEEE"
+        ],
+        "note": "Alpha black over the app; ramp shows the opaque hue only."
+      },
+      "close-grey": {
+        "role": "neutral",
+        "displayName": "Close Grey",
+        "canonical": "#E9EBEE",
+        "tonalRamp": [
+          "#0A0B0D",
+          "#232426",
+          "#3E4042",
+          "#5C5E60",
+          "#7C7D80",
+          "#9D9EA1",
+          "#C2C4C7",
+          "#EDEFF2"
+        ]
+      },
+      "chip-grey": {
+        "role": "neutral",
+        "displayName": "Chip Grey",
+        "canonical": "#ECEEF1",
+        "tonalRamp": [
+          "#0A0B0D",
+          "#232426",
+          "#3E4042",
+          "#5C5E60",
+          "#7C7D80",
+          "#9D9EA1",
+          "#C2C4C7",
+          "#EDEFF2"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#DDE1E6",
+        "tonalRamp": [
+          "#090B0F",
+          "#212428",
+          "#3D4044",
+          "#5A5E62",
+          "#7A7E82",
+          "#9B9FA3",
+          "#C1C4C9",
+          "#EBEFF4"
+        ]
+      },
+      "track-grey": {
+        "role": "neutral",
+        "displayName": "Track Grey",
+        "canonical": "#C9CDD3",
+        "tonalRamp": [
+          "#090B0F",
+          "#212429",
+          "#3D4045",
+          "#5A5E63",
+          "#7A7D83",
+          "#9B9FA4",
+          "#C0C4CA",
+          "#EBEFF5"
+        ]
+      },
+      "track-night": {
+        "role": "neutral",
+        "displayName": "Track Night",
+        "canonical": "#3A3E45",
+        "tonalRamp": [
+          "#080B11",
+          "#20242B",
+          "#3C4047",
+          "#595E65",
+          "#797D85",
+          "#9A9FA7",
+          "#BFC4CD",
+          "#EAEFF8"
+        ]
+      },
+      "done-green": {
+        "role": "tertiary",
+        "displayName": "Done Green",
+        "canonical": "#1B7F3B",
+        "tonalRamp": [
+          "#001003",
+          "#032D0F",
+          "#0A4D20",
+          "#157033",
+          "#35934E",
+          "#5AB56E",
+          "#81DD93",
+          "#C9FFD1"
+        ]
+      },
+      "done-green-night": {
+        "role": "tertiary",
+        "displayName": "Done Green Night",
+        "canonical": "#4CC071",
+        "tonalRamp": [
+          "#001003",
+          "#022D12",
+          "#094D24",
+          "#137038",
+          "#0E964A",
+          "#44B96A",
+          "#6EE08F",
+          "#C8FED4"
+        ]
+      },
+      "caution-amber": {
+        "role": "tertiary",
+        "displayName": "Caution Amber",
+        "canonical": "#9A5B00",
+        "tonalRamp": [
+          "#150800",
+          "#361D01",
+          "#5B3606",
+          "#845010",
+          "#AD6C20",
+          "#D18E47",
+          "#F9B46D",
+          "#FEEBD9"
+        ]
+      },
+      "caution-amber-night": {
+        "role": "tertiary",
+        "displayName": "Caution Amber Night",
+        "canonical": "#F0A63A",
+        "tonalRamp": [
+          "#130800",
+          "#341F01",
+          "#583806",
+          "#7F530F",
+          "#AA6F09",
+          "#D58D11",
+          "#FEB34A",
+          "#FEEBD5"
+        ]
+      },
+      "danger-red": {
+        "role": "tertiary",
+        "displayName": "Danger Red",
+        "canonical": "#C62828",
+        "tonalRamp": [
+          "#1F0001",
+          "#490406",
+          "#7D0009",
+          "#B10414",
+          "#D83C38",
+          "#FA6A60",
+          "#FEABA2",
+          "#FEE9E6"
+        ]
+      },
+      "danger-red-night": {
+        "role": "tertiary",
+        "displayName": "Danger Red Night",
+        "canonical": "#FF6B6B",
+        "tonalRamp": [
+          "#1F0002",
+          "#4A020A",
+          "#790B18",
+          "#AD1628",
+          "#D34347",
+          "#FB6768",
+          "#FBACA8",
+          "#FFE9E7"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Setup wordmark only."
+      },
+      "sign-head": {
+        "displayName": "Sign Head",
+        "purpose": "First sentence of an overlay instruction; scales with system font up to 1.3x; fallback line spacing off."
+      },
+      "sign-sub": {
+        "displayName": "Sign Sub",
+        "purpose": "Remaining sentences of an instruction, soft ink; scales up to 1.3x."
+      },
+      "stop-current": {
+        "displayName": "Stop Current",
+        "purpose": "Current setup stop number and title."
+      },
+      "stop": {
+        "displayName": "Stop",
+        "purpose": "Other setup stop titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Setup tagline and Ready text."
+      },
+      "body-small": {
+        "displayName": "Body Small",
+        "purpose": "Disclosure, hints, status lines."
+      },
+      "button": {
+        "displayName": "Button",
+        "purpose": "Repeat, Close and primary actions; shrinks to fit beside its glyph, never below 13."
+      },
+      "button-secondary": {
+        "displayName": "Button Secondary",
+        "purpose": "Setup outline actions."
+      },
+      "disc-word": {
+        "displayName": "Disc Word",
+        "purpose": "Help/Listening/Looking under the disc glyph, width axis 88; never below 14."
+      }
+    },
+    "fonts": [
+      {
+        "family": "Anek",
+        "source": "android/app/src/main/assets/fonts",
+        "files": [
+          "AnekLatin.ttf",
+          "AnekDevanagari.ttf",
+          "AnekTamil.ttf",
+          "AnekTelugu.ttf",
+          "AnekKannada.ttf",
+          "AnekMalayalam.ttf"
+        ],
+        "axes": {
+          "wght": "100-800",
+          "wdth": "75-125"
+        },
+        "purpose": "One variable file per script, chosen by the senior's language; each also carries Latin."
+      }
+    ],
+    "shadows": [
+      {
+        "name": "sign-inset",
+        "value": "Android elevation 4dp",
+        "purpose": "Top inset sign card over the app."
+      },
+      {
+        "name": "sign-docked",
+        "value": "Android elevation 8dp",
+        "purpose": "Bottom docked platform board (square corners)."
+      },
+      {
+        "name": "disc-lift",
+        "value": "0 2px 6px rgba(0,0,0,0.33)",
+        "purpose": "Help disc only, together with its 3dp bright rim."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ring-glide",
+        "value": "520ms, DecelerateInterpolator(2)",
+        "purpose": "The ring travels from its last stop or the Help disc to the next target. The signature motion."
+      },
+      {
+        "name": "station-dot-breathe",
+        "value": "1600ms loop, up to 18% swell",
+        "purpose": "Station dot pulses once the ring has arrived; nothing else moves."
+      },
+      {
+        "name": "disc-listening",
+        "value": "1400ms loop, two rings outward",
+        "purpose": "Help disc while the mic is open."
+      },
+      {
+        "name": "disc-looking",
+        "value": "1400ms loop, 100-degree arc rotating",
+        "purpose": "Help disc while the screen is being read."
+      },
+      {
+        "name": "reduce-motion",
+        "value": "ValueAnimator.areAnimatorsEnabled() == false",
+        "purpose": "Remove animations: every motion above becomes an instant cut or is not started."
+      }
+    ],
+    "breakpoints": [],
+    "accessibility": [
+      {
+        "name": "font-scale-cap",
+        "value": "1.0-1.3x",
+        "purpose": "Overlay type follows system font scale up to 1.3x."
+      },
+      {
+        "name": "ring-min",
+        "value": "64dp",
+        "purpose": "Minimum ring side for small targets."
+      },
+      {
+        "name": "touch-min",
+        "value": "60dp sign buttons, 56dp setup buttons, 52dp chips",
+        "purpose": "Large targets for older hands."
+      },
+      {
+        "name": "glyph-grid",
+        "value": "24-unit grid, 3.2 stroke, round caps/joins",
+        "purpose": "Drawn icon set (Glyphs.kt) shared by overlay and setup."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Repeat Button",
+      "kind": "button",
+      "refersTo": "button-repeat",
+      "description": "Filled metro-blue sign button; replays the spoken step.",
+      "html": "<button class=\"ds-btn-repeat\"><svg viewBox=\"0 0 24 24\" width=\"24\" height=\"24\" aria-hidden=\"true\"><path d=\"M18.5 15.75A7.5 7.5 0 1 1 13.3 4.6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.2\" stroke-linecap=\"round\"/><path d=\"M10.5 0.8L16 4.5 10.5 8.2z\" fill=\"currentColor\"/></svg>Repeat</button>",
+      "css": ".ds-btn-repeat{font-family:'Anek Latin','Anek Devanagari',sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:60px;min-width:200px;padding:0 14px;border-radius:10px;font-size:21px;font-weight:700;cursor:pointer;transition:filter .15s;background:#0858A8;color:#FFFFFF;border:none;} .ds-btn-repeat:hover{filter:brightness(1.1);} .ds-btn-repeat:focus-visible{outline:3px solid #111214;outline-offset:3px;} .ds-btn-repeat:active{filter:brightness(.9);}"
+    },
+    {
+      "name": "Close Button (on veil)",
+      "kind": "button",
+      "refersTo": "button-close-on-veil",
+      "description": "Outline sign button with an opaque neutral fill, used beneath the inset sign on the veil.",
+      "html": "<button class=\"ds-btn-close\"><svg viewBox=\"0 0 24 24\" width=\"24\" height=\"24\" aria-hidden=\"true\"><path d=\"M6 6l12 12M18 6L6 18\" stroke=\"currentColor\" stroke-width=\"3.2\" stroke-linecap=\"round\"/></svg>Close</button>",
+      "css": ".ds-btn-close{font-family:'Anek Latin','Anek Devanagari',sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:60px;min-width:200px;padding:0 14px;border-radius:10px;font-size:21px;font-weight:700;cursor:pointer;transition:filter .15s;background:#E9EBEE;color:#0858A8;border:2.5px solid #0858A8;} .ds-btn-close:hover{background:#DDE1E6;} .ds-btn-close:focus-visible{outline:3px solid #111214;outline-offset:3px;} .ds-btn-close:active{background:#C9CDD3;}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Setup outline action; label may wrap to two lines.",
+      "html": "<button class=\"ds-btn-secondary\">Open app info</button>",
+      "css": ".ds-btn-secondary{font-family:'Anek Latin','Anek Devanagari',sans-serif;min-height:56px;min-width:260px;padding:12px 16px;border-radius:10px;background:transparent;color:#0858A8;border:2.5px solid #0858A8;font-size:18px;font-weight:600;cursor:pointer;} .ds-btn-secondary:hover{background:rgba(8,88,168,.08);} .ds-btn-secondary:focus-visible{outline:3px solid #111214;outline-offset:3px;}"
+    },
+    {
+      "name": "Instruction Sign",
+      "kind": "card",
+      "refersTo": "sign-panel",
+      "description": "Enamel panel with a leading band, a heavy arrow and the first sentence large.",
+      "html": "<div class=\"ds-sign\"><span class=\"ds-sign-band\"></span><span class=\"ds-sign-glyph\"><svg viewBox=\"0 0 24 24\" width=\"56\" height=\"56\" aria-hidden=\"true\"><path d=\"M9.5 2h5v10.5h6L12 22 3.5 12.5h6z\" fill=\"currentColor\"/></svg></span><div class=\"ds-sign-text\"><p class=\"ds-sign-head\">Press 'Network &amp; internet'.</p><p class=\"ds-sign-sub\">Wi-Fi is inside it.</p></div></div>",
+      "css": ".ds-sign{font-family:'Anek Latin','Anek Devanagari',sans-serif;display:flex;align-items:stretch;width:360px;background:#FFFFFF;border-radius:8px;overflow:hidden;box-shadow:0 2px 4px rgba(0,0,0,.2);} .ds-sign-band{width:12px;background:#0858A8;flex:none;} .ds-sign-glyph{display:flex;align-items:center;color:#111214;margin:0 6px 0 8px;} .ds-sign-text{padding:18px 18px 18px 0;} .ds-sign-head{margin:0;color:#111214;font-size:27px;font-weight:700;line-height:1.3;} .ds-sign-sub{margin:6px 0 0;color:#3B3F45;font-size:20px;font-weight:500;line-height:1.35;}"
+    },
+    {
+      "name": "Help Disc",
+      "kind": "custom",
+      "refersTo": "help-disc",
+      "description": "Metro-blue station disc with a bright rim, guide mark and state word.",
+      "html": "<button class=\"ds-disc\" aria-label=\"Help\"><svg viewBox=\"0 0 24 24\" width=\"26\" height=\"26\" aria-hidden=\"true\"><path d=\"M2.5 12H13M9 7l5 5-5 5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"19.5\" cy=\"12\" r=\"3\" fill=\"currentColor\"/></svg><span>Help</span></button>",
+      "css": ".ds-disc{font-family:'Anek Latin','Anek Devanagari',sans-serif;width:80px;height:80px;border-radius:50%;background:#0858A8;color:#FFFFFF;border:3px solid #FFFFFF;box-shadow:0 2px 6px rgba(0,0,0,.33);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:16px;font-weight:700;font-stretch:88%;cursor:pointer;} .ds-disc:focus-visible{outline:3px solid #111214;outline-offset:3px;} .ds-disc:active{filter:brightness(.9);}"
+    },
+    {
+      "name": "Ring Pointer",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "Blue ring with a bright edge and a station dot on its leading end, cut out of a flat veil.",
+      "html": "<div class=\"ds-veil\"><div class=\"ds-ring\"><span class=\"ds-dot\"></span>Display &amp; touch</div></div>",
+      "css": ".ds-veil{font-family:'Anek Latin','Anek Devanagari',sans-serif;position:relative;padding:40px 24px;background:#ECEEF1;background-image:linear-gradient(rgba(0,0,0,.36),rgba(0,0,0,.36));} .ds-ring{position:relative;height:64px;display:flex;align-items:center;padding-left:28px;border-radius:16px;background:#ECEEF1;border:6px solid #0858A8;box-shadow:0 0 0 2.5px #FFFFFF,inset 0 0 0 2.5px #FFFFFF;font-size:20px;color:#111214;} .ds-dot{position:absolute;left:-15px;top:50%;width:18px;height:18px;margin-top:-9px;border-radius:50%;background:#0858A8;box-shadow:0 0 0 2.5px #FFFFFF;}"
+    },
+    {
+      "name": "Language Chip",
+      "kind": "chip",
+      "refersTo": "language-chip",
+      "description": "Pill set in its own script; selected is tinted and outlined blue.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip ds-chip-on\" aria-pressed=\"true\">हिन्दी</button><button class=\"ds-chip\">English</button><button class=\"ds-chip\">தமிழ்</button></div>",
+      "css": ".ds-chips{display:flex;gap:10px;} .ds-chip{font-family:'Anek Latin','Anek Devanagari',sans-serif;min-height:52px;padding:10px 20px;border-radius:26px;background:#ECEEF1;color:#111214;border:2.5px solid transparent;font-size:21px;font-weight:600;cursor:pointer;} .ds-chip:hover{background:#DDE1E6;} .ds-chip:focus-visible{outline:3px solid #111214;outline-offset:2px;} .ds-chip-on{background:rgba(8,88,168,.14);border-color:#0858A8;color:#0858A8;font-weight:700;}"
+    },
+    {
+      "name": "Speed Choice",
+      "kind": "button",
+      "refersTo": "choice-selected",
+      "description": "Two-way outlined choice; the selected one fills blue and gains a tick.",
+      "html": "<div class=\"ds-choices\"><button class=\"ds-choice\">Slow</button><button class=\"ds-choice ds-choice-on\" aria-pressed=\"true\"><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" aria-hidden=\"true\"><path d=\"M4.5 12.5l5 5 10-11\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Normal</button></div>",
+      "css": ".ds-choices{display:flex;gap:10px;width:320px;} .ds-choice{font-family:'Anek Latin','Anek Devanagari',sans-serif;flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:56px;padding:0 12px;border-radius:10px;background:transparent;color:#0858A8;border:2.5px solid #0858A8;font-size:19px;font-weight:600;cursor:pointer;} .ds-choice:focus-visible{outline:3px solid #111214;outline-offset:3px;} .ds-choice-on{background:#0858A8;color:#FFFFFF;}"
+    },
+    {
+      "name": "Setup Line Stop",
+      "kind": "nav",
+      "refersTo": "",
+      "description": "A stop on the setup rail: done stops ticked, the current stop a large open ring.",
+      "html": "<ol class=\"ds-line\"><li class=\"ds-stop ds-done\"><span class=\"ds-mark\"><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" aria-hidden=\"true\"><path d=\"M4.5 12.5l5 5 10-11\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></span><b>1</b> Choose language</li><li class=\"ds-stop ds-current\"><span class=\"ds-mark\"></span><b>2</b> Allow the mic</li><li class=\"ds-stop\"><span class=\"ds-mark\"></span><b>3</b> Turn on Saathi</li></ol>",
+      "css": ".ds-line{font-family:'Anek Latin','Anek Devanagari',sans-serif;list-style:none;margin:0;padding:0 0 0 0;border-left:6px solid #C9CDD3;margin-left:22px;} .ds-stop{position:relative;display:flex;align-items:center;gap:12px;min-height:40px;margin-bottom:26px;padding-left:24px;font-size:20px;font-weight:600;color:#3B3F45;} .ds-stop b{color:#3B3F45;} .ds-mark{position:absolute;left:-17px;width:22px;height:22px;border-radius:50%;background:#FFFFFF;box-shadow:inset 0 0 0 4px #C9CDD3;display:flex;align-items:center;justify-content:center;color:#FFFFFF;} .ds-done{color:#111214;} .ds-done b{color:#0858A8;} .ds-done .ds-mark{left:-21px;width:30px;height:30px;background:#0858A8;box-shadow:none;} .ds-current{font-size:26px;font-weight:700;color:#111214;} .ds-current b{color:#0858A8;} .ds-current .ds-mark{left:-23px;width:34px;height:34px;box-shadow:inset 0 0 0 7px #0858A8;}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Metro Sign",
+    "overview": "**Creative North Star: \"The Metro Sign\"**\n\nSaathi guides the way a Delhi Metro sign does: one heavy arrow, one ringed stop, the instruction set on a white enamel panel with a thick metro-blue band on its leading edge. Everything else on screen is dimmed under a flat neutral veil, so the only lit things are the sign, the ring around the target, and the round blue Help disc. The setup screen is the same world read as a line map: five stops on a rail, done stops ticked, the current stop large with its sign beside it.\n\nThe system is built for older eyes and six scripts. Type is big and bold (Anek, a signage sans from Ek Type, in the script of the senior's language), touch targets never drop below 52 to 60 units, and every state is carried by a drawn glyph's shape as well as its colour. The world refuses the category default of a rounded bottom sheet with a soft glowing highlight: the sign is either an inset enamel card or a square-cornered platform board, and the target is ringed with a hard blue line, not lit.\n\nAll dimensions below are Android dp (sp for setup text), written as px in the tokens at 1px = 1dp. Both themes are first-class: the night scheme swaps to a graphite panel, white type, and a lighter blue line with a deeper blue fill.",
+    "keyCharacteristics": [
+      "White enamel panels, near-black bold signage type, metro blue the only accent.",
+      "A thick coloured band on the leading edge of every sign; band colour and glyph shape together say what kind of sign it is.",
+      "A thick blue ring with a bright edge and a solid station dot marks the one place to press.",
+      "Flat veil, flat panels, square docking; depth only where a layer must hold over an unknown app.",
+      "One drawn icon set on a 24-unit grid, used by overlay and setup alike.",
+      "Motion is one glide of the ring from stop to stop, and it all stops when the system says Remove animations."
+    ],
+    "rules": [
+      {
+        "name": "The One Blue Rule",
+        "body": "Metro blue is the only accent. Green, amber and red appear only as a sign's band and glyph or a status mark, never as decoration or a second brand colour.",
+        "section": "colors"
+      },
+      {
+        "name": "The Shape-Plus-Colour Rule",
+        "body": "No state is told by colour alone. Press here is an arrow, done is a tick, do-it-yourself is a lock, warning is a triangle, a note with no target is a station stop. A selected choice carries a tick; a reached stop carries a tick; a selected chip carries a heavier weight and an outline.",
+        "section": "colors"
+      },
+      {
+        "name": "The Line and Fill Rule",
+        "body": "At night, blue that is a line (band, ring, stroke, text on an outline) uses the lighter line blue; blue that carries white on it uses the deeper fill blue.",
+        "section": "colors"
+      },
+      {
+        "name": "The First Sentence Rule",
+        "body": "A sign splits at its first sentence end (. ! ? or ।): that sentence is large and bold, the rest smaller beneath. One instruction reads at a glance.",
+        "section": "typography"
+      },
+      {
+        "name": "The Indic Line Rule",
+        "body": "Set the typeface before the size and line height, give every overlay text an explicit line height (1.3 head, 1.35 sub), and turn fallback line spacing and font padding off. Devanagari and the Dravidian scripts' tall metrics otherwise push a two-line instruction apart into what reads as two lines.",
+        "section": "typography"
+      },
+      {
+        "name": "The 1.3 Cap Rule",
+        "body": "Overlay type follows the system font scale up to 1.3× and no further, so a sign never covers the screen; the cap is read on every render.",
+        "section": "typography"
+      },
+      {
+        "name": "The Own-Script Chip Rule",
+        "body": "Each language chip is set in its own script's face, whatever the current language.",
+        "section": "typography"
+      },
+      {
+        "name": "The Away-From-Target Rule",
+        "body": "The sign, the disc and the buttons never cover the thing the senior is meant to press.",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat Veil Rule",
+        "body": "The veil is one flat neutral with a hard cutout. No gradient, no blur, no glow around the target.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Bright Edge Rule",
+        "body": "Anything blue that floats over an app (ring, station dot, Help disc) carries a bright edge: white by day, near-black at night.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Station Dot Rule",
+        "body": "The station dot is the system's signature: a solid blue dot with a bright edge on the leading end of the ring, at the end of the guide mark, and in the launcher.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "**Do** pair every state with its glyph shape: arrow for press here, tick for done, lock for do-it-yourself, warning triangle for warnings, station stop for a note.",
+      "**Do** put the sign at the top as an inset 8-radius card with Repeat and Close on the veil beneath, or at the bottom docked full width at 0 radius with the buttons inside.",
+      "**Do** give Close an opaque neutral fill whenever it sits on the veil.",
+      "**Do** make buttons 10-radius rounded rectangles at least 60 tall, with the glyph centred on the word's ink.",
+      "**Do** size the Help disc once per language to its longest state word and keep its centre fixed.",
+      "**Do** give the ring a bright edge (white by day, near-black at night) and a station dot on its leading end, and never draw it smaller than 64.",
+      "**Do** set explicit line heights with fallback line spacing off for all overlay text.",
+      "**Do** cap overlay font scale at 1.3× and honour Remove animations everywhere.",
+      "**Do** draw every icon from the 24-unit glyph set."
+    ],
+    "donts": [
+      "**Don't** use a rounded bottom sheet or a soft glowing highlight around the target; the veil is a flat neutral with a hard cutout and the ring is a hard line.",
+      "**Don't** add a second accent colour; green, amber and red live only in bands, status marks and their glyphs.",
+      "**Don't** let any state depend on colour alone.",
+      "**Don't** shrink sign buttons' words below 13 or the disc word below 14; grow the container first.",
+      "**Don't** cover the target with the sign, the disc or the buttons.",
+      "**Don't** use emoji, font icons or text characters as icons; draw them."
+    ]
+  }
+}

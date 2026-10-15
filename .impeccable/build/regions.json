@@ -1,0 +1,111 @@
+{
+ "regions": [
+  {
+   "id": "status-bar",
+   "kind": "chrome",
+   "grid": "A0:J0",
+   "note": "Android status bar of the host phone (time, signal, battery) (system UI rendered by Android under the overlay)",
+   "codeDrawn": true
+  },
+  {
+   "id": "sign-band",
+   "kind": "chrome",
+   "grid": "A0:A1",
+   "note": "thick metro-blue band on the sign panel's leading edge"
+  },
+  {
+   "id": "sign-arrow",
+   "kind": "chrome",
+   "grid": "B0:B1",
+   "note": "heavy solid black arrow pointing down toward the target"
+  },
+  {
+   "id": "caption-head",
+   "kind": "text",
+   "note": "first sentence of the instruction, large bold near-black signage sans: Press 'Display & touch'",
+   "box": [
+    210,
+    108,
+    610,
+    72
+   ]
+  },
+  {
+   "id": "caption-sub",
+   "kind": "text",
+   "note": "rest of the instruction, smaller regular weight: The text size is in here.",
+   "box": [
+    210,
+    182,
+    440,
+    52
+   ]
+  },
+  {
+   "id": "repeat",
+   "kind": "control",
+   "grid": "A2:E2",
+   "note": "filled metro-blue pill button labelled Repeat, white bold text"
+  },
+  {
+   "id": "close",
+   "kind": "control",
+   "grid": "F2:J2",
+   "note": "outline metro-blue pill button labelled Close, blue text, set apart from Repeat"
+  },
+  {
+   "id": "host-battery",
+   "kind": "chrome",
+   "grid": "A3:J3",
+   "note": "host app row Battery under the grey veil (system UI rendered by Android under the overlay)",
+   "codeDrawn": true
+  },
+  {
+   "id": "host-storage",
+   "kind": "chrome",
+   "grid": "A4:I4",
+   "note": "host app row Storage under the grey veil (system UI rendered by Android under the overlay)",
+   "codeDrawn": true
+  },
+  {
+   "id": "help-disc",
+   "kind": "control",
+   "grid": "J4:J4",
+   "note": "round metro-blue Help disc at the right edge with a white arrow-to-dot glyph"
+  },
+  {
+   "id": "host-sound",
+   "kind": "chrome",
+   "grid": "A5:J5",
+   "note": "host app row Sound & vibration under the grey veil (system UI rendered by Android under the overlay)",
+   "codeDrawn": true
+  },
+  {
+   "id": "target-ring",
+   "kind": "chrome",
+   "grid": "A6:I6",
+   "note": "thick metro-blue rounded ring around the undimmed target row Display & touch, solid blue station dot on its left end"
+  },
+  {
+   "id": "host-wallpaper",
+   "kind": "chrome",
+   "grid": "A7:J7",
+   "note": "host app row Wallpaper & style under the grey veil (system UI rendered by Android under the overlay)",
+   "codeDrawn": true
+  },
+  {
+   "id": "host-accessibility",
+   "kind": "chrome",
+   "grid": "A8:J8",
+   "note": "host app row Accessibility under the grey veil (system UI rendered by Android under the overlay)",
+   "codeDrawn": true
+  },
+  {
+   "id": "host-navbar",
+   "kind": "chrome",
+   "grid": "A9:J9",
+   "note": "Android navigation bar of the host phone (system UI rendered by Android under the overlay)",
+   "codeDrawn": true
+  }
+ ]
+}

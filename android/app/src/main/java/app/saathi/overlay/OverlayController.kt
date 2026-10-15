@@ -89,6 +89,18 @@ class OverlayController(
             wm.updateViewLayout(bubble, bubbleParams)
         }
         val res = strings()
+        // One size for every state, so the disc holds still; recentred if the language changed it.
+        val grew = bubble.sizeFor(
+            listOf(res.getString(R.string.bubble_help), res.getString(R.string.bubble_listening), res.getString(R.string.bubble_looking)),
+            prefs.language,
+        )
+        if (grew != 0 && attached) {
+            bubbleParams.x -= grew / 2
+            bubbleParams.y -= grew / 2
+            wm.updateViewLayout(bubble, bubbleParams)
+            // Remember the recentred spot, so returning to idle doesn't shift it back.
+            if (prefs.bubbleX >= 0) saveBubble()
+        }
         val label = when (state) {
             GuideState.LISTENING -> res.getString(R.string.bubble_listening)
             GuideState.THINKING -> res.getString(R.string.bubble_looking)

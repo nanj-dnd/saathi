@@ -488,7 +488,8 @@ private fun DoneLine(label: String) {
     val t = LocalTones.current
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.size(28.dp).background(t.done, CircleShape), contentAlignment = Alignment.Center) {
-            GlyphIcon(Glyph.CHECK, Color.White, 18.dp)
+            // The night green is light, so its tick is dark to keep ≥3:1.
+            GlyphIcon(Glyph.CHECK, if (t.m === Metro.DARK) Color(0xFF0B0C0E) else Color.White, 18.dp)
         }
         Spacer(Modifier.width(10.dp))
         Txt(label, 19, FontWeight.SemiBold, t.ink)
@@ -526,7 +527,7 @@ private fun HelpDisc(label: String, size: Dp) {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             GlyphIcon(Glyph.GUIDE, t.onAccent, size * 0.34f)
-            if (size >= 64.dp) Txt(label, 13, FontWeight.Bold, t.onAccent)
+            if (size >= 64.dp) Txt(label, 14, FontWeight.Bold, t.onAccent)
         }
     }
 }

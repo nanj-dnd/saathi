@@ -46,9 +46,9 @@ internal class BubbleView(
 ) : View(context) {
     private var metro = Metro.of(context)
     // The disc carries a word under its glyph ("Help", "मदद") for seniors who don't know the mark yet.
-    // It grows (up to 104dp) to fit longer words rather than shrinking them below 14dp.
+    // It is sized once per language (80–124dp) to fit its longest state word, never below 14dp.
     private val minSize = context.dp(80f).toInt()
-    private val maxSize = context.dp(104f).toInt()
+    private val maxSize = context.dp(124f).toInt()
     private var size = minSize
     private val pad = context.dp(16f).toInt()
     private val fill = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -75,19 +75,30 @@ internal class BubbleView(
         contentDescription = "Saathi"
     }
 
+    /**
+     * Sizes the disc once for a language, to fit the longest of its state words ("Help",
+     * "Listening", "Looking"), so it never changes size, or moves, as the state changes.
+     * Returns how much the diameter changed, so the caller can keep the disc's centre still.
+     */
+    fun sizeFor(labels: List<String>, language: String): Int {
+        label.typeface = SaathiType.typeface(context, language, weight = 700, width = 88)
+        label.textSize = context.dp(16f)
+        val want = (minSize..maxSize step context.dp(2f).toInt())
+            .firstOrNull { d -> labels.all { fits(it, d / 2f) } } ?: maxSize
+        val delta = want - size
+        if (delta != 0) {
+            size = want
+            requestLayout()
+        }
+        return delta
+    }
+
     fun render(state: GuideState, label: String, language: String) {
         this.state = state
         this.text = label
         this.language = language
         metro = Metro.of(context)
         contentDescription = label
-        this.label.typeface = SaathiType.typeface(context, language, weight = 700, width = 88)
-        this.label.textSize = context.dp(16f)
-        val want = (this.label.measureText(label) / 0.775f).toInt().coerceIn(minSize, maxSize)
-        if (want != size) {
-            size = want
-            requestLayout()
-        }
         val moving = state == GuideState.LISTENING || state == GuideState.THINKING
         if (moving && animationsOn()) animator.start() else animator.cancel()
         invalidate()
@@ -129,9 +140,8 @@ internal class BubbleView(
         label.color = metro.onAccent
         label.typeface = SaathiType.typeface(context, language, weight = 700, width = 88)
         label.textSize = context.dp(16f)
-        val maxW = r * 1.55f
-        while (label.measureText(text) > maxW && label.textSize > context.dp(14f)) label.textSize -= context.dp(0.5f)
-        canvas.drawText(text, cx, cy + r * 0.42f, label)
+        while (!fits(text, r) && label.textSize > context.dp(14f)) label.textSize -= context.dp(0.5f)
+        canvas.drawText(text, cx, cy + r * BASELINE, label)
     }
 
     private var downX = 0f
@@ -169,6 +179,31 @@ internal class BubbleView(
     }
 
     override fun getAccessibilityClassName(): CharSequence = Button::class.java.name
+
+    private val ink = android.graphics.Rect()
+    /** Room inside the rim and the looking arc (its inset plus stroke). */
+    private val inner = context.dp(12f)
+
+    /**
+     * True if [text], at the label paint's current size, fits inside a disc of radius [r]: its ink
+     * (Devanagari's ू and ँ included) must clear the inner circle at the ink's farthest point from
+     * the centre, where the circle is narrowest.
+     */
+    private fun fits(text: String, r: Float): Boolean {
+        if (text.isEmpty()) return true
+        label.getTextBounds(text, 0, text.length, ink)
+        val ri = r - inner
+        val baseline = r * BASELINE
+        val far = maxOf(kotlin.math.abs(baseline + ink.top), kotlin.math.abs(baseline + ink.bottom))
+        if (far >= ri) return false
+        val half = kotlin.math.sqrt(ri * ri - far * far)
+        return ink.width() / 2f <= half
+    }
+
+    private companion object {
+        /** The word's baseline, below the disc's centre, as a fraction of the radius. */
+        const val BASELINE = 0.42f
+    }
 
     override fun onInitializeAccessibilityNodeInfo(info: AccessibilityNodeInfo) {
         super.onInitializeAccessibilityNodeInfo(info)
@@ -385,6 +420,10 @@ internal class CaptionView(
         sub.visibility = if (rest.isEmpty()) GONE else VISIBLE
         head.setTextColor(metro.ink)
         sub.setTextColor(metro.inkSoft)
+        // Typeface first: setLineHeight is computed from the current font's metrics, so setting it
+        // under the system font and then switching to Anek left the first sign of a session loose.
+        head.typeface = SaathiType.typeface(context, language, weight = 700)
+        sub.typeface = SaathiType.typeface(context, language, weight = 500)
         val headSize = context.dp(27f * fontScale)
         val subSize = context.dp(20f * fontScale)
         head.setTextSize(TypedValue.COMPLEX_UNIT_PX, headSize)
@@ -396,8 +435,6 @@ internal class CaptionView(
         sub.isFallbackLineSpacing = false
         head.lineHeight = (headSize * 1.3f).toInt()
         sub.lineHeight = (subSize * 1.35f).toInt()
-        head.typeface = SaathiType.typeface(context, language, weight = 700)
-        sub.typeface = SaathiType.typeface(context, language, weight = 500)
         panelBg.setColor(metro.panel)
         panelBg.cornerRadius = if (docked) 0f else context.dp(8f)
         band.setBackgroundColor(bandColor)
@@ -539,6 +576,20 @@ internal class SignButton(
             paint.textSize = size
         }
         text.setTextSize(TypedValue.COMPLEX_UNIT_PX, size)
+        text.post { alignIcon() }
+    }
+
+    /**
+     * Centres the glyph on the word's ink rather than its line box. Devanagari's headline and
+     * the Dravidian scripts' tall vowels put the visual centre well above the box centre.
+     */
+    private fun alignIcon() {
+        val label = text.text.toString()
+        if (label.isEmpty() || text.height == 0) return
+        val ink = android.graphics.Rect()
+        text.paint.getTextBounds(label, 0, label.length, ink)
+        val inkCenter = text.baseline + (ink.top + ink.bottom) / 2f
+        icon.translationY = inkCenter - text.height / 2f
     }
 
     override fun getAccessibilityClassName(): CharSequence = Button::class.java.name
