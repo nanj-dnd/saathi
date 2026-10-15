@@ -1,6 +1,6 @@
 {
   "id": "safety-pin-to-receive",
-  "version": 1,
+  "version": 2,
   "goal": "asked to enter a PIN to receive money",
   "apps": [
     "*"
@@ -68,6 +68,9 @@
     ],
     "ml-IN": [
       "പണം ലഭിക്കാൻ PIN ഇടാൻ പറയുന്നു"
+    ],
+    "en-IN": [
+      "they want my UPI pin so I can receive money"
     ]
   },
   "steps": [
@@ -79,7 +82,8 @@
         "ta-IN": "கவனம்! பணம் பெற PIN போட வேண்டியதே இல்லை. PIN போட்டால் உங்கள் கணக்கிலிருந்து பணம் போய்விடும். மறுத்துவிடுங்கள்.",
         "te-IN": "జాగ్రత్త! డబ్బు రావడానికి PIN వేయాల్సిన అవసరం లేదు. PIN వేస్తే మీ ఖాతా నుంచి డబ్బు పోతుంది. వద్దు అనండి.",
         "kn-IN": "ಎಚ್ಚರ! ಹಣ ಪಡೆಯಲು PIN ಹಾಕುವ ಅಗತ್ಯವೇ ಇಲ್ಲ. PIN ಹಾಕಿದರೆ ನಿಮ್ಮ ಖಾತೆಯಿಂದ ಹಣ ಹೋಗುತ್ತದೆ. ನಿರಾಕರಿಸಿ.",
-        "ml-IN": "ശ്രദ്ധിക്കുക! പണം ലഭിക്കാൻ PIN ഇടേണ്ട ആവശ്യമില്ല. PIN ഇട്ടാൽ നിങ്ങളുടെ അക്കൗണ്ടിൽ നിന്ന് പണം പോകും. നിരസിക്കുക."
+        "ml-IN": "ശ്രദ്ധിക്കുക! പണം ലഭിക്കാൻ PIN ഇടേണ്ട ആവശ്യമില്ല. PIN ഇട്ടാൽ നിങ്ങളുടെ അക്കൗണ്ടിൽ നിന്ന് പണം പോകും. നിരസിക്കുക.",
+        "en-IN": "Careful! You never need to enter a PIN to receive money. Entering your PIN sends money out of your account. Say no."
       },
       "danger": "scam_suspected"
     }

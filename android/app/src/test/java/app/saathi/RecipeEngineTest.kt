@@ -217,6 +217,13 @@ class RecipeEngineTest {
         assertEquals(r.version + 1, merged.byGoal(r.goal)!!.version)
     }
 
+    @Test fun `a negation must be a whole word`() {
+        // "not " used to match inside "notifications", sending every such request to the model.
+        assertEquals("tip-notifications", engine.match("show me my notifications", "com.google.android.apps.nexuslauncher")?.id)
+        assertEquals("settings-dnd-off", engine.match("switch off do not disturb", "com.google.android.apps.nexuslauncher")?.id)
+        assertEquals(null, engine.match("my notifications are not coming", "com.google.android.apps.nexuslauncher")?.id)
+    }
+
     @Test fun `typed debug requests start a recipe from the goal`() {
         val g = RecipeEngine(book).guide(req(settingsHome, goal = "how do I make the text bigger"))
         assertEquals("make the text bigger", g!!.goal)
@@ -252,6 +259,8 @@ class RecipeEngineTest {
             "फोटो जोड़नी है", "इसका मतलब क्या है", "पोते को एक ऐप इंस्टॉल करना है", "एक बात पूछनी है", "मेरी स्क्रीन पर काला धब्बा है",
             // Words that contain a trigger word inside them.
             "अलार्म के लिए गाना लगाना नहीं",
+            // English problems and negations.
+            "do not disturb is not turning off", "why is my phone so slow", "WhatsApp is not working",
         )
         val wrong = forModel.mapNotNull { said ->
             engine.match(said, "com.google.android.apps.nexuslauncher")?.let { "\"$said\" -> ${it.id}" }

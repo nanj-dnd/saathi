@@ -1,6 +1,6 @@
 {
   "id": "meet-join",
-  "version": 1,
+  "version": 2,
   "goal": "join a Google Meet call",
   "apps": [
     "com.google.android.apps.tachyon",
@@ -79,6 +79,9 @@
     ],
     "ml-IN": [
       "ഗൂഗിൾ മീറ്റിൽ ചേരണം"
+    ],
+    "en-IN": [
+      "join the Google Meet class"
     ]
   },
   "steps": [
@@ -96,7 +99,8 @@
         "ta-IN": "'{label}' ஐ அழுத்துங்கள். கேமரா, மைக் அனுமதி கேட்டால் 'Allow' ஐ அழுத்துங்கள்.",
         "te-IN": "'{label}' నొక్కండి. కెమెరా, మైక్ అనుమతి అడిగితే 'Allow' నొక్కండి.",
         "kn-IN": "'{label}' ಒತ್ತಿ. ಕ್ಯಾಮೆರಾ, ಮೈಕ್ ಅನುಮತಿ ಕೇಳಿದರೆ 'Allow' ಒತ್ತಿ.",
-        "ml-IN": "'{label}' അമർത്തുക. ക്യാമറ, മൈക്ക് അനുമതി ചോദിച്ചാൽ 'Allow' അമർത്തുക."
+        "ml-IN": "'{label}' അമർത്തുക. ക്യാമറ, മൈക്ക് അനുമതി ചോദിച്ചാൽ 'Allow' അമർത്തുക.",
+        "en-IN": "Press '{label}'. If it asks for camera and microphone permission, press 'Allow'."
       }
     },
     {
@@ -111,7 +115,8 @@
         "ta-IN": "மேலே 'Join with a code' ஐ அழுத்தி மீட்டிங் குறியீட்டை எழுதுங்கள்.",
         "te-IN": "పైన 'Join with a code' నొక్కి మీటింగ్ కోడ్ రాయండి.",
         "kn-IN": "ಮೇಲೆ 'Join with a code' ಒತ್ತಿ ಮೀಟಿಂಗ್ ಕೋಡ್ ಬರೆಯಿರಿ.",
-        "ml-IN": "മുകളിൽ 'Join with a code' അമർത്തി മീറ്റിംഗ് കോഡ് എഴുതുക."
+        "ml-IN": "മുകളിൽ 'Join with a code' അമർത്തി മീറ്റിംഗ് കോഡ് എഴുതുക.",
+        "en-IN": "Press 'Join with a code' at the top and write the meeting code."
       }
     }
   ]

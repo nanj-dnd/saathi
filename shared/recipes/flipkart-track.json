@@ -1,6 +1,6 @@
 {
   "id": "flipkart-track",
-  "version": 1,
+  "version": 2,
   "goal": "track an order on Flipkart",
   "apps": [
     "com.flipkart.android"
@@ -92,6 +92,9 @@
     ],
     "ml-IN": [
       "ഫ്ലിപ്കാർട്ട് ഓർഡർ എവിടെ"
+    ],
+    "en-IN": [
+      "track my Flipkart order"
     ]
   },
   "steps": [
@@ -107,7 +110,8 @@
         "ta-IN": "'{label}' ஐ அழுத்துங்கள். ஒவ்வொரு பொருளுக்கும் எப்போது வரும் என்று எழுதியிருக்கும்.",
         "te-IN": "'{label}' నొక్కండి. ప్రతి వస్తువు ఎప్పుడు వస్తుందో అక్కడ రాసి ఉంటుంది.",
         "kn-IN": "'{label}' ಒತ್ತಿ. ಪ್ರತಿ ವಸ್ತು ಯಾವಾಗ ಬರುತ್ತದೆ ಎಂದು ಅಲ್ಲಿ ಬರೆದಿರುತ್ತದೆ.",
-        "ml-IN": "'{label}' അമർത്തുക. ഓരോ സാധനവും എപ്പോൾ വരുമെന്ന് അവിടെ എഴുതിയിരിക്കും."
+        "ml-IN": "'{label}' അമർത്തുക. ഓരോ സാധനവും എപ്പോൾ വരുമെന്ന് അവിടെ എഴുതിയിരിക്കും.",
+        "en-IN": "Press '{label}'. Next to each item it will say when it will arrive."
       }
     },
     {
@@ -122,7 +126,8 @@
         "ta-IN": "கீழே '{label}' ஐ அழுத்துங்கள்.",
         "te-IN": "కింద '{label}' నొక్కండి.",
         "kn-IN": "ಕೆಳಗೆ '{label}' ಒತ್ತಿ.",
-        "ml-IN": "താഴെ '{label}' അമർത്തുക."
+        "ml-IN": "താഴെ '{label}' അമർത്തുക.",
+        "en-IN": "Press '{label}' at the bottom."
       }
     }
   ]

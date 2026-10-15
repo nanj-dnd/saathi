@@ -40,6 +40,7 @@ object Languages {
     /** BCP-47 tag to the language's own name, as a senior would recognise it. */
     val ALL = linkedMapOf(
         "hi-IN" to "हिन्दी",
+        "en-IN" to "English",
         "ta-IN" to "தமிழ்",
         "te-IN" to "తెలుగు",
         "kn-IN" to "ಕನ್ನಡ",

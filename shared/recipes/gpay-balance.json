@@ -1,6 +1,6 @@
 {
   "id": "gpay-balance",
-  "version": 1,
+  "version": 2,
   "goal": "check bank balance on Google Pay",
   "apps": [
     "com.google.android.apps.nbu.paisa.user"
@@ -87,6 +87,9 @@
     ],
     "ml-IN": [
       "ഗൂഗിൾ പേയിൽ ബാലൻസ് നോക്കണം"
+    ],
+    "en-IN": [
+      "check my bank balance on Google Pay"
     ]
   },
   "steps": [
@@ -102,7 +105,8 @@
         "ta-IN": "'{label}' ஐ அழுத்துங்கள். PIN-ஐ நீங்களே போடுங்கள், யாரிடமும் சொல்லாதீர்கள்.",
         "te-IN": "'{label}' నొక్కండి. PIN మీరే వేయండి, ఎవరికీ చెప్పకండి.",
         "kn-IN": "'{label}' ಒತ್ತಿ. PIN ಅನ್ನು ನೀವೇ ಹಾಕಿ, ಯಾರಿಗೂ ಹೇಳಬೇಡಿ.",
-        "ml-IN": "'{label}' അമർത്തുക. PIN നിങ്ങൾ തന്നെ ഇടുക, ആരോടും പറയരുത്."
+        "ml-IN": "'{label}' അമർത്തുക. PIN നിങ്ങൾ തന്നെ ഇടുക, ആരോടും പറയരുത്.",
+        "en-IN": "Press '{label}'. Enter your PIN yourself and never tell it to anyone."
       }
     },
     {
@@ -123,7 +127,8 @@
         "ta-IN": "திரையில் விரலை வைத்து மேலே தள்ளுங்கள்.",
         "te-IN": "స్క్రీన్‌పై వేలు పెట్టి పైకి జరపండి.",
         "kn-IN": "ಪರದೆಯ ಮೇಲೆ ಬೆರಳಿಟ್ಟು ಮೇಲಕ್ಕೆ ಸರಿಸಿ.",
-        "ml-IN": "സ്ക്രീനിൽ വിരൽ വെച്ച് മുകളിലേക്ക് നീക്കുക."
+        "ml-IN": "സ്ക്രീനിൽ വിരൽ വെച്ച് മുകളിലേക്ക് നീക്കുക.",
+        "en-IN": "Put your finger on the screen and slide it upwards."
       }
     }
   ]

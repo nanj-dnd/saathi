@@ -1,6 +1,6 @@
 {
   "id": "phone-missed-calls",
-  "version": 1,
+  "version": 2,
   "goal": "see missed calls",
   "apps": [
     "com.google.android.dialer",
@@ -60,6 +60,9 @@
     ],
     "ml-IN": [
       "മിസ്ഡ് കോൾ കാണണം"
+    ],
+    "en-IN": [
+      "show my missed calls"
     ]
   },
   "steps": [
@@ -78,7 +81,8 @@
         "ta-IN": "கீழே '{label}' ஐ அழுத்துங்கள். தவறிய அழைப்புகள் சிவப்பில் தெரியும்.",
         "te-IN": "కింద '{label}' నొక్కండి. మిస్డ్ కాల్స్ ఎరుపు రంగులో కనిపిస్తాయి.",
         "kn-IN": "ಕೆಳಗೆ '{label}' ಒತ್ತಿ. ತಪ್ಪಿದ ಕರೆಗಳು ಕೆಂಪು ಬಣ್ಣದಲ್ಲಿ ಕಾಣುತ್ತವೆ.",
-        "ml-IN": "താഴെ '{label}' അമർത്തുക. മിസ്ഡ് കോളുകൾ ചുവപ്പിൽ കാണാം."
+        "ml-IN": "താഴെ '{label}' അമർത്തുക. മിസ്ഡ് കോളുകൾ ചുവപ്പിൽ കാണാം.",
+        "en-IN": "Press '{label}' at the bottom. Missed calls show in red."
       }
     }
   ]

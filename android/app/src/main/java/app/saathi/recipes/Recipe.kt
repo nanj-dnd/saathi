@@ -100,7 +100,7 @@ class RecipeBook(val common: Common, val recipes: List<Recipe>) {
     fun byGoal(goal: String): Recipe? = if (goal.isBlank()) null else recipes.firstOrNull { it.goal == goal }
 
     companion object {
-        val LANGUAGES = listOf("hi-IN", "ta-IN", "te-IN", "kn-IN", "ml-IN")
+        val LANGUAGES = listOf("hi-IN", "en-IN", "ta-IN", "te-IN", "kn-IN", "ml-IN")
         val COMMON_LINES = listOf("open", "drawer", "find")
         val EMPTY = RecipeBook(Common(), emptyList())
 

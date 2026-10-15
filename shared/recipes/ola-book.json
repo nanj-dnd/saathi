@@ -1,6 +1,6 @@
 {
   "id": "ola-book",
-  "version": 1,
+  "version": 2,
   "goal": "book a ride on Ola",
   "apps": [
     "com.olacabs.customer"
@@ -81,6 +81,9 @@
     ],
     "ml-IN": [
       "ഓലയിൽ ഓട്ടോ ബുക്ക് ചെയ്യണം"
+    ],
+    "en-IN": [
+      "book an Ola cab"
     ]
   },
   "steps": [
@@ -98,7 +101,8 @@
         "ta-IN": "மேலே '{label}' ஐ அழுத்தி, போக வேண்டிய இடத்தின் பெயரை எழுதுங்கள்.",
         "te-IN": "పైన '{label}' నొక్కి, వెళ్ళాల్సిన చోటు పేరు రాయండి.",
         "kn-IN": "ಮೇಲೆ '{label}' ಒತ್ತಿ, ಹೋಗಬೇಕಾದ ಜಾಗದ ಹೆಸರು ಬರೆಯಿರಿ.",
-        "ml-IN": "മുകളിൽ '{label}' അമർത്തി, പോകേണ്ട സ്ഥലത്തിന്റെ പേര് എഴുതുക."
+        "ml-IN": "മുകളിൽ '{label}' അമർത്തി, പോകേണ്ട സ്ഥലത്തിന്റെ പേര് എഴുതുക.",
+        "en-IN": "Press '{label}' at the top and write the name of the place you want to go."
       }
     }
   ]

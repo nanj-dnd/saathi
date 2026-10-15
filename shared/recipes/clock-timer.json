@@ -1,6 +1,6 @@
 {
   "id": "clock-timer",
-  "version": 1,
+  "version": 2,
   "goal": "set a timer",
   "apps": [
     "com.google.android.deskclock",
@@ -61,6 +61,9 @@
     ],
     "ml-IN": [
       "പത്ത് മിനിറ്റ് ടൈമർ വെക്കണം"
+    ],
+    "en-IN": [
+      "set a timer for ten minutes"
     ]
   },
   "steps": [
@@ -80,7 +83,8 @@
         "ta-IN": "நிமிடங்களை அழுத்தி, பிறகு கீழே உள்ள 'Start' பொத்தானை அழுத்துங்கள்.",
         "te-IN": "నిమిషాలు నొక్కి, తర్వాత కింద ఉన్న 'Start' బటన్ నొక్కండి.",
         "kn-IN": "ನಿಮಿಷಗಳನ್ನು ಒತ್ತಿ, ನಂತರ ಕೆಳಗಿನ 'Start' ಬಟನ್ ಒತ್ತಿ.",
-        "ml-IN": "മിനിറ്റുകൾ അമർത്തി, പിന്നെ താഴെയുള്ള 'Start' ബട്ടൺ അമർത്തുക."
+        "ml-IN": "മിനിറ്റുകൾ അമർത്തി, പിന്നെ താഴെയുള്ള 'Start' ബട്ടൺ അമർത്തുക.",
+        "en-IN": "Press the minutes, then press the 'Start' button at the bottom."
       }
     },
     {
@@ -94,7 +98,8 @@
         "ta-IN": "கீழே '{label}' ஐ அழுத்துங்கள்.",
         "te-IN": "కింద '{label}' నొక్కండి.",
         "kn-IN": "ಕೆಳಗೆ '{label}' ಒತ್ತಿ.",
-        "ml-IN": "താഴെ '{label}' അമർത്തുക."
+        "ml-IN": "താഴെ '{label}' അമർത്തുക.",
+        "en-IN": "Press '{label}' at the bottom."
       }
     }
   ]

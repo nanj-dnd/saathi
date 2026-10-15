@@ -1,6 +1,6 @@
 {
   "id": "tip-rotation",
-  "version": 1,
+  "version": 2,
   "goal": "stop the screen from turning sideways",
   "apps": [
     "*"
@@ -58,6 +58,9 @@
     ],
     "ml-IN": [
       "സ്ക്രീൻ കറങ്ങിക്കൊണ്ടിരിക്കുന്നു"
+    ],
+    "en-IN": [
+      "the screen keeps turning sideways"
     ]
   },
   "steps": [
@@ -69,7 +72,8 @@
         "ta-IN": "திரையின் மேலிருந்து விரலை இரண்டு முறை கீழே இழுங்கள், பிறகு 'Auto-rotate' ஐ அழுத்தி அணையுங்கள். திரை நேராக இருக்கும்.",
         "te-IN": "స్క్రీన్ పై నుంచి వేలును రెండు సార్లు కిందకు లాగండి, తర్వాత 'Auto-rotate' నొక్కి ఆఫ్ చేయండి. స్క్రీన్ నిటారుగా ఉంటుంది.",
         "kn-IN": "ಪರದೆಯ ಮೇಲಿನಿಂದ ಬೆರಳನ್ನು ಎರಡು ಬಾರಿ ಕೆಳಗೆ ಎಳೆಯಿರಿ, ನಂತರ 'Auto-rotate' ಒತ್ತಿ ಆಫ್ ಮಾಡಿ. ಪರದೆ ನೇರವಾಗಿರುತ್ತದೆ.",
-        "ml-IN": "സ്ക്രീനിന്റെ മുകളിൽ നിന്ന് വിരൽ രണ്ടു തവണ താഴേക്ക് വലിക്കുക, പിന്നെ 'Auto-rotate' അമർത്തി ഓഫാക്കുക. സ്ക്രീൻ നേരെ നിൽക്കും."
+        "ml-IN": "സ്ക്രീനിന്റെ മുകളിൽ നിന്ന് വിരൽ രണ്ടു തവണ താഴേക്ക് വലിക്കുക, പിന്നെ 'Auto-rotate' അമർത്തി ഓഫാക്കുക. സ്ക്രീൻ നേരെ നിൽക്കും.",
+        "en-IN": "Slide your finger down from the very top of the screen twice, then press 'Auto-rotate' to turn it off. The screen will stay straight."
       }
     }
   ]

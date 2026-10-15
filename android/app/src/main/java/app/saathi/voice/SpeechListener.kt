@@ -16,7 +16,7 @@ import kotlin.coroutines.resume
 
 /**
  * Transcribes one utterance with the phone's own speech service (Google's on most phones), which
- * covers all five languages for free. Offline, it uses the on-device recogniser when the language
+ * covers all six languages for free. Offline, it uses the on-device recogniser when the language
  * pack is downloaded, so scripted recipes keep working with no network at all. Main thread only.
  */
 class SpeechListener(

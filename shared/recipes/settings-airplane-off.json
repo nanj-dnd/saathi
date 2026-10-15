@@ -1,6 +1,6 @@
 {
   "id": "settings-airplane-off",
-  "version": 1,
+  "version": 2,
   "goal": "turn off airplane mode",
   "apps": [
     "com.android.settings"
@@ -69,6 +69,9 @@
     ],
     "ml-IN": [
       "ഫ്ലൈറ്റ് മോഡ് മാറ്റണം"
+    ],
+    "en-IN": [
+      "remove airplane mode"
     ]
   },
   "steps": [
@@ -86,7 +89,8 @@
         "ta-IN": "Airplane mode அணைந்துள்ளது. சிறிது நேரத்தில் நெட்வொர்க் வரும்.",
         "te-IN": "Airplane mode ఆఫ్‌లో ఉంది. కాసేపట్లో నెట్‌వర్క్ వస్తుంది.",
         "kn-IN": "Airplane mode ಆಫ್ ಆಗಿದೆ. ಸ್ವಲ್ಪ ಹೊತ್ತಿನಲ್ಲಿ ನೆಟ್‌ವರ್ಕ್ ಬರುತ್ತದೆ.",
-        "ml-IN": "Airplane mode ഓഫാണ്. കുറച്ചു കഴിഞ്ഞ് നെറ്റ്‌വർക്ക് വരും."
+        "ml-IN": "Airplane mode ഓഫാണ്. കുറച്ചു കഴിഞ്ഞ് നെറ്റ്‌വർക്ക് വരും.",
+        "en-IN": "Airplane mode is off. The network will come back in a little while."
       }
     },
     {
@@ -103,7 +107,8 @@
         "ta-IN": "'{label}' அருகே உள்ள பொத்தானை அழுத்தி அணையுங்கள்.",
         "te-IN": "'{label}' పక్కన ఉన్న బటన్ నొక్కి ఆఫ్ చేయండి.",
         "kn-IN": "'{label}' ಪಕ್ಕದ ಬಟನ್ ಒತ್ತಿ ಆಫ್ ಮಾಡಿ.",
-        "ml-IN": "'{label}'-ന് അടുത്തുള്ള ബട്ടൺ അമർത്തി ഓഫാക്കുക."
+        "ml-IN": "'{label}'-ന് അടുത്തുള്ള ബട്ടൺ അമർത്തി ഓഫാക്കുക.",
+        "en-IN": "Press the switch next to '{label}' to turn it off."
       }
     },
     {
@@ -130,7 +135,8 @@
         "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
         "te-IN": "'{label}' నొక్కండి.",
         "kn-IN": "'{label}' ಒತ್ತಿ.",
-        "ml-IN": "'{label}' അമർത്തുക."
+        "ml-IN": "'{label}' അമർത്തുക.",
+        "en-IN": "Press '{label}'."
       }
     },
     {
@@ -153,7 +159,8 @@
         "ta-IN": "திரையில் விரலை வைத்து மேலே தள்ளுங்கள்.",
         "te-IN": "స్క్రీన్‌పై వేలు పెట్టి పైకి జరపండి.",
         "kn-IN": "ಪರದೆಯ ಮೇಲೆ ಬೆರಳಿಟ್ಟು ಮೇಲಕ್ಕೆ ಸರಿಸಿ.",
-        "ml-IN": "സ്ക്രീനിൽ വിരൽ വെച്ച് മുകളിലേക്ക് നീക്കുക."
+        "ml-IN": "സ്ക്രീനിൽ വിരൽ വെച്ച് മുകളിലേക്ക് നീക്കുക.",
+        "en-IN": "Put your finger on the screen and slide it upwards."
       }
     }
   ]
