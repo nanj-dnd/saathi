@@ -66,7 +66,7 @@ class RecipeEngine(private val book: RecipeBook) {
                 if (n < after.min || n > after.max) continue
             }
             var node = if (step.target.isEmpty()) null else screen.find(step.target, step.exact) ?: continue
-            var label = node?.label.orEmpty()
+            var label = node?.let { screen.spokenLabel(it, step.target) }.orEmpty()
             if (step.switch.isNotEmpty()) {
                 val sw = screen.switchFor(step.switch) ?: continue
                 if (sw.on != (step.switchIs == "on")) continue

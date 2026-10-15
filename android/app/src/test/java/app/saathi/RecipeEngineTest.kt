@@ -103,7 +103,8 @@ class RecipeEngineTest {
     @Test fun `the whole text size task runs on the phone`() {
         val first = engine.guide(req(displayScreen, utterance = "अक्षर बड़े करने हैं"))!!
         assertEquals("n4", first.nodeId) // the clickable row, not its non-clickable title
-        assertEquals("'Display & touch Dark theme, font size, brightness' पर दबाइए। अक्षरों का साइज़ इसी में है।", first.say)
+        // The row's text includes its summary; the senior only hears the title they need to find.
+        assertEquals("'Display & touch' पर दबाइए। अक्षरों का साइज़ इसी में है।", first.say)
 
         var history = listOf(past(first))
         val larger = engine.guide(req(fontScreen, goal = first.goal, history = history))!!

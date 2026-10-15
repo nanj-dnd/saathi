@@ -50,6 +50,19 @@ class ScreenText(val nodes: List<TreeNode>) {
         return best
     }
 
+    /**
+     * What to call [node] out loud when [find] picked it for [labels]. A Settings row's text is its
+     * title plus summary ("Display & touch Dark theme, font size, touch"); the senior should only
+     * hear the label they are looking for, written as the recipe writes it.
+     */
+    fun spokenLabel(node: TreeNode, labels: List<String>): String {
+        val have = norm(node.label)
+        if (labels.any { norm(it) == have }) return node.label
+        return labels.firstOrNull { val w = norm(it); w.isNotEmpty() && have.startsWith(w) }
+            ?: labels.firstOrNull { val w = norm(it); w.isNotEmpty() && w in have }
+            ?: node.label
+    }
+
     /** An on/off control: [row] is the labelled line, [toggle] the element that shows the state. */
     class Switch(val row: TreeNode, val toggle: TreeNode, val on: Boolean)
 
