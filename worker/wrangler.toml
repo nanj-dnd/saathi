@@ -13,13 +13,13 @@ DAILY_TURN_LIMIT = "300"
 # Per-device daily counters. Create with: npx wrangler kv namespace create USAGE
 [[kv_namespaces]]
 binding = "USAGE"
-id = "REPLACE_WITH_KV_ID"
+id = "3b489d9bc0b24d8d85907e18fab426b7"
 
 # Answers shared between phones for non-personal screens (src/cache.ts). Optional.
 # Create with: npx wrangler kv namespace create GUIDE_CACHE
 [[kv_namespaces]]
 binding = "GUIDE_CACHE"
-id = "REPLACE_WITH_GUIDE_CACHE_KV_ID"
+id = "8ab0b8fd80a24796b91986bc0bcbb3ac"
 
 # Secrets (npx wrangler secret put <NAME>, or .dev.vars locally):
 #   ANTHROPIC_API_KEY  TOKEN_SECRET
