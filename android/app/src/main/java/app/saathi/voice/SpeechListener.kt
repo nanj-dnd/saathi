@@ -106,10 +106,11 @@ class SpeechListener(
             else -> if (online) Heard.Silence else Heard.Offline
         }
 
-        fun isOnline(context: Context): Boolean {
+        /** Assumes online if the check itself fails: a wrong guess costs one recogniser choice, a crash costs the turn. */
+        fun isOnline(context: Context): Boolean = runCatching {
             val cm = context.getSystemService(ConnectivityManager::class.java) ?: return true
             val caps = cm.getNetworkCapabilities(cm.activeNetwork) ?: return false
-            return caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-        }
+            caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        }.getOrDefault(true)
     }
 }
