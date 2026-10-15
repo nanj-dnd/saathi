@@ -224,6 +224,12 @@ class RecipeEngineTest {
         assertEquals(null, engine.match("my notifications are not coming", "com.google.android.apps.nexuslauncher")?.id)
     }
 
+    @Test fun `an unreadable screen is left to the model, not taken as outside the app`() {
+        // Android 14+ hides "data sensitive" pages (Wi-Fi) from the tree, so the app comes back blank.
+        val g = engine.guide(req("", app = "", utterance = "please turn on the wifi", language = "en-IN"))
+        assertEquals(null, g)
+    }
+
     @Test fun `typed debug requests start a recipe from the goal`() {
         val g = RecipeEngine(book).guide(req(settingsHome, goal = "how do I make the text bigger"))
         assertEquals("make the text bigger", g!!.goal)

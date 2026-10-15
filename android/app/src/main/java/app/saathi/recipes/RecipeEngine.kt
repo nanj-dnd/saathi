@@ -18,6 +18,10 @@ class RecipeEngine(private val book: RecipeBook) {
 
     fun guide(req: TurnRequest): Guide? {
         if (book.recipes.isEmpty()) return null
+        // No app means the screen couldn't be read (Android 14+ hides "data sensitive" pages such
+        // as Wi-Fi from non-tool accessibility services). That is not "outside the app": leave it
+        // to the model, which still gets the screenshot.
+        if (req.app.isBlank()) return null
         val recipe = active(req) ?: return null
         val screen = ScreenText.parse(req.tree)
         val home = recipe.anyApp || req.app in recipe.apps

@@ -123,7 +123,7 @@ class GuideSessionTest {
         assertEquals(GuideState.WATCHING, s.state.value)
 
         s.onScreenEvent(ScreenEvent.CLICK)
-        advanceTimeBy(ScreenEvent.CLICK.settleMs + 1)
+        advanceTimeBy(ScreenEvent.CLICK.settleMs + GuideSession.SETTLE_STEP_MS + 1)
         runCurrent()
 
         assertEquals(2, f.requests.size)
@@ -143,7 +143,7 @@ class GuideSessionTest {
         s.onBubbleTap()
         runCurrent()
         s.onScreenEvent(ScreenEvent.SCROLLED)
-        advanceTimeBy(ScreenEvent.SCROLLED.settleMs + 1)
+        advanceTimeBy(ScreenEvent.SCROLLED.settleMs + GuideSession.SETTLE_STEP_MS + 1)
         runCurrent()
         assertEquals(1, f.requests.size)
         assertEquals(listOf("ADD दबाइए"), f.said)
@@ -159,10 +159,32 @@ class GuideSessionTest {
         s.onBubbleTap()
         runCurrent()
         s.onScreenEvent(ScreenEvent.CLICK)
-        advanceTimeBy(ScreenEvent.CLICK.settleMs + 1)
+        advanceTimeBy(ScreenEvent.CLICK.settleMs + GuideSession.SETTLE_STEP_MS + 1)
         runCurrent()
         assertEquals(2, f.requests.size)
-        assertEquals(2, f.looks) // the look before deciding is reused for the turn
+        // One look for the first turn, then two for the settle check (the screen read the same
+        // twice); that settled look is reused for the turn rather than taken a third time.
+        assertEquals(3, f.looks)
+    }
+
+    @Test fun `a page that fills in after opening is judged once it has settled`() = runTest {
+        // Android's Internet page adds its Wi-Fi switch a moment after it opens.
+        val f = Fakes().apply { tree = fullScreen; replies += step("Internet दबाइए"); replies += step("Wi-Fi चालू है") }
+        val s = f.session(this)
+        s.onBubbleTap()
+        runCurrent()
+        val half = fullScreen.replace("Item 6", "Loading")
+        f.tree = half
+        s.onScreenEvent(ScreenEvent.CLICK)
+        advanceTimeBy(ScreenEvent.CLICK.settleMs + 1)
+        runCurrent()                      // first look: half-loaded
+        f.tree = fullScreen.replace("Item 6", "Wi-Fi")
+        advanceTimeBy(GuideSession.SETTLE_STEP_MS + 1)
+        runCurrent()                      // second look differs: keep waiting
+        advanceTimeBy(GuideSession.SETTLE_STEP_MS + 1)
+        runCurrent()                      // third look matches: settled
+        assertEquals(2, f.requests.size)
+        assertTrue(f.requests.last().tree.contains("Wi-Fi"))
     }
 
     @Test fun `a scroll that changed the screen asks again`() = runTest {
@@ -172,7 +194,7 @@ class GuideSessionTest {
         runCurrent()
         f.tree = fullScreen.replace("Item 6", "Item 7")
         s.onScreenEvent(ScreenEvent.SCROLLED)
-        advanceTimeBy(ScreenEvent.SCROLLED.settleMs + 1)
+        advanceTimeBy(ScreenEvent.SCROLLED.settleMs + GuideSession.SETTLE_STEP_MS + 1)
         runCurrent()
         assertEquals(2, f.requests.size)
     }
@@ -194,7 +216,7 @@ class GuideSessionTest {
             s.onScreenEvent(ScreenEvent.SCROLLED)
             advanceTimeBy(200)
         }
-        advanceTimeBy(ScreenEvent.SCROLLED.settleMs + 1)
+        advanceTimeBy(ScreenEvent.SCROLLED.settleMs + GuideSession.SETTLE_STEP_MS + 1)
         runCurrent()
         assertEquals(2, f.requests.size)
     }

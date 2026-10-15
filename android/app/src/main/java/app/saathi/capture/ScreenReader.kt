@@ -36,7 +36,10 @@ class ScreenReader(private val service: AccessibilityService) : Eyes {
         val w = bounds.width()
         val h = bounds.height()
 
-        val window = appWindow()
+        // A window can briefly report no content while it redraws (the Internet page's live
+        // "Searching for networks" bar); take the first candidate that has some.
+        val candidates = appWindows()
+        val window = candidates.firstOrNull { it.root != null } ?: candidates.firstOrNull()
         val root = window?.root ?: service.rootInActiveWindow
         val app = root?.packageName?.toString().orEmpty()
         val tree = withContext(Dispatchers.Default) {
@@ -58,9 +61,10 @@ class ScreenReader(private val service: AccessibilityService) : Eyes {
         )
     }
 
-    private fun appWindow(): AccessibilityWindowInfo? {
+    /** App windows, most likely first: the active one, then the focused one, then the rest. */
+    private fun appWindows(): List<AccessibilityWindowInfo> {
         val apps = service.windows.filter { it.type == AccessibilityWindowInfo.TYPE_APPLICATION }
-        return apps.firstOrNull { it.isActive } ?: apps.firstOrNull { it.isFocused } ?: apps.firstOrNull()
+        return apps.sortedBy { if (it.isActive) 0 else if (it.isFocused) 1 else 2 }
     }
 
     private fun toRaw(node: AccessibilityNodeInfo, depth: Int): RawNode {
