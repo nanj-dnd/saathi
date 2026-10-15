@@ -4,7 +4,6 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
@@ -18,26 +17,26 @@ import android.view.ViewConfiguration
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.animation.DecelerateInterpolator
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import app.saathi.capture.Box
+import app.saathi.design.Glyph
+import app.saathi.design.Glyphs
+import app.saathi.design.Metro
+import app.saathi.design.SaathiType
 import app.saathi.session.GuideState
 import kotlin.math.hypot
 
 internal fun Context.dp(v: Float) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, v, resources.displayMetrics)
 
-internal object Palette {
-    const val SAFFRON = 0xFFE8590C.toInt()
-    const val LISTEN = 0xFFD6336C.toInt()
-    const val THINK = 0xFF1971C2.toInt()
-    const val SPEAK = 0xFF2B8A3E.toInt()
-    const val RING = 0xFFFFC300.toInt()
-    const val SCAM = 0xFFC92A2A.toInt()
-    const val SENSITIVE = 0xFFB35C00.toInt()
-    const val CARD = 0xFF1B1B1F.toInt()
-}
+/** The system's "Remove animations" setting: motion becomes instant cuts. */
+private fun animationsOn() = ValueAnimator.areAnimatorsEnabled()
 
-/** Big round "Help" button. Tap to talk; drag to move it out of the way. */
+/**
+ * The Help disc: a metro-blue station marker the senior taps to talk, and drags out of the way.
+ * Its glyph changes shape with the state (guide mark, microphone, looking arc), not just colour.
+ */
 @SuppressLint("ViewConstructor")
 internal class BubbleView(
     context: Context,
@@ -45,31 +44,29 @@ internal class BubbleView(
     private val onDrag: (dx: Int, dy: Int) -> Unit,
     private val onDragEnd: () -> Unit,
 ) : View(context) {
-    private val size = context.dp(84f).toInt()
+    private var metro = Metro.of(context)
+    // The disc carries a word under its glyph ("Help", "मदद") for seniors who don't know the mark yet.
+    // It grows (up to 104dp) to fit longer words rather than shrinking them below 14dp.
+    private val minSize = context.dp(80f).toInt()
+    private val maxSize = context.dp(104f).toInt()
+    private var size = minSize
+    private val pad = context.dp(16f).toInt()
     private val fill = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val halo = Paint(Paint.ANTI_ALIAS_FLAG)
-    // A white rim keeps the bubble visible on orange and red apps (Swiggy, Zomato, PhonePe).
-    private val rim = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.STROKE
-        strokeWidth = context.dp(3f)
-        color = Color.WHITE
-    }
-    private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.WHITE
-        textAlign = Paint.Align.CENTER
-        isFakeBoldText = true
-    }
+    // The rim keeps the disc visible on blue, orange and red apps (Paytm, Swiggy, PhonePe).
+    private val rim = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = context.dp(3f) }
+    private val rings = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = context.dp(2.5f) }
     private val arc = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeWidth = context.dp(4f)
-        color = Color.WHITE
         strokeCap = Paint.Cap.ROUND
     }
-    private var label = ""
+    private val label = Paint(Paint.ANTI_ALIAS_FLAG).apply { textAlign = Paint.Align.CENTER }
+    private var text = ""
+    private var language = "hi-IN"
     private var state = GuideState.IDLE
     private var phase = 0f
     private val animator = ValueAnimator.ofFloat(0f, 1f).apply {
-        duration = 1100
+        duration = 1400
         repeatCount = ValueAnimator.INFINITE
         addUpdateListener { phase = it.animatedValue as Float; invalidate() }
     }
@@ -78,22 +75,25 @@ internal class BubbleView(
         contentDescription = "Saathi"
     }
 
-    fun render(state: GuideState, label: String) {
+    fun render(state: GuideState, label: String, language: String) {
         this.state = state
-        this.label = label
-        fill.color = when (state) {
-            GuideState.LISTENING -> Palette.LISTEN
-            GuideState.THINKING -> Palette.THINK
-            GuideState.SPEAKING -> Palette.SPEAK
-            else -> Palette.SAFFRON
-        }
+        this.text = label
+        this.language = language
+        metro = Metro.of(context)
         contentDescription = label
-        if (state == GuideState.LISTENING || state == GuideState.THINKING) animator.start() else animator.cancel()
+        this.label.typeface = SaathiType.typeface(context, language, weight = 700, width = 88)
+        this.label.textSize = context.dp(16f)
+        val want = (this.label.measureText(label) / 0.775f).toInt().coerceIn(minSize, maxSize)
+        if (want != size) {
+            size = want
+            requestLayout()
+        }
+        val moving = state == GuideState.LISTENING || state == GuideState.THINKING
+        if (moving && animationsOn()) animator.start() else animator.cancel()
         invalidate()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val pad = context.dp(14f).toInt()
         setMeasuredDimension(size + pad * 2, size + pad * 2)
     }
 
@@ -101,26 +101,37 @@ internal class BubbleView(
         val cx = width / 2f
         val cy = height / 2f
         val r = size / 2f
+        fill.color = metro.accentFill
+        rim.color = metro.ringEdge
         if (state == GuideState.LISTENING) {
-            halo.color = Palette.LISTEN
-            halo.alpha = ((1 - phase) * 110).toInt()
-            canvas.drawCircle(cx, cy, r + phase * (width / 2f - r), halo)
+            // Two rings travel outward from the disc while the mic is open (comp 2).
+            rings.color = metro.accent
+            for (k in 0..1) {
+                val t = (phase + k * 0.5f) % 1f
+                rings.alpha = ((1 - t) * 255).toInt()
+                canvas.drawCircle(cx, cy, r + t * pad, rings)
+            }
         }
-        fill.setShadowLayer(context.dp(6f), 0f, context.dp(2f), 0x66000000)
+        fill.setShadowLayer(context.dp(6f), 0f, context.dp(2f), 0x55000000)
         canvas.drawCircle(cx, cy, r, fill)
         canvas.drawCircle(cx, cy, r - rim.strokeWidth / 2, rim)
+
         if (state == GuideState.THINKING) {
+            arc.color = metro.onAccent
             val inset = context.dp(7f)
             canvas.drawArc(cx - r + inset, cy - r + inset, cx + r - inset, cy + r - inset, phase * 360f, 100f, false, arc)
         }
-        // Shrink long labels ("सुन रहा हूँ…") to fit inside the circle.
-        textPaint.textSize = context.dp(20f)
-        val maxW = r * 1.6f
-        while (textPaint.measureText(label) > maxW && textPaint.textSize > context.dp(11f)) {
-            textPaint.textSize -= context.dp(1f)
-        }
-        val y = cy - (textPaint.descent() + textPaint.ascent()) / 2
-        canvas.drawText(label, cx, y, textPaint)
+        val glyph = if (state == GuideState.LISTENING) Glyph.MIC else Glyph.GUIDE
+        val g = context.dp(26f)
+        Glyphs.draw(canvas, glyph, RectF(cx - g / 2, cy - r * 0.62f, cx + g / 2, cy - r * 0.62f + g), metro.onAccent)
+
+        // The word sits under the glyph; past the disc's largest size it shrinks, but never below 14dp.
+        label.color = metro.onAccent
+        label.typeface = SaathiType.typeface(context, language, weight = 700, width = 88)
+        label.textSize = context.dp(16f)
+        val maxW = r * 1.55f
+        while (label.measureText(text) > maxW && label.textSize > context.dp(14f)) label.textSize -= context.dp(0.5f)
+        canvas.drawText(text, cx, cy + r * 0.42f, label)
     }
 
     private var downX = 0f
@@ -167,53 +178,42 @@ internal class BubbleView(
 }
 
 /**
- * Full-screen, touch-through layer: dims everything except the target, draws a pulsing ring around
- * it and a pointing hand. The spotlight glides from its last position so the eye can follow it.
+ * Full-screen, touch-through layer: a flat veil over everything except the target, which is
+ * ringed in metro blue with a station dot on its leading end. The ring glides from its last stop
+ * (or from the Help disc) so the eye can follow it; that glide is Saathi's one signature motion.
  */
 internal class PointerView(context: Context) : View(context) {
-    private val dim = Paint().apply { color = 0x73000000 }
-    private val ring = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.STROKE
-        strokeWidth = context.dp(6f)
-        color = Palette.RING
-    }
-    // A dark edge under the yellow ring keeps it visible on yellow and white screens.
-    private val ringEdge = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.STROKE
-        strokeWidth = context.dp(10f)
-        color = 0xCC1B1B1F.toInt()
-    }
-    /** Small targets (a 24dp icon) get a spotlight at least this big, so they're easy to find. */
+    private var metro = Metro.of(context)
+    private val veil = Paint()
+    private val ring = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = context.dp(6f) }
+    private val ringEdge = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = context.dp(11f) }
+    private val dot = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val dotEdge = Paint(Paint.ANTI_ALIAS_FLAG)
+    /** Small targets (a 24dp icon) get a ring at least this big, so they're easy to find. */
     private val minSide = context.dp(64f)
-    private val pulse = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.STROKE
-        strokeWidth = context.dp(4f)
-        color = Palette.RING
-    }
-    private val hand = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        textSize = context.dp(56f)
-        textAlign = Paint.Align.CENTER
-    }
-    private val pad = context.dp(10f)
-    private val corner = context.dp(18f)
+    private val pad = context.dp(8f)
+    private val corner = context.dp(16f)
+    private val dotR = context.dp(9f)
     private val path = Path().apply { fillType = Path.FillType.EVEN_ODD }
 
     private var from: RectF? = null
     private var to: RectF? = null
     private val current = RectF()
     private var travel = 1f
-    private var pulsePhase = 0f
+    private var beat = 0f
     private val loc = IntArray(2)
 
-    private val pulseAnim = ValueAnimator.ofFloat(0f, 1f).apply {
-        duration = 1200
+    // The station dot breathes slowly once the ring has arrived; nothing else moves.
+    private val beatAnim = ValueAnimator.ofFloat(0f, 1f).apply {
+        duration = 1600
         repeatCount = ValueAnimator.INFINITE
-        addUpdateListener { pulsePhase = it.animatedValue as Float; invalidate() }
+        addUpdateListener { beat = it.animatedValue as Float; invalidate() }
     }
     private var travelAnim: ValueAnimator? = null
 
-    /** [target] is in screen pixels; [origin] is where the spotlight starts if nothing is showing. */
+    /** [target] is in screen pixels; [origin] is where the ring starts if nothing is showing. */
     fun pointAt(target: Box, origin: Box) {
+        metro = Metro.of(context)
         getLocationOnScreen(loc)
         val next = RectF(
             target.left - loc[0] - pad, target.top - loc[1] - pad,
@@ -221,25 +221,36 @@ internal class PointerView(context: Context) : View(context) {
         )
         if (next.width() < minSide) next.inset(-(minSide - next.width()) / 2, 0f)
         if (next.height() < minSide) next.inset(0f, -(minSide - next.height()) / 2)
+        // Keep the whole ring, its white edge and the station dot on screen for full-width rows.
+        val edge = ringEdge.strokeWidth / 2
+        next.left = next.left.coerceAtLeast(dotR + context.dp(4f))
+        next.right = next.right.coerceAtMost(width - edge)
+        next.top = next.top.coerceAtLeast(edge)
+        next.bottom = next.bottom.coerceAtMost(height - edge)
         from = if (to != null) RectF(current) else RectF(
             origin.left - loc[0].toFloat(), origin.top - loc[1].toFloat(),
             origin.right - loc[0].toFloat(), origin.bottom - loc[1].toFloat(),
         )
         to = next
         travelAnim?.cancel()
-        travelAnim = ValueAnimator.ofFloat(0f, 1f).apply {
-            duration = 550
-            interpolator = DecelerateInterpolator(1.6f)
-            addUpdateListener { travel = it.animatedValue as Float; invalidate() }
-            start()
+        if (animationsOn()) {
+            travelAnim = ValueAnimator.ofFloat(0f, 1f).apply {
+                duration = 520
+                interpolator = DecelerateInterpolator(2f)
+                addUpdateListener { travel = it.animatedValue as Float; invalidate() }
+                start()
+            }
+            if (!beatAnim.isStarted) beatAnim.start()
+        } else {
+            travel = 1f
+            invalidate()
         }
-        if (!pulseAnim.isStarted) pulseAnim.start()
         visibility = VISIBLE
     }
 
     fun clear() {
         travelAnim?.cancel()
-        pulseAnim.cancel()
+        beatAnim.cancel()
         from = null
         to = null
         visibility = GONE
@@ -252,86 +263,283 @@ internal class PointerView(context: Context) : View(context) {
             a.left + (b.left - a.left) * travel, a.top + (b.top - a.top) * travel,
             a.right + (b.right - a.right) * travel, a.bottom + (b.bottom - a.bottom) * travel,
         )
+        veil.color = metro.veil
+        ring.color = metro.accent
+        ringEdge.color = metro.ringEdge
+        dot.color = metro.accent
+        dotEdge.color = metro.ringEdge
+
         path.reset()
         path.addRect(0f, 0f, width.toFloat(), height.toFloat(), Path.Direction.CW)
         path.addRoundRect(current, corner, corner, Path.Direction.CW)
-        canvas.drawPath(path, dim)
+        canvas.drawPath(path, veil)
         canvas.drawRoundRect(current, corner, corner, ringEdge)
         canvas.drawRoundRect(current, corner, corner, ring)
 
-        if (travel >= 1f) {
-            val grow = pad * 2.5f * pulsePhase
-            pulse.alpha = ((1 - pulsePhase) * 255).toInt()
-            canvas.drawRoundRect(
-                current.left - grow, current.top - grow, current.right + grow, current.bottom + grow,
-                corner + grow, corner + grow, pulse,
-            )
-        }
-
-        // Hand below the target, or above it when the target is near the bottom.
-        val bob = (if (pulsePhase < 0.5f) pulsePhase else 1 - pulsePhase) * pad * 2
-        val below = current.bottom + hand.textSize < height - pad * 6
-        val x = current.centerX().coerceIn(hand.textSize / 2, width - hand.textSize / 2)
-        if (below) canvas.drawText("👆", x, current.bottom + hand.textSize + bob, hand)
-        else canvas.drawText("👇", x, current.top - pad - bob, hand)
+        // The station dot on the ring's leading end.
+        val swell = if (travel >= 1f) 1f + 0.18f * (if (beat < 0.5f) beat * 2 else (1 - beat) * 2) else 1f
+        canvas.drawCircle(current.left, current.centerY(), dotR * swell + context.dp(2.5f), dotEdge)
+        canvas.drawCircle(current.left, current.centerY(), dotR * swell, dot)
     }
 }
 
-/** Large caption with Repeat / Close, placed on the half of the screen away from the target. */
-@SuppressLint("ViewConstructor", "SetTextI18n")
+/** What a sign is saying; each kind has its own glyph shape and band colour. */
+internal enum class SignKind { DOWN, UP, NOTE, DONE, YOURSELF, WARNING }
+
+/**
+ * The instruction sign: an enamel panel with a coloured band on its leading edge, the glyph (an
+ * arrow aimed at the target, or the state's mark), the first sentence large and the rest smaller.
+ * At the top of the screen it is an inset card with Repeat and Close on the veil beneath it (comp 1);
+ * at the bottom it docks full-width like a platform board, with the buttons inside it (comp 2).
+ */
+@SuppressLint("ViewConstructor")
 internal class CaptionView(
     context: Context,
     onRepeat: () -> Unit,
     onClose: () -> Unit,
 ) : LinearLayout(context) {
-    // Large system font sizes are common among seniors; past 1.3× the caption would cover the screen.
-    private val fontScale = context.resources.configuration.fontScale.coerceIn(1f, 1.3f)
-    private val text = TextView(context).apply {
-        setTextColor(Color.WHITE)
-        setTextSize(TypedValue.COMPLEX_UNIT_DIP, 26f * fontScale)
-        setLineSpacing(0f, 1.15f)
-        maxLines = 5
+    private var metro = Metro.of(context)
+    // Large system font sizes are common among seniors; past 1.3× the sign would cover the screen.
+    // Read on every render so a change in system settings applies to the next sign.
+    private val fontScale get() = context.resources.configuration.fontScale.coerceIn(1f, 1.3f)
+
+    private val band = View(context)
+    private val glyph = GlyphView(context)
+    private val head = TextView(context).apply {
+        maxLines = 4
         ellipsize = TextUtils.TruncateAt.END
+        includeFontPadding = false
     }
-    private val repeat = pill(context, onRepeat)
-    private val close = pill(context, onClose)
-    private val bg = GradientDrawable().apply { cornerRadius = context.dp(22f) }
+    private val sub = TextView(context).apply {
+        maxLines = 4
+        ellipsize = TextUtils.TruncateAt.END
+        includeFontPadding = false
+    }
+    private val panelBg = GradientDrawable()
+    private val content = LinearLayout(context).apply { orientation = VERTICAL }
+    private val panel = LinearLayout(context).apply {
+        orientation = HORIZONTAL
+        background = panelBg
+        clipToOutline = true
+        elevation = context.dp(4f)
+    }
+    private val repeat = SignButton(context, Glyph.REPEAT, filled = true, onRepeat)
+    private val close = SignButton(context, Glyph.CLOSE, filled = false, onClose)
+    // Repeat and Close, kept apart so Close is never hit by accident.
+    private val buttons = LinearLayout(context).apply {
+        orientation = HORIZONTAL
+        addView(repeat, LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f))
+        addView(View(context), LayoutParams(context.dp(28f).toInt(), 1))
+        addView(close, LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f))
+    }
 
     init {
         orientation = VERTICAL
-        background = bg
         val p = context.dp(18f).toInt()
-        setPadding(p, p, p, p)
-        addView(text)
-        addView(LinearLayout(context).apply {
+        val texts = LinearLayout(context).apply {
+            orientation = VERTICAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(0, p, p, p)
+            addView(head)
+            addView(sub, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply { topMargin = context.dp(6f).toInt() })
+        }
+        val message = LinearLayout(context).apply {
             orientation = HORIZONTAL
-            gravity = Gravity.END
-            setPadding(0, context.dp(14f).toInt(), 0, 0)
-            addView(repeat)
-            addView(close, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
-                marginStart = context.dp(12f).toInt()
+            addView(glyph, LayoutParams(context.dp(64f).toInt(), context.dp(64f).toInt()).apply {
+                gravity = Gravity.CENTER_VERTICAL
+                marginStart = context.dp(8f).toInt()
+                marginEnd = context.dp(6f).toInt()
             })
-        })
+            addView(texts, LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f))
+        }
+        content.addView(message)
+        panel.addView(band, LayoutParams(context.dp(12f).toInt(), LayoutParams.MATCH_PARENT))
+        panel.addView(content, LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f))
+        addView(panel, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
     }
 
-    fun render(caption: String, color: Int, repeatLabel: String, closeLabel: String) {
-        text.text = caption
-        bg.setColor(color)
-        repeat.text = "🔁  $repeatLabel"
-        close.text = "✕  $closeLabel"
-        // Screen readers should say "Repeat", not "counterclockwise arrows button Repeat".
-        repeat.contentDescription = repeatLabel
-        close.contentDescription = closeLabel
+    /**
+     * [docked]: at the bottom edge, full-width and flat, buttons inside, padded clear of the
+     * navigation bar by [bottomInset]. [veiled]: the screen behind is dimmed, so Close can let it through.
+     */
+    fun render(
+        caption: String,
+        kind: SignKind,
+        language: String,
+        repeatLabel: String,
+        closeLabel: String,
+        docked: Boolean,
+        veiled: Boolean,
+        bottomInset: Int,
+    ) {
+        metro = Metro.of(context)
+        val bandColor = when (kind) {
+            SignKind.DONE -> metro.done
+            SignKind.YOURSELF -> metro.caution
+            SignKind.WARNING -> metro.danger
+            else -> metro.accent
+        }
+        val (first, rest) = split(caption)
+        head.text = first
+        sub.text = rest
+        sub.visibility = if (rest.isEmpty()) GONE else VISIBLE
+        head.setTextColor(metro.ink)
+        sub.setTextColor(metro.inkSoft)
+        val headSize = context.dp(27f * fontScale)
+        val subSize = context.dp(20f * fontScale)
+        head.setTextSize(TypedValue.COMPLEX_UNIT_PX, headSize)
+        sub.setTextSize(TypedValue.COMPLEX_UNIT_PX, subSize)
+        // Explicit line heights: Devanagari and the Dravidian scripts have tall font metrics that
+        // otherwise push a two-line instruction apart into what reads as two separate lines.
+        // Fallback line spacing would re-expand lines to the font's tallest extents and undo this.
+        head.isFallbackLineSpacing = false
+        sub.isFallbackLineSpacing = false
+        head.lineHeight = (headSize * 1.3f).toInt()
+        sub.lineHeight = (subSize * 1.35f).toInt()
+        head.typeface = SaathiType.typeface(context, language, weight = 700)
+        sub.typeface = SaathiType.typeface(context, language, weight = 500)
+        panelBg.setColor(metro.panel)
+        panelBg.cornerRadius = if (docked) 0f else context.dp(8f)
+        band.setBackgroundColor(bandColor)
+        glyph.show(
+            when (kind) {
+                SignKind.DOWN -> Glyph.ARROW_DOWN
+                SignKind.UP -> Glyph.ARROW_UP
+                SignKind.NOTE -> Glyph.STOP
+                SignKind.DONE -> Glyph.CHECK
+                SignKind.YOURSELF -> Glyph.LOCK
+                SignKind.WARNING -> Glyph.WARNING
+            },
+            if (kind == SignKind.DOWN || kind == SignKind.UP) metro.ink else bandColor,
+        )
+        repeat.render(repeatLabel, metro, language, fontScale, clearFill = false)
+        // On the veil (comp 1) Close is an outline the veil shows through; on the panel it sits on white.
+        close.render(closeLabel, metro, language, fontScale, clearFill = veiled && !docked)
+
+        (buttons.parent as? android.view.ViewGroup)?.removeView(buttons)
+        val p = context.dp(18f).toInt()
+        if (docked) {
+            buttons.setPadding(context.dp(8f).toInt(), 0, p, p + bottomInset)
+            content.addView(buttons, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
+            panel.elevation = context.dp(8f)
+        } else {
+            buttons.setPadding(0, context.dp(12f).toInt(), 0, 0)
+            addView(buttons, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
+            panel.elevation = context.dp(4f)
+        }
+        // TalkBack reads the whole sign as one announcement.
+        panel.contentDescription = caption
+        panel.importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
     }
 
-    private fun pill(context: Context, onClick: () -> Unit) = Button(context).apply {
-        isAllCaps = false
-        setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20f * fontScale)
-        setTextColor(Palette.CARD)
-        minHeight = context.dp(56f).toInt()
-        val pad = context.dp(18f).toInt()
-        setPadding(pad, 0, pad, 0)
-        background = GradientDrawable().apply { cornerRadius = context.dp(28f); setColor(Color.WHITE) }
+    internal companion object {
+        /** Splits off the first sentence for the large line; the rest goes small beneath it. */
+        fun split(caption: String): Pair<String, String> {
+            val text = caption.trim()
+            val end = Regex("[.!?।](\\s+)").find(text) ?: return text to ""
+            val cut = end.range.first + 1
+            return text.substring(0, cut).trim() to text.substring(cut).trim()
+        }
+    }
+}
+
+/** A glyph in a fixed square, used by the sign. */
+internal class GlyphView(context: Context) : View(context) {
+    private var glyph = Glyph.STOP
+    private var color = 0
+    private val box = RectF()
+
+    fun show(glyph: Glyph, color: Int) {
+        this.glyph = glyph
+        this.color = color
+        importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
+        invalidate()
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        val inset = width * 0.08f
+        box.set(inset, inset, width - inset, height - inset)
+        Glyphs.draw(canvas, glyph, box, color)
+    }
+}
+
+/**
+ * A sign button: a rounded rectangle like the enamel panels, filled metro blue for Repeat and an
+ * outline for Close. The drawn glyph stays beside the word for seniors who recognise ↻ and ✕ faster
+ * than they read the label; glyph and word are centred together and the word shrinks to fit.
+ */
+@SuppressLint("ViewConstructor")
+internal class SignButton(
+    context: Context,
+    private val glyph: Glyph,
+    private val filled: Boolean,
+    onClick: () -> Unit,
+) : FrameLayout(context) {
+    private val bg = GradientDrawable().apply { cornerRadius = context.dp(10f) }
+    private val icon = GlyphView(context)
+    private val text = TextView(context).apply { maxLines = 1; includeFontPadding = false }
+    private val iconSize = context.dp(24f).toInt()
+    private val gap = context.dp(10f).toInt()
+    private val pad = context.dp(14f).toInt()
+    private var targetPx = context.dp(21f)
+
+    init {
+        background = bg
+        minimumHeight = context.dp(60f).toInt()
+        isClickable = true
+        isFocusable = true
         setOnClickListener { onClick() }
+        val row = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            addView(icon, LinearLayout.LayoutParams(iconSize, iconSize).apply { marginEnd = gap })
+            addView(text)
+        }
+        addView(row, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER))
     }
+
+    fun render(label: String, metro: Metro, language: String, fontScale: Float, clearFill: Boolean) {
+        val fg = if (filled) metro.onAccent else metro.accent
+        if (filled) {
+            bg.setColor(metro.accentFill)
+            bg.setStroke(0, 0)
+        } else {
+            // On the veil Close is a flat neutral (comp 1's light grey): secondary, and opaque so the
+            // app underneath never shows through its label.
+            bg.setColor(if (clearFill) (if (metro === Metro.DARK) 0xFF2A2D33.toInt() else 0xFFE9EBEE.toInt()) else metro.panel)
+            bg.setStroke(context.dp(2.5f).toInt(), metro.accent)
+        }
+        text.text = label
+        text.setTextColor(fg)
+        text.typeface = SaathiType.typeface(context, language, weight = 700)
+        targetPx = context.dp(21f * fontScale)
+        icon.show(glyph, fg)
+        // Screen readers should say "Repeat", not describe the icon.
+        contentDescription = label
+        fit(width)
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        if (w != oldw) post { fit(w) }
+    }
+
+    /** Largest size up to the target at which the word fits beside its glyph ("மீண்டும் கேள்"). */
+    private fun fit(width: Int) {
+        if (width <= 0) {
+            text.setTextSize(TypedValue.COMPLEX_UNIT_PX, targetPx)
+            return
+        }
+        val room = width - pad * 2 - iconSize - gap
+        val paint = android.graphics.Paint(text.paint)
+        var size = targetPx
+        paint.textSize = size
+        while (paint.measureText(text.text.toString()) > room && size > context.dp(13f)) {
+            size -= context.dp(0.5f)
+            paint.textSize = size
+        }
+        text.setTextSize(TypedValue.COMPLEX_UNIT_PX, size)
+    }
+
+    override fun getAccessibilityClassName(): CharSequence = Button::class.java.name
 }

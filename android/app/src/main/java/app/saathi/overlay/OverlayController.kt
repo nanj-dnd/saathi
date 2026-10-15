@@ -71,6 +71,11 @@ class OverlayController(
         wm.updateViewLayout(bubble, bubbleParams)
     }
 
+    /** Hidden while Saathi's own setup screen is in front; shown again over every other app. */
+    fun setBubbleVisible(visible: Boolean) {
+        if (attached) bubble.visibility = if (visible) View.VISIBLE else View.GONE
+    }
+
     /** The mic just opened: a buzz, so the senior knows to start talking even without looking. */
     fun listeningCue() {
         if (attached) bubble.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
@@ -89,7 +94,7 @@ class OverlayController(
             GuideState.THINKING -> res.getString(R.string.bubble_looking)
             else -> res.getString(R.string.bubble_help)
         }
-        bubble.render(state, label)
+        bubble.render(state, label, prefs.language)
         // Keep our own drawing out of the screenshot the model is about to see.
         if (state == GuideState.THINKING || state == GuideState.LISTENING) {
             pointer.clear()
@@ -100,15 +105,23 @@ class OverlayController(
     override fun point(target: Box?, caption: String, danger: String, done: Boolean) {
         if (!attached) return
         val res = strings()
-        val color = when {
-            danger == Danger.SCAM -> Palette.SCAM
-            danger == Danger.SENSITIVE -> Palette.SENSITIVE
-            done -> Palette.SPEAK
-            else -> Palette.CARD
+        val atTop = placeCaption(target)
+        val docked = !atTop
+        // The glyph's shape carries the state, so nothing depends on telling colours apart.
+        val kind = when {
+            danger == Danger.SCAM -> SignKind.WARNING
+            danger == Danger.SENSITIVE -> SignKind.YOURSELF
+            done -> SignKind.DONE
+            target == null -> SignKind.NOTE
+            atTop -> SignKind.DOWN
+            else -> SignKind.UP
         }
-        val shown = if (done && danger == Danger.NONE) "✓  $caption" else caption
-        this.caption.render(shown, color, res.getString(R.string.btn_repeat), res.getString(R.string.btn_close))
-        placeCaption(target)
+        this.caption.render(
+            caption, kind, prefs.language, res.getString(R.string.btn_repeat), res.getString(R.string.btn_close),
+            docked = docked,
+            veiled = target != null && danger != Danger.SCAM,
+            bottomInset = if (docked && keyboardTop() == null) navBarInset() else 0,
+        )
         this.caption.visibility = View.VISIBLE
 
         if (target != null && danger != Danger.SCAM) {
@@ -125,21 +138,34 @@ class OverlayController(
      * The caption goes on the half of the screen away from the target. Our overlay draws above the
      * keyboard, so when one is open the caption must stay above it or it would hide the keys.
      */
-    private fun placeCaption(target: Box?) {
+    /** Returns true when the sign went to the top of the screen. */
+    private fun placeCaption(target: Box?): Boolean {
         val h = screen.height()
         val keyboardTop = keyboardTop()
         val usable = keyboardTop ?: h
         val targetLow = target != null && target.centerY > usable / 2
         val gap = service.dp(if (targetLow) 36f else 24f).toInt()
-        if (targetLow || (keyboardTop != null && target == null)) {
+        val top = targetLow || (keyboardTop != null && target == null)
+        val margin = service.dp(12f).toInt()
+        if (top) {
+            // Comp 1: an inset card below the status bar.
             captionParams.gravity = Gravity.TOP or Gravity.START
             captionParams.y = gap
+            captionParams.x = margin
+            captionParams.width = screen.width() - margin * 2
         } else {
+            // Comp 2: docked full-width to the bottom edge, or to the top of an open keyboard.
             captionParams.gravity = Gravity.BOTTOM or Gravity.START
-            captionParams.y = gap + (h - usable)
+            captionParams.y = h - usable
+            captionParams.x = 0
+            captionParams.width = screen.width()
         }
         wm.updateViewLayout(caption, captionParams)
+        return top
     }
+
+    private fun navBarInset(): Int =
+        wm.currentWindowMetrics.windowInsets.getInsets(android.view.WindowInsets.Type.navigationBars()).bottom
 
     private fun keyboardTop(): Int? = runCatching {
         service.windows.firstOrNull { it.type == AccessibilityWindowInfo.TYPE_INPUT_METHOD }

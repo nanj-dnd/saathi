@@ -1,0 +1,7 @@
+{
+ "prompt": "Metro Wayfinding variation: setup screen as a vertical metro line with five station stops (Language, Microphone done with checks; Turn on Saathi current, large ring; Voice, Ready ahead), sign panel beside the current stop with 'Open settings' button, language chips at top.",
+ "tool": "Figma AI gpt-image-2.5-sunburst",
+ "approved": false,
+ "approved_companion": true,
+ "note": "User approved all three as one system (2026-10-15); this is a companion to comp-1."
+}

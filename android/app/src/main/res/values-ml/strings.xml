@@ -45,4 +45,5 @@
     <string name="speed_normal">സാധാരണ</string>
     <string name="offline_download">ഇന്റർനെറ്റ് ഇല്ലാതെ കേൾക്കാൻ ശബ്ദ തിരിച്ചറിയൽ ഡൗൺലോഡ് ചെയ്യുക</string>
     <string name="offline_started">ഡൗൺലോഡ് ചെയ്യുന്നു. ഫോൺ Wi-Fi-യിൽ വെക്കുക.</string>
+    <string name="access_summary">ബട്ടണുകൾ കാണിക്കാൻ സാഥി സ്ക്രീൻ കാണണം. അത് സ്വയം ഒന്നും അമർത്തില്ല.</string>
 </resources>

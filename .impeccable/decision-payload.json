@@ -1,0 +1,57 @@
+{
+  "title": "Choose Saathi's visual world",
+  "question": "The roll assigned the Inland Letter. Keep it, take an alternate, or re-roll.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "Inland Letter",
+      "kicker": "THE ROLL",
+      "lineage": "India Post inland letter-cards and postmarks",
+      "thesis": "Every step arrives like a letter from someone who cares: one clear message, then a postmark on exactly what to press.",
+      "palette": ["#DCE8F5", "#0F2747", "#FFFFFF", "#C8102E"],
+      "materials": ["flat letter-card blue", "ruled address lines", "double-ring postmark", "post-box red as the only accent"],
+      "viewport": "The phone app dimmed to blue-grey; a crisp double-ring postmark circles the one button to press; a white letter card at the opposite edge carries the line in large type; a red round Help seal sits at the side.",
+      "risk": "Post imagery reads old-fashioned if the postmark gets ornamental instead of staying a clean double ring.",
+      "raised": [
+        {"from": "rw-timetable-slide-rack", "raise": "Caption text runs at one large size; rank comes only from weight and reversal, never from small print."},
+        {"from": "pop-culture-shelf-doujin-event-catalog", "raise": "State is a mark, not a colour: the target is ringed, finished setup steps are cancelled with a postmark strike."},
+        {"from": "digital-design-canon-dark-first-developer-console", "raise": "Close sits apart from Repeat behind deliberate empty space and stays outline-only."},
+        {"from": "rw-manual-acetate-tab-board", "raise": "Setup shows its whole extent as a row of PIN-code boxes, filled as each step is done."},
+        {"from": "aww2-zoo-gardens-guide-map", "raise": "One step owns each setup screen; nothing competes with it."},
+        {"from": "variable-font-specimen", "raise": "The step numeral is set huge against small labels; hierarchy by scale contrast alone."}
+      ],
+      "comp": ".impeccable/mocks/decision/assigned.png"
+    },
+    {
+      "id": "model-pick",
+      "label": "Metro Wayfinding",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "Delhi Metro signage and line diagrams",
+      "thesis": "Saathi guides like a station sign: one arrow, one destination, stacked in your language and English.",
+      "palette": ["#FFFFFF", "#1A1A1A", "#0067B1", "#F5F5F2"],
+      "materials": ["enamel sign panels", "line-diagram stations", "bold directional arrows"],
+      "viewport": "A sign-panel caption with a bold arrow aimed at the target; the target ringed like a station dot; setup laid out as a line diagram with stations.",
+      "risk": "Transit wayfinding is where many 'clean and modern' guidance apps land; familiar by design.",
+      "comp": ".impeccable/mocks/decision/model-pick.png"
+    },
+    {"id": "challenger-timetable", "label": "Timetable Slide Rack", "verdict": "declined", "lineage": "1971 pocket airline timetable on a light table", "thesis": "Raked glass slides on a lit goldenrod bed, one type size throughout.", "palette": ["#E8B23A", "#3A4A5A", "#F4EEDC", "#C8102E"], "materials": ["tinted glass slides", "lit goldenrod bed"], "viewport": "Raked slides carrying each instruction.", "risk": "Raked containers and dense columns fight weak eyesight.", "case": "Fuses poorly: seniors don't know airline timetables, and raked type slows reading.", "kept": "One type size; rank by weight and reversal.", "hero": "https://impeccable.style/worlds/cards/rw-timetable-slide-rack-hero.webp"},
+    {"id": "challenger-catalog", "label": "Event Circle Catalog", "verdict": "declined", "lineage": "doujin event catalogs on newsprint", "thesis": "Stamp-sized cells, the chosen one circled in biro.", "palette": ["#1A1A1A", "#E9E6DE", "#D6336C"], "materials": ["newsprint", "biro circles"], "viewport": "A packed grid with the target circled.", "risk": "Density is the opposite of what a confused senior needs.", "case": "Fuses poorly: unfamiliar world, dense grid hurts clarity.", "kept": "State shown by a mark: circled now, struck when done.", "hero": "https://impeccable.style/worlds/cards/pop-culture-shelf-doujin-event-catalog-hero.webp"},
+    {"id": "challenger-console", "label": "Dark Developer Console", "verdict": "declined", "lineage": "dark-first developer tools", "thesis": "Graphite panels with hairline seams and isolated destructive actions.", "palette": ["#1C1F24", "#2A2F36", "#7FD1AE", "#F2F2F2"], "materials": ["graphite", "hairline seams"], "viewport": "Panels over the app, accents for state only.", "risk": "Reads technical and cold to an older audience.", "case": "Fuses poorly: seniors don't identify with developer tools.", "kept": "Destructive action isolated by deliberate space.", "hero": "https://impeccable.style/worlds/cards/digital-design-canon-dark-first-developer-console-hero.webp"},
+    {"id": "challenger-manual", "label": "Acetate Manual Tabs", "verdict": "declined", "lineage": "boxed-software manuals with tab dividers", "thesis": "Leaves over coloured boards, a stepped tab rail showing extent.", "palette": ["#E8762C", "#F5F3EC", "#2E6FD8", "#3A3A3A"], "materials": ["milk acetate", "divider board"], "viewport": "A leaf over a coloured board with a tab rail.", "risk": "Layered acetate muddies contrast for weak eyes.", "case": "Fuses poorly: unfamiliar artefact; layering costs legibility.", "kept": "A rail that shows the whole extent and where you are.", "hero": "https://impeccable.style/worlds/cards/rw-manual-acetate-tab-board-hero.webp"},
+    {"id": "challenger-zoo", "label": "Zoo Guide Map", "verdict": "declined", "lineage": "illustrated zoo and garden maps", "thesis": "Flat colour lobes with coastlines that divide everything.", "palette": ["#8ED462", "#F5F1E4", "#2C2E2A", "#FF705D"], "materials": ["flat lobes", "capsule controls"], "viewport": "One dominant lobe per screen.", "risk": "Playful overshoot motion conflicts with calm, and with the clean brief.", "case": "Fuses poorly: playful world contradicts the clean-and-modern brief.", "kept": "One region dominates each screen.", "hero": "https://impeccable.style/worlds/cards/aww2-zoo-gardens-guide-map-hero.webp"},
+    {"id": "challenger-specimen", "label": "Type Specimen", "verdict": "declined", "lineage": "interactive variable-font specimens", "thesis": "Giant letterforms, tiny labels, scale contrast as hierarchy.", "palette": ["#FAFAF7", "#111111", "#3355FF"], "materials": ["paper white", "giant glyphs"], "viewport": "A giant glyph with a live axis readout.", "risk": "A specimen celebrates type, not the senior's task.", "case": "Fuses poorly: no audience link; the task disappears behind the type.", "kept": "Hierarchy by scale contrast alone.", "hero": "https://impeccable.style/worlds/cards/variable-font-specimen-hero.webp"}
+  ],
+  "reroll": {"registers": ["safer", "bolder"]},
+  "buildPath": {"value": "comp", "toggle": true},
+  "canon": true,
+  "canonCard": {
+    "label": "The category standard",
+    "thesis": "A Material 3 assistant overlay: white cards, one accent, rounded everything, executed impeccably.",
+    "palette": ["#FFFFFF", "#1B1B1F", "#E8590C", "#F3EFEA"],
+    "materials": ["Material 3 surfaces", "rounded cards", "tonal buttons"],
+    "viewport": "A rounded white caption sheet, a circular highlight on the target, a floating action button for Help.",
+    "risk": "Indistinguishable from every other assistant overlay by design.",
+    "comp": ".impeccable/mocks/decision/canon.png"
+  },
+  "steer": true
+}

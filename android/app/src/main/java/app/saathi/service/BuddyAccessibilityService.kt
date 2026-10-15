@@ -175,7 +175,17 @@ class BuddyAccessibilityService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
         if (!::session.isInitialized) return
         val pkg = event.packageName?.toString() ?: return
-        if (pkg == packageName || pkg in IGNORED || "inputmethod" in pkg) return
+        if (pkg == packageName) {
+            // Saathi's own setup screen came to the front: end any guidance (its ring and sign belong
+            // to the app the senior just left) and hide the disc so it doesn't cover setup.
+            if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED && event.className?.startsWith("$packageName.ui") == true) {
+                session.stop()
+                overlay.setBubbleVisible(false)
+            }
+            return
+        }
+        if (pkg in IGNORED || "inputmethod" in pkg) return
+        if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) overlay.setBubbleVisible(true)
 
         when (event.eventType) {
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> onAppOpened(pkg)

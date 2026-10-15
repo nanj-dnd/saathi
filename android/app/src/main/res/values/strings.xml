@@ -46,4 +46,5 @@
     <string name="speed_normal">Normal</string>
     <string name="offline_download">Download speech for use without internet</string>
     <string name="offline_started">Downloading. Keep the phone on Wi-Fi.</string>
+    <string name="access_summary">Saathi needs to see the screen to point at buttons. It never presses anything.</string>
 </resources>
