@@ -1,0 +1,122 @@
+{
+  "id": "gallery-set-wallpaper",
+  "version": 1,
+  "goal": "set a photo as the wallpaper",
+  "apps": [
+    "com.google.android.apps.photos",
+    "com.sec.android.gallery3d",
+    "com.miui.gallery",
+    "com.coloros.gallery3d",
+    "com.vivo.gallery",
+    "com.android.gallery3d"
+  ],
+  "app_label": "Gallery",
+  "app_names": [
+    "Gallery",
+    "Photos",
+    "गैलरी"
+  ],
+  "triggers": [
+    {
+      "all": [
+        [
+          "wallpaper",
+          "वॉलपेपर",
+          "वालपेपर",
+          "पीछे की फोटो",
+          "स्क्रीन पर फोटो",
+          "வால்பேப்பர்",
+          "వాల్‌పేపర్",
+          "ವಾಲ್‌ಪೇಪರ್",
+          "വാൾപേപ്പർ"
+        ]
+      ]
+    }
+  ],
+  "examples": {
+    "hi-IN": [
+      "पोते की फोटो वॉलपेपर लगानी है"
+    ],
+    "ta-IN": [
+      "பேரனின் போட்டோவை வால்பேப்பராக வைக்க வேண்டும்"
+    ],
+    "te-IN": [
+      "మనవడి ఫోటో వాల్‌పేపర్‌గా పెట్టాలి"
+    ],
+    "kn-IN": [
+      "ಮೊಮ್ಮಗನ ಫೋಟೋ ವಾಲ್‌ಪೇಪರ್ ಆಗಿ ಹಾಕಬೇಕು"
+    ],
+    "ml-IN": [
+      "കൊച്ചുമകന്റെ ഫോട്ടോ വാൾപേപ്പർ ആക്കണം"
+    ]
+  },
+  "steps": [
+    {
+      "id": "set",
+      "after": {
+        "step": "use",
+        "min": 1
+      },
+      "target": [
+        "Set as wallpaper",
+        "Wallpaper",
+        "Home screen and lock screen",
+        "Home & lock screens",
+        "Set wallpaper"
+      ],
+      "status": "done",
+      "say": {
+        "hi-IN": "'{label}' पर दबाइए।",
+        "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
+        "te-IN": "'{label}' నొక్కండి.",
+        "kn-IN": "'{label}' ಒತ್ತಿ.",
+        "ml-IN": "'{label}' അമർത്തുക."
+      }
+    },
+    {
+      "id": "use",
+      "after": {
+        "step": "more",
+        "min": 1
+      },
+      "target": [
+        "Use as",
+        "Set as",
+        "Set as wallpaper"
+      ],
+      "say": {
+        "hi-IN": "'{label}' पर दबाइए।",
+        "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
+        "te-IN": "'{label}' నొక్కండి.",
+        "kn-IN": "'{label}' ಒತ್ತಿ.",
+        "ml-IN": "'{label}' അമർത്തുക."
+      }
+    },
+    {
+      "id": "more",
+      "target": [
+        "More options",
+        "More"
+      ],
+      "exact": true,
+      "say": {
+        "hi-IN": "ऊपर या नीचे तीन बिंदु वाला निशान दबाइए।",
+        "ta-IN": "மேலே அல்லது கீழே உள்ள மூன்று புள்ளி குறியை அழுத்துங்கள்.",
+        "te-IN": "పైన లేదా కింద ఉన్న మూడు చుక్కల గుర్తు నొక్కండి.",
+        "kn-IN": "ಮೇಲೆ ಅಥವಾ ಕೆಳಗೆ ಮೂರು ಚುಕ್ಕೆಗಳ ಗುರುತು ಒತ್ತಿ.",
+        "ml-IN": "മുകളിലോ താഴെയോ ഉള്ള മൂന്ന് കുത്തുകളുള്ള അടയാളം അമർത്തുക."
+      }
+    },
+    {
+      "id": "open",
+      "max_repeats": 2,
+      "say": {
+        "hi-IN": "जो फोटो लगानी है, उस पर दबाकर उसे खोलिए।",
+        "ta-IN": "வைக்க வேண்டிய புகைப்படத்தை அழுத்தித் திறங்கள்.",
+        "te-IN": "పెట్టాల్సిన ఫోటో మీద నొక్కి తెరవండి.",
+        "kn-IN": "ಹಾಕಬೇಕಾದ ಫೋಟೋ ಮೇಲೆ ಒತ್ತಿ ತೆರೆಯಿರಿ.",
+        "ml-IN": "വെക്കേണ്ട ഫോട്ടോയിൽ അമർത്തി തുറക്കുക."
+      }
+    }
+  ]
+}

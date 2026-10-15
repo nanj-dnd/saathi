@@ -15,5 +15,11 @@ DAILY_TURN_LIMIT = "300"
 binding = "USAGE"
 id = "REPLACE_WITH_KV_ID"
 
+# Answers shared between phones for non-personal screens (src/cache.ts). Optional.
+# Create with: npx wrangler kv namespace create GUIDE_CACHE
+[[kv_namespaces]]
+binding = "GUIDE_CACHE"
+id = "REPLACE_WITH_GUIDE_CACHE_KV_ID"
+
 # Secrets (npx wrangler secret put <NAME>, or .dev.vars locally):
 #   ANTHROPIC_API_KEY  TOKEN_SECRET

@@ -1,0 +1,160 @@
+{
+  "id": "settings-airplane-off",
+  "version": 1,
+  "goal": "turn off airplane mode",
+  "apps": [
+    "com.android.settings"
+  ],
+  "app_label": "Settings",
+  "app_names": [
+    "Settings",
+    "सेटिंग",
+    "सेटिंग्स",
+    "அமைப்புகள்",
+    "సెట్టింగ్‌లు",
+    "ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
+    "ക്രമീകരണങ്ങൾ"
+  ],
+  "triggers": [
+    {
+      "all": [
+        [
+          "airplane",
+          "aeroplane",
+          "flight mode",
+          "एयरप्लेन",
+          "एरोप्लेन",
+          "हवाई जहाज",
+          "फ्लाइट मोड",
+          "फ्लाइट मॉड",
+          "ஏர்பிளேன்",
+          "விமானப் பயன்முறை",
+          "பிளைட் மோட்",
+          "ఫ్లైట్ మోడ్",
+          "విమాన మోడ్",
+          "ఎయిర్‌ప్లేన్",
+          "ಏರೋಪ್ಲೇನ್",
+          "ವಿಮಾನ ಮೋಡ್",
+          "ಫ್ಲೈಟ್ ಮೋಡ್",
+          "ഫ്ലൈറ്റ് മോഡ്",
+          "വിമാന മോഡ്",
+          "എയർപ്ലെയിൻ"
+        ]
+      ]
+    }
+  ],
+  "unless": [
+    "चालू कर",
+    "ऑन कर",
+    "lagana",
+    "लगाना",
+    "ticket",
+    "टिकट",
+    "booking",
+    "बुक"
+  ],
+  "examples": {
+    "hi-IN": [
+      "फ्लाइट मोड हटाना है",
+      "airplane mode band karna hai"
+    ],
+    "ta-IN": [
+      "ஏர்பிளேன் மோடை அணைக்க வேண்டும்"
+    ],
+    "te-IN": [
+      "ఫ్లైట్ మోడ్ తీసేయాలి"
+    ],
+    "kn-IN": [
+      "ಫ್ಲೈಟ್ ಮೋಡ್ ತೆಗೆಯಬೇಕು"
+    ],
+    "ml-IN": [
+      "ഫ്ലൈറ്റ് മോഡ് മാറ്റണം"
+    ]
+  },
+  "steps": [
+    {
+      "id": "done",
+      "switch": [
+        "Airplane mode",
+        "Flight mode",
+        "Aeroplane mode"
+      ],
+      "switch_is": "off",
+      "status": "done",
+      "say": {
+        "hi-IN": "हवाई जहाज़ वाला मोड बंद है। थोड़ी देर में नेटवर्क आ जाएगा।",
+        "ta-IN": "Airplane mode அணைந்துள்ளது. சிறிது நேரத்தில் நெட்வொர்க் வரும்.",
+        "te-IN": "Airplane mode ఆఫ్‌లో ఉంది. కాసేపట్లో నెట్‌వర్క్ వస్తుంది.",
+        "kn-IN": "Airplane mode ಆಫ್ ಆಗಿದೆ. ಸ್ವಲ್ಪ ಹೊತ್ತಿನಲ್ಲಿ ನೆಟ್‌ವರ್ಕ್ ಬರುತ್ತದೆ.",
+        "ml-IN": "Airplane mode ഓഫാണ്. കുറച്ചു കഴിഞ്ഞ് നെറ്റ്‌വർക്ക് വരും."
+      }
+    },
+    {
+      "id": "switch",
+      "switch": [
+        "Airplane mode",
+        "Flight mode",
+        "Aeroplane mode"
+      ],
+      "switch_is": "on",
+      "tap_switch": true,
+      "say": {
+        "hi-IN": "'{label}' के सामने वाला बटन दबाकर बंद कीजिए।",
+        "ta-IN": "'{label}' அருகே உள்ள பொத்தானை அழுத்தி அணையுங்கள்.",
+        "te-IN": "'{label}' పక్కన ఉన్న బటన్ నొక్కి ఆఫ్ చేయండి.",
+        "kn-IN": "'{label}' ಪಕ್ಕದ ಬಟನ್ ಒತ್ತಿ ಆಫ್ ಮಾಡಿ.",
+        "ml-IN": "'{label}'-ന് അടുത്തുള്ള ബട്ടൺ അമർത്തി ഓഫാക്കുക."
+      }
+    },
+    {
+      "id": "open",
+      "screen_has": [
+        [
+          "Network & internet",
+          "Connections",
+          "Connected devices",
+          "Battery",
+          "Notifications",
+          "Sound & vibration",
+          "Sounds and vibration",
+          "Apps"
+        ]
+      ],
+      "target": [
+        "Network & internet",
+        "Connections",
+        "Network and internet"
+      ],
+      "say": {
+        "hi-IN": "'{label}' पर दबाइए।",
+        "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
+        "te-IN": "'{label}' నొక్కండి.",
+        "kn-IN": "'{label}' ಒತ್ತಿ.",
+        "ml-IN": "'{label}' അമർത്തുക."
+      }
+    },
+    {
+      "id": "scroll",
+      "screen_has": [
+        [
+          "Network & internet",
+          "Connections",
+          "Connected devices",
+          "Battery",
+          "Notifications",
+          "Sound & vibration",
+          "Sounds and vibration",
+          "Apps"
+        ]
+      ],
+      "max_repeats": 4,
+      "say": {
+        "hi-IN": "स्क्रीन पर उंगली रखकर ऊपर की ओर सरकाइए।",
+        "ta-IN": "திரையில் விரலை வைத்து மேலே தள்ளுங்கள்.",
+        "te-IN": "స్క్రీన్‌పై వేలు పెట్టి పైకి జరపండి.",
+        "kn-IN": "ಪರದೆಯ ಮೇಲೆ ಬೆರಳಿಟ್ಟು ಮೇಲಕ್ಕೆ ಸರಿಸಿ.",
+        "ml-IN": "സ്ക്രീനിൽ വിരൽ വെച്ച് മുകളിലേക്ക് നീക്കുക."
+      }
+    }
+  ]
+}

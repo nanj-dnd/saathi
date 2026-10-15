@@ -1,0 +1,187 @@
+{
+  "id": "settings-wifi",
+  "version": 1,
+  "goal": "turn on Wi-Fi",
+  "apps": [
+    "com.android.settings"
+  ],
+  "app_label": "Settings",
+  "app_names": [
+    "Settings",
+    "सेटिंग",
+    "सेटिंग्स",
+    "அமைப்புகள்",
+    "సెట్టింగ్‌లు",
+    "ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
+    "ക്രമീകരണങ്ങൾ"
+  ],
+  "triggers": [
+    {
+      "all": [
+        [
+          "wifi",
+          "wi-fi",
+          "wi fi",
+          "वाईफाई",
+          "वाई-फाई",
+          "वाई फाई",
+          "वायफाय",
+          "வைஃபை",
+          "வைபை",
+          "వైఫై",
+          "వై-ఫై",
+          "ವೈಫೈ",
+          "ವೈ-ಫೈ",
+          "വൈഫൈ",
+          "വൈ-ഫൈ"
+        ]
+      ]
+    }
+  ],
+  "unless": [
+    "off",
+    "बंद",
+    "ऑफ",
+    "ஆஃப்",
+    "அணை",
+    "నిలిపి",
+    "ఆఫ్",
+    "ಆಫ್",
+    "ഓഫ്",
+    "password",
+    "पासवर्ड",
+    "hotspot",
+    "हॉटस्पॉट",
+    "பாஸ்வேர்ட்",
+    "పాస్‌వర్డ్",
+    "ಪಾಸ್‌ವರ್ಡ್",
+    "പാസ്‌വേഡ്"
+  ],
+  "examples": {
+    "hi-IN": [
+      "वाईफाई चालू करना है",
+      "wifi on karna hai"
+    ],
+    "ta-IN": [
+      "வைஃபை ஆன் செய்ய வேண்டும்"
+    ],
+    "te-IN": [
+      "వైఫై ఆన్ చేయాలి"
+    ],
+    "kn-IN": [
+      "ವೈಫೈ ಆನ್ ಮಾಡಬೇಕು"
+    ],
+    "ml-IN": [
+      "വൈഫൈ ഓണാക്കണം"
+    ]
+  },
+  "steps": [
+    {
+      "id": "done",
+      "switch": [
+        "Wi-Fi",
+        "Use Wi-Fi"
+      ],
+      "switch_is": "on",
+      "status": "done",
+      "say": {
+        "hi-IN": "वाई-फाई चालू है। नीचे अपने घर के वाई-फाई का नाम दिखेगा।",
+        "ta-IN": "Wi-Fi இயக்கத்தில் உள்ளது. கீழே உங்கள் வீட்டு Wi-Fi பெயர் தெரியும்.",
+        "te-IN": "Wi-Fi ఆన్‌లో ఉంది. కింద మీ ఇంటి Wi-Fi పేరు కనిపిస్తుంది.",
+        "kn-IN": "Wi-Fi ಆನ್ ಆಗಿದೆ. ಕೆಳಗೆ ನಿಮ್ಮ ಮನೆಯ Wi-Fi ಹೆಸರು ಕಾಣುತ್ತದೆ.",
+        "ml-IN": "Wi-Fi ഓണാണ്. താഴെ നിങ്ങളുടെ വീട്ടിലെ Wi-Fi പേര് കാണാം."
+      }
+    },
+    {
+      "id": "switch",
+      "switch": [
+        "Wi-Fi",
+        "Use Wi-Fi"
+      ],
+      "switch_is": "off",
+      "tap_switch": true,
+      "say": {
+        "hi-IN": "'{label}' के सामने वाला बटन दबाइए, वह चालू हो जाएगा।",
+        "ta-IN": "'{label}' அருகே உள்ள பொத்தானை அழுத்துங்கள், அது இயங்கும்.",
+        "te-IN": "'{label}' పక్కన ఉన్న బటన్ నొక్కండి, అది ఆన్ అవుతుంది.",
+        "kn-IN": "'{label}' ಪಕ್ಕದ ಬಟನ್ ಒತ್ತಿ, ಅದು ಆನ್ ಆಗುತ್ತದೆ.",
+        "ml-IN": "'{label}'-ന് അടുത്തുള്ള ബട്ടൺ അമർത്തുക, അത് ഓണാകും."
+      }
+    },
+    {
+      "id": "internet",
+      "screen_has": [
+        [
+          "Airplane mode",
+          "Flight mode",
+          "SIMs",
+          "Hotspot & tethering",
+          "Mobile network",
+          "Data Saver",
+          "Data usage",
+          "Private DNS"
+        ]
+      ],
+      "target": [
+        "Internet"
+      ],
+      "say": {
+        "hi-IN": "'{label}' पर दबाइए।",
+        "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
+        "te-IN": "'{label}' నొక్కండి.",
+        "kn-IN": "'{label}' ಒತ್ತಿ.",
+        "ml-IN": "'{label}' അമർത്തുക."
+      }
+    },
+    {
+      "id": "open",
+      "screen_has": [
+        [
+          "Network & internet",
+          "Connections",
+          "Connected devices",
+          "Battery",
+          "Notifications",
+          "Sound & vibration",
+          "Sounds and vibration",
+          "Apps"
+        ]
+      ],
+      "target": [
+        "Network & internet",
+        "Connections",
+        "Network and internet"
+      ],
+      "say": {
+        "hi-IN": "'{label}' पर दबाइए।",
+        "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
+        "te-IN": "'{label}' నొక్కండి.",
+        "kn-IN": "'{label}' ಒತ್ತಿ.",
+        "ml-IN": "'{label}' അമർത്തുക."
+      }
+    },
+    {
+      "id": "scroll",
+      "screen_has": [
+        [
+          "Network & internet",
+          "Connections",
+          "Connected devices",
+          "Battery",
+          "Notifications",
+          "Sound & vibration",
+          "Sounds and vibration",
+          "Apps"
+        ]
+      ],
+      "max_repeats": 4,
+      "say": {
+        "hi-IN": "स्क्रीन पर उंगली रखकर ऊपर की ओर सरकाइए।",
+        "ta-IN": "திரையில் விரலை வைத்து மேலே தள்ளுங்கள்.",
+        "te-IN": "స్క్రీన్‌పై వేలు పెట్టి పైకి జరపండి.",
+        "kn-IN": "ಪರದೆಯ ಮೇಲೆ ಬೆರಳಿಟ್ಟು ಮೇಲಕ್ಕೆ ಸರಿಸಿ.",
+        "ml-IN": "സ്ക്രീനിൽ വിരൽ വെച്ച് മുകളിലേക്ക് നീക്കുക."
+      }
+    }
+  ]
+}

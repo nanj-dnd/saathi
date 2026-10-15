@@ -1,0 +1,180 @@
+{
+  "id": "settings-battery-saver",
+  "version": 1,
+  "goal": "turn on battery saver",
+  "apps": [
+    "com.android.settings"
+  ],
+  "app_label": "Settings",
+  "app_names": [
+    "Settings",
+    "सेटिंग",
+    "सेटिंग्स",
+    "அமைப்புகள்",
+    "సెట్టింగ్‌లు",
+    "ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
+    "ക്രമീകരണങ്ങൾ"
+  ],
+  "triggers": [
+    {
+      "all": [
+        [
+          "battery",
+          "बैटरी",
+          "बेटरी",
+          "பேட்டரி",
+          "బ్యాటరీ",
+          "ಬ್ಯಾಟರಿ",
+          "ബാറ്ററി"
+        ],
+        [
+          "saver",
+          "save",
+          "बचा",
+          "बचत",
+          "ज़्यादा चले",
+          "ज्यादा चले",
+          "देर तक",
+          "சேமி",
+          "நீடிக்க",
+          "ఆదా",
+          "ఎక్కువ సేపు",
+          "ಉಳಿಸ",
+          "ಹೆಚ್ಚು ಹೊತ್ತು",
+          "ലാഭ",
+          "കൂടുതൽ നേരം"
+        ]
+      ]
+    }
+  ],
+  "unless": [
+    "off",
+    "बंद",
+    "ऑफ",
+    "ஆஃப்",
+    "அணை",
+    "నిలిపి",
+    "ఆఫ్",
+    "ಆಫ್",
+    "ഓഫ്"
+  ],
+  "examples": {
+    "hi-IN": [
+      "बैटरी बचानी है",
+      "बैटरी ज़्यादा चले ऐसा करना है"
+    ],
+    "ta-IN": [
+      "பேட்டரியை சேமிக்க வேண்டும்"
+    ],
+    "te-IN": [
+      "బ్యాటరీ ఆదా చేయాలి"
+    ],
+    "kn-IN": [
+      "ಬ್ಯಾಟರಿ ಉಳಿಸಬೇಕು"
+    ],
+    "ml-IN": [
+      "ബാറ്ററി ലാഭിക്കണം"
+    ]
+  },
+  "steps": [
+    {
+      "id": "done",
+      "switch": [
+        "Use Battery Saver",
+        "Battery Saver",
+        "Power saving",
+        "Power saving mode"
+      ],
+      "switch_is": "on",
+      "status": "done",
+      "say": {
+        "hi-IN": "बैटरी बचाने वाला मोड चालू है।",
+        "ta-IN": "பேட்டரி சேமிப்பு இயக்கத்தில் உள்ளது.",
+        "te-IN": "బ్యాటరీ సేవర్ ఆన్‌లో ఉంది.",
+        "kn-IN": "ಬ್ಯಾಟರಿ ಸೇವರ್ ಆನ್ ಆಗಿದೆ.",
+        "ml-IN": "ബാറ്ററി സേവർ ഓണാണ്."
+      }
+    },
+    {
+      "id": "switch",
+      "switch": [
+        "Use Battery Saver",
+        "Battery Saver",
+        "Power saving",
+        "Power saving mode"
+      ],
+      "switch_is": "off",
+      "tap_switch": true,
+      "say": {
+        "hi-IN": "'{label}' के सामने वाला बटन दबाइए, वह चालू हो जाएगा।",
+        "ta-IN": "'{label}' அருகே உள்ள பொத்தானை அழுத்துங்கள், அது இயங்கும்.",
+        "te-IN": "'{label}' పక్కన ఉన్న బటన్ నొక్కండి, అది ఆన్ అవుతుంది.",
+        "kn-IN": "'{label}' ಪಕ್ಕದ ಬಟನ್ ಒತ್ತಿ, ಅದು ಆನ್ ಆಗುತ್ತದೆ.",
+        "ml-IN": "'{label}'-ന് അടുത്തുള്ള ബട്ടൺ അമർത്തുക, അത് ഓണാകും."
+      }
+    },
+    {
+      "id": "saver",
+      "target": [
+        "Battery Saver",
+        "Power saving"
+      ],
+      "say": {
+        "hi-IN": "'{label}' पर दबाइए।",
+        "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
+        "te-IN": "'{label}' నొక్కండి.",
+        "kn-IN": "'{label}' ಒತ್ತಿ.",
+        "ml-IN": "'{label}' അമർത്തുക."
+      }
+    },
+    {
+      "id": "open",
+      "screen_has": [
+        [
+          "Network & internet",
+          "Connections",
+          "Connected devices",
+          "Battery",
+          "Notifications",
+          "Sound & vibration",
+          "Sounds and vibration",
+          "Apps"
+        ]
+      ],
+      "target": [
+        "Battery",
+        "Battery and device care"
+      ],
+      "say": {
+        "hi-IN": "'{label}' पर दबाइए।",
+        "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
+        "te-IN": "'{label}' నొక్కండి.",
+        "kn-IN": "'{label}' ಒತ್ತಿ.",
+        "ml-IN": "'{label}' അമർത്തുക."
+      }
+    },
+    {
+      "id": "scroll",
+      "screen_has": [
+        [
+          "Network & internet",
+          "Connections",
+          "Connected devices",
+          "Battery",
+          "Notifications",
+          "Sound & vibration",
+          "Sounds and vibration",
+          "Apps"
+        ]
+      ],
+      "max_repeats": 4,
+      "say": {
+        "hi-IN": "स्क्रीन पर उंगली रखकर ऊपर की ओर सरकाइए।",
+        "ta-IN": "திரையில் விரலை வைத்து மேலே தள்ளுங்கள்.",
+        "te-IN": "స్క్రీన్‌పై వేలు పెట్టి పైకి జరపండి.",
+        "kn-IN": "ಪರದೆಯ ಮೇಲೆ ಬೆರಳಿಟ್ಟು ಮೇಲಕ್ಕೆ ಸರಿಸಿ.",
+        "ml-IN": "സ്ക്രീനിൽ വിരൽ വെച്ച് മുകളിലേക്ക് നീക്കുക."
+      }
+    }
+  ]
+}

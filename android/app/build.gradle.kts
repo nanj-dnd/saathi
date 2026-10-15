@@ -37,6 +37,10 @@ android {
         compose = true
         buildConfig = true
     }
+    sourceSets {
+        // shared/recipes at the repo root becomes assets/recipes, the same files the Worker serves.
+        getByName("main").assets.srcDir("../../shared")
+    }
 }
 
 dependencies {

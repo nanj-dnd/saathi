@@ -3,10 +3,13 @@ package app.saathi.overlay
 import android.accessibilityservice.AccessibilityService
 import android.content.Context
 import android.graphics.PixelFormat
+import android.graphics.Rect
 import android.view.Gravity
+import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.WindowManager
 import android.view.WindowManager.LayoutParams as LP
+import android.view.accessibility.AccessibilityWindowInfo
 import app.saathi.Prefs
 import app.saathi.R
 import app.saathi.capture.Box
@@ -43,11 +46,8 @@ class OverlayController(
 
     fun show() {
         if (attached) return
-        val margin = service.dp(12f).toInt()
-        captionParams.width = screen.width() - margin * 2
-        captionParams.x = margin
-        bubbleParams.x = prefs.bubbleX.takeIf { it >= 0 } ?: (screen.width() - service.dp(112f).toInt())
-        bubbleParams.y = prefs.bubbleY.takeIf { it >= 0 } ?: (screen.height() * 0.62f).toInt()
+        sizeCaption()
+        placeBubbleWhereSaved()
         wm.addView(pointer, pointerParams)
         wm.addView(caption, captionParams)
         wm.addView(bubble, bubbleParams)
@@ -61,8 +61,28 @@ class OverlayController(
         attached = false
     }
 
+    /** After rotation or a fold: fit the caption to the new width and keep the bubble on screen. */
+    fun onScreenResized() {
+        if (!attached) return
+        clear()
+        sizeCaption()
+        wm.updateViewLayout(caption, captionParams)
+        placeBubbleWhereSaved()
+        wm.updateViewLayout(bubble, bubbleParams)
+    }
+
+    /** The mic just opened: a buzz, so the senior knows to start talking even without looking. */
+    fun listeningCue() {
+        if (attached) bubble.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+    }
+
     override fun state(state: GuideState) {
         this.state = state
+        // Back to idle: the bubble returns to where the senior put it, if a step had moved it.
+        if (state == GuideState.IDLE && attached) {
+            placeBubbleWhereSaved()
+            wm.updateViewLayout(bubble, bubbleParams)
+        }
         val res = strings()
         val label = when (state) {
             GuideState.LISTENING -> res.getString(R.string.bubble_listening)
@@ -77,28 +97,86 @@ class OverlayController(
         }
     }
 
-    override fun point(target: Box?, caption: String, danger: String) {
+    override fun point(target: Box?, caption: String, danger: String, done: Boolean) {
         if (!attached) return
         val res = strings()
-        val color = when (danger) {
-            Danger.SCAM -> Palette.SCAM
-            Danger.SENSITIVE -> Palette.SENSITIVE
+        val color = when {
+            danger == Danger.SCAM -> Palette.SCAM
+            danger == Danger.SENSITIVE -> Palette.SENSITIVE
+            done -> Palette.SPEAK
             else -> Palette.CARD
         }
-        this.caption.render(caption, color, res.getString(R.string.btn_repeat), res.getString(R.string.btn_close))
-
-        // Caption goes on the half of the screen away from the target.
-        val targetLow = target != null && target.centerY > screen.height() / 2
-        captionParams.gravity = (if (targetLow) Gravity.TOP else Gravity.BOTTOM) or Gravity.START
-        captionParams.y = service.dp(if (targetLow) 36f else 24f).toInt()
-        wm.updateViewLayout(this.caption, captionParams)
+        val shown = if (done && danger == Danger.NONE) "✓  $caption" else caption
+        this.caption.render(shown, color, res.getString(R.string.btn_repeat), res.getString(R.string.btn_close))
+        placeCaption(target)
         this.caption.visibility = View.VISIBLE
 
         if (target != null && danger != Danger.SCAM) {
+            moveBubbleOffTarget(target)
             pointer.pointAt(target, bubbleBox())
         } else {
             pointer.clear()
         }
+        // A buzz with every new step helps seniors who don't hear well; a stronger one for warnings.
+        bubble.performHapticFeedback(if (danger == Danger.SCAM) HapticFeedbackConstants.REJECT else HapticFeedbackConstants.CONFIRM)
+    }
+
+    /**
+     * The caption goes on the half of the screen away from the target. Our overlay draws above the
+     * keyboard, so when one is open the caption must stay above it or it would hide the keys.
+     */
+    private fun placeCaption(target: Box?) {
+        val h = screen.height()
+        val keyboardTop = keyboardTop()
+        val usable = keyboardTop ?: h
+        val targetLow = target != null && target.centerY > usable / 2
+        val gap = service.dp(if (targetLow) 36f else 24f).toInt()
+        if (targetLow || (keyboardTop != null && target == null)) {
+            captionParams.gravity = Gravity.TOP or Gravity.START
+            captionParams.y = gap
+        } else {
+            captionParams.gravity = Gravity.BOTTOM or Gravity.START
+            captionParams.y = gap + (h - usable)
+        }
+        wm.updateViewLayout(caption, captionParams)
+    }
+
+    private fun keyboardTop(): Int? = runCatching {
+        service.windows.firstOrNull { it.type == AccessibilityWindowInfo.TYPE_INPUT_METHOD }
+            ?.let { Rect().also(it::getBoundsInScreen).top }
+    }.getOrNull()
+
+    /** If the bubble sits on the button the senior must press, slide it to the other side. */
+    private fun moveBubbleOffTarget(target: Box) {
+        val margin = service.dp(24f).toInt()
+        val b = bubbleBox()
+        val overlaps = b.left < target.right + margin && b.right > target.left - margin &&
+            b.top < target.bottom + margin && b.bottom > target.top - margin
+        if (!overlaps) return
+        val s = screen
+        val w = bubble.width.takeIf { it > 0 } ?: service.dp(112f).toInt()
+        val h = bubble.height.takeIf { it > 0 } ?: service.dp(112f).toInt()
+        // Opposite horizontal side first; if the target spans the width, go above or below it.
+        bubbleParams.x = if (target.centerX > s.width() / 2) 0 else s.width() - w
+        if (target.width > s.width() - w * 2) {
+            bubbleParams.y = if (target.centerY > s.height() / 2) (target.top - h - margin).coerceAtLeast(0)
+            else (target.bottom + margin).coerceAtMost(s.height() - h)
+        }
+        wm.updateViewLayout(bubble, bubbleParams)
+    }
+
+    private fun sizeCaption() {
+        val margin = service.dp(12f).toInt()
+        captionParams.width = screen.width() - margin * 2
+        captionParams.x = margin
+    }
+
+    private fun placeBubbleWhereSaved() {
+        val s = screen
+        val w = bubble.width.takeIf { it > 0 } ?: service.dp(112f).toInt()
+        val h = bubble.height.takeIf { it > 0 } ?: service.dp(112f).toInt()
+        bubbleParams.x = (prefs.bubbleX.takeIf { it >= 0 } ?: (s.width() - w)).coerceIn(0, (s.width() - w).coerceAtLeast(0))
+        bubbleParams.y = (prefs.bubbleY.takeIf { it >= 0 } ?: (s.height() * 0.62f).toInt()).coerceIn(0, (s.height() - h).coerceAtLeast(0))
     }
 
     override fun clear() {

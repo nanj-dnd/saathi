@@ -59,9 +59,13 @@ export interface Guide {
   expect: string;
 }
 
+/** Who answered: the model, the shared cache, or a dev stand-in. The phone adds its own sources. */
+export type Source = "model" | "cache" | "demo" | "mock";
+
 export interface TurnResponse {
   guide: Guide;
   timings_ms: Record<string, number>;
+  source: Source;
 }
 
 // Structured-output schema. No nullable fields: "none" targets use node_id "" and x/y -1.

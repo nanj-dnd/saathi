@@ -1,0 +1,168 @@
+{
+  "id": "settings-screen-timeout",
+  "version": 1,
+  "goal": "keep the screen on longer",
+  "apps": [
+    "com.android.settings"
+  ],
+  "app_label": "Settings",
+  "app_names": [
+    "Settings",
+    "सेटिंग",
+    "सेटिंग्स",
+    "அமைப்புகள்",
+    "సెట్టింగ్‌లు",
+    "ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
+    "ക്രമീകരണങ്ങൾ"
+  ],
+  "triggers": [
+    {
+      "all": [
+        [
+          "screen",
+          "स्क्रीन",
+          "திரை",
+          "ஸ்கிரீன்",
+          "స్క్రీన్",
+          "ಸ್ಕ್ರೀನ್",
+          "ಪರದೆ",
+          "സ്ക്രീൻ"
+        ],
+        [
+          "timeout",
+          "time out",
+          "jaldi",
+          "जल्दी",
+          "झट से",
+          "சீக்கிரம்",
+          "త్వరగా",
+          "ಬೇಗ",
+          "പെട്ടെന്ന്"
+        ]
+      ]
+    }
+  ],
+  "examples": {
+    "hi-IN": [
+      "स्क्रीन जल्दी बंद हो जाती है"
+    ],
+    "ta-IN": [
+      "திரை சீக்கிரம் அணைந்துவிடுகிறது"
+    ],
+    "te-IN": [
+      "స్క్రీన్ త్వరగా ఆఫ్ అవుతోంది"
+    ],
+    "kn-IN": [
+      "ಪರದೆ ಬೇಗ ಆಫ್ ಆಗುತ್ತದೆ"
+    ],
+    "ml-IN": [
+      "സ്ക്രീൻ പെട്ടെന്ന് ഓഫാകുന്നു"
+    ]
+  },
+  "steps": [
+    {
+      "id": "done",
+      "screen_has": [
+        [
+          "Screen timeout"
+        ]
+      ],
+      "after": {
+        "step": "choose",
+        "min": 1
+      },
+      "status": "done",
+      "say": {
+        "hi-IN": "अब स्क्रीन देर से बंद होगी।",
+        "ta-IN": "இனி திரை தாமதமாக அணையும்.",
+        "te-IN": "ఇక స్క్రీన్ ఆలస్యంగా ఆఫ్ అవుతుంది.",
+        "kn-IN": "ಇನ್ನು ಪರದೆ ತಡವಾಗಿ ಆಫ್ ಆಗುತ್ತದೆ.",
+        "ml-IN": "ഇനി സ്ക്രീൻ വൈകിയേ ഓഫാകൂ."
+      }
+    },
+    {
+      "id": "choose",
+      "screen_has": [
+        [
+          "30 seconds",
+          "1 minute"
+        ]
+      ],
+      "target": [
+        "10 minutes",
+        "5 minutes",
+        "2 minutes"
+      ],
+      "exact": true,
+      "say": {
+        "hi-IN": "'{label}' चुनिए। स्क्रीन देर तक चालू रहेगी।",
+        "ta-IN": "'{label}' ஐத் தேர்ந்தெடுங்கள். திரை நீண்ட நேரம் இயங்கும்.",
+        "te-IN": "'{label}' ఎంచుకోండి. స్క్రీన్ ఎక్కువ సేపు ఆన్‌లో ఉంటుంది.",
+        "kn-IN": "'{label}' ಆಯ್ಕೆ ಮಾಡಿ. ಪರದೆ ಹೆಚ್ಚು ಹೊತ್ತು ಆನ್ ಇರುತ್ತದೆ.",
+        "ml-IN": "'{label}' തിരഞ്ഞെടുക്കുക. സ്ക്രീൻ കൂടുതൽ നേരം ഓണായിരിക്കും."
+      }
+    },
+    {
+      "id": "timeout",
+      "target": [
+        "Screen timeout"
+      ],
+      "say": {
+        "hi-IN": "'{label}' पर दबाइए।",
+        "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
+        "te-IN": "'{label}' నొక్కండి.",
+        "kn-IN": "'{label}' ಒತ್ತಿ.",
+        "ml-IN": "'{label}' അമർത്തുക."
+      }
+    },
+    {
+      "id": "open",
+      "screen_has": [
+        [
+          "Network & internet",
+          "Connections",
+          "Connected devices",
+          "Battery",
+          "Notifications",
+          "Sound & vibration",
+          "Sounds and vibration",
+          "Apps"
+        ]
+      ],
+      "target": [
+        "Display & touch",
+        "Display"
+      ],
+      "say": {
+        "hi-IN": "'{label}' पर दबाइए।",
+        "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
+        "te-IN": "'{label}' నొక్కండి.",
+        "kn-IN": "'{label}' ಒತ್ತಿ.",
+        "ml-IN": "'{label}' അമർത്തുക."
+      }
+    },
+    {
+      "id": "scroll",
+      "screen_has": [
+        [
+          "Network & internet",
+          "Connections",
+          "Connected devices",
+          "Battery",
+          "Notifications",
+          "Sound & vibration",
+          "Sounds and vibration",
+          "Apps"
+        ]
+      ],
+      "max_repeats": 4,
+      "say": {
+        "hi-IN": "स्क्रीन पर उंगली रखकर ऊपर की ओर सरकाइए।",
+        "ta-IN": "திரையில் விரலை வைத்து மேலே தள்ளுங்கள்.",
+        "te-IN": "స్క్రీన్‌పై వేలు పెట్టి పైకి జరపండి.",
+        "kn-IN": "ಪರದೆಯ ಮೇಲೆ ಬೆರಳಿಟ್ಟು ಮೇಲಕ್ಕೆ ಸರಿಸಿ.",
+        "ml-IN": "സ്ക്രീനിൽ വിരൽ വെച്ച് മുകളിലേക്ക് നീക്കുക."
+      }
+    }
+  ]
+}

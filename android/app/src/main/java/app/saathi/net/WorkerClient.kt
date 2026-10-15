@@ -44,8 +44,21 @@ class WorkerClient(
             res = post("/turn", body, token)
         }
         res.use {
-            if (!it.isSuccessful) throw IOException("worker ${it.code}")
+            when {
+                it.code == 429 -> throw TurnFailure(TurnFailure.Kind.LIMIT, "daily limit")
+                it.code >= 500 -> throw TurnFailure(TurnFailure.Kind.BUSY, "worker ${it.code}")
+                !it.isSuccessful -> throw IOException("worker ${it.code}")
+            }
             json.decodeFromString<TurnResponse>(it.body!!.string())
+        }
+    }
+
+    /** The Worker's current recipe bundle (shared/recipes), as JSON. */
+    suspend fun fetchRecipes(): String = withContext(Dispatchers.IO) {
+        val req = Request.Builder().url(baseUrl.trimEnd('/') + "/recipes").get().build()
+        http.newCall(req).await().use {
+            if (!it.isSuccessful) throw IOException("recipes ${it.code}")
+            it.body!!.string()
         }
     }
 

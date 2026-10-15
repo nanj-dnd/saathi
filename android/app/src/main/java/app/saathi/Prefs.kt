@@ -15,6 +15,16 @@ class Prefs(context: Context) {
         get() = sp.getString("token", null)
         set(v) = sp.edit().putString("token", v).apply()
 
+    /** When recipes were last fetched from the Worker, in epoch ms. */
+    var recipesCheckedAt: Long
+        get() = sp.getLong("recipes_checked_at", 0L)
+        set(v) = sp.edit().putLong("recipes_checked_at", v).apply()
+
+    /** TextToSpeech rate; seniors who find the default too fast pick "slow" in setup. */
+    var speechRate: Float
+        get() = sp.getFloat("speech_rate", 0.85f)
+        set(v) = sp.edit().putFloat("speech_rate", v).apply()
+
     var bubbleX: Int
         get() = sp.getInt("bubble_x", -1)
         set(v) = sp.edit().putInt("bubble_x", v).apply()
