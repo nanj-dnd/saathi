@@ -3,6 +3,7 @@ import { issueToken, underDailyLimit, verifyToken } from "./auth.ts";
 import { demoGuide } from "./demo.ts";
 import { readShared, shareable, sharedKey, writeShared } from "./cache.ts";
 import { askGuide, mockGuide } from "./guide.ts";
+import { SpendGuard, today } from "./spend.ts";
 import recipeBundle from "./recipe-bundle.json";
 import { BadRequest, parseTurnRequest, type Guide, type Source, type TurnResponse } from "./schema.ts";
 
@@ -15,11 +16,21 @@ export interface Env {
   GUIDE_MODEL: string;
   GUIDE_EFFORT: string;
   DAILY_TURN_LIMIT: string;
+  /** Model calls per day across all phones; a ceiling on the Anthropic bill. */
+  GLOBAL_DAILY_LIMIT: string;
+  SPEND: DurableObjectNamespace<SpendGuard>;
   /** "1" = scripted Settings walkthrough for recording demos (src/demo.ts). Local only. */
   DEMO?: string;
   USAGE: KVNamespace;
   /** Answers shared between phones (src/cache.ts). Optional: without it every turn asks the model. */
   GUIDE_CACHE?: KVNamespace;
+}
+
+export { SpendGuard };
+
+function underGlobalLimit(env: Env): Promise<boolean> {
+  const guard = env.SPEND.get(env.SPEND.idFromName("global"));
+  return guard.take(today(), Number(env.GLOBAL_DAILY_LIMIT) || 3000);
 }
 
 const json = (body: unknown, status = 200) =>
@@ -72,6 +83,8 @@ export default {
           source = "cache";
         } else {
           if (!(await allowed())) return json({ error: "daily limit reached" }, 429);
+          // Everyone shares this ceiling, so the senior hears "busy, try later", not "your limit".
+          if (!(await underGlobalLimit(env))) return json({ error: "busy" }, 503);
           guide = await askGuide(
             {
               apiKey: env.ANTHROPIC_API_KEY,

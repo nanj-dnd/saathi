@@ -16,7 +16,7 @@ const reply: Guide = {
 };
 const askGuide = vi.fn(async () => reply);
 vi.mock("../src/guide.ts", async (orig) => ({ ...(await orig<typeof import("../src/guide.ts")>()), askGuide }));
-const { default: worker } = await import("../src/index.ts");
+const { default: worker, SpendGuard } = await import("../src/index.ts");
 
 class MemoryKV {
   data = new Map<string, string>();
@@ -26,6 +26,31 @@ class MemoryKV {
   async put(k: string, v: string) {
     this.data.set(k, v);
   }
+}
+
+/** Just enough of DurableObjectStorage for SpendGuard. */
+class MemoryStorage {
+  data = new Map<string, unknown>();
+  async get<T>(k: string) {
+    return this.data.get(k) as T | undefined;
+  }
+  async put(k: string, v: unknown) {
+    this.data.set(k, v);
+  }
+  async list({ prefix = "" } = {}) {
+    return new Map([...this.data].filter(([k]) => k.startsWith(prefix)));
+  }
+  async delete(keys: string[]) {
+    keys.forEach((k) => this.data.delete(k));
+    return keys.length;
+  }
+}
+
+/** A SPEND binding backed by one real SpendGuard, as "global" is the only name used. */
+function spendNamespace() {
+  const storage = new MemoryStorage();
+  const guard = new SpendGuard({ storage } as never, {} as never);
+  return { storage, idFromName: () => "global", get: () => guard };
 }
 
 const tree = [
@@ -80,7 +105,41 @@ beforeEach(async () => {
     DAILY_TURN_LIMIT: "300",
     USAGE: new MemoryKV(),
     GUIDE_CACHE: new MemoryKV(),
+    GLOBAL_DAILY_LIMIT: "3000",
+    SPEND: spendNamespace(),
   };
+});
+
+describe("global daily cap", () => {
+  it("refuses model turns from every phone once the shared budget is spent", async () => {
+    env.GLOBAL_DAILY_LIMIT = "2";
+    delete env.GUIDE_CACHE;
+    for (let i = 0; i < 2; i++) {
+      token = await issueToken("secret"); // a new phone each time, as an abuser would register
+      expect((await turn()).status).toBe(200);
+    }
+    token = await issueToken("secret");
+    const third = await turn();
+    expect(third.status).toBe(503);
+    expect(third.json.error).toBe("busy");
+    expect(askGuide).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not spend the budget on cached answers", async () => {
+    env.GLOBAL_DAILY_LIMIT = "1";
+    expect((await turn()).json.source).toBe("model");
+    expect((await turn()).json.source).toBe("cache");
+    expect((await turn()).status).toBe(200);
+  });
+
+  it("starts each day fresh and forgets old days", async () => {
+    const ns = spendNamespace();
+    const guard = ns.get();
+    expect(await guard.take("2026-10-14", 1)).toBe(true);
+    expect(await guard.take("2026-10-14", 1)).toBe(false);
+    expect(await guard.take("2026-10-15", 1)).toBe(true);
+    expect([...ns.storage.data.keys()]).toEqual(["day:2026-10-15"]);
+  });
 });
 
 describe("/turn with the shared cache", () => {
