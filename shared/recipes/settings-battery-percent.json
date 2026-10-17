@@ -1,0 +1,205 @@
+{
+  "id": "settings-battery-percent",
+  "version": 1,
+  "goal": "show the battery percentage",
+  "apps": [
+    "com.android.settings"
+  ],
+  "app_label": "Settings",
+  "app_names": [
+    "Settings",
+    "सेटिंग",
+    "सेटिंग्स",
+    "அமைப்புகள்",
+    "సెట్టింగ్‌లు",
+    "ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
+    "ക്രമീകരണങ്ങൾ"
+  ],
+  "triggers": [
+    {
+      "all": [
+        [
+          "battery",
+          "बैटरी",
+          "बेटरी",
+          "பேட்டரி",
+          "బ్యాటరీ",
+          "ಬ್ಯಾಟರಿ",
+          "ബാറ്ററി"
+        ],
+        [
+          "percent",
+          "percentage",
+          "प्रतिशत",
+          "परसेंट",
+          "%",
+          "சதவீத",
+          "பர்சன்ட்",
+          "శాతం",
+          "పర్సంట్",
+          "ಶೇಕಡ",
+          "ಪರ್ಸೆಂಟ್",
+          "ശതമാന",
+          "പെർസന്റ്"
+        ],
+        [
+          "दिखा",
+          "दिखे",
+          "show",
+          "ऊपर",
+          "காட்ட",
+          "தெரிய",
+          "చూపించ",
+          "కనిపించ",
+          "ತೋರಿಸ",
+          "ಕಾಣಿಸ",
+          "കാണിക്ക",
+          "കാണാൻ"
+        ]
+      ]
+    }
+  ],
+  "examples": {
+    "hi-IN": [
+      "बैटरी का प्रतिशत ऊपर दिखाना है"
+    ],
+    "en-IN": [
+      "show the battery percentage at the top"
+    ],
+    "ta-IN": [
+      "பேட்டரி சதவீதம் மேலே தெரிய வேண்டும்"
+    ],
+    "te-IN": [
+      "బ్యాటరీ శాతం పైన కనిపించాలి"
+    ],
+    "kn-IN": [
+      "ಬ್ಯಾಟರಿ ಶೇಕಡಾ ಮೇಲೆ ಕಾಣಿಸಬೇಕು"
+    ],
+    "ml-IN": [
+      "ബാറ്ററി ശതമാനം മുകളിൽ കാണിക്കണം"
+    ]
+  },
+  "steps": [
+    {
+      "id": "done",
+      "switch": [
+        "Battery percentage",
+        "Show battery percentage",
+        "Battery percent"
+      ],
+      "switch_is": "on",
+      "status": "done",
+      "say": {
+        "hi-IN": "अब ऊपर बैटरी के पास बचा हुआ प्रतिशत लिखा दिखेगा।",
+        "en-IN": "Now the battery percentage left will show at the top, next to the battery.",
+        "ta-IN": "இனி மேலே பேட்டரி அருகே மீதமுள்ள சதவீதம் தெரியும்.",
+        "te-IN": "ఇక పైన బ్యాటరీ పక్కన మిగిలిన శాతం కనిపిస్తుంది.",
+        "kn-IN": "ಇನ್ನು ಮೇಲೆ ಬ್ಯಾಟರಿ ಪಕ್ಕ ಉಳಿದ ಶೇಕಡಾ ಕಾಣುತ್ತದೆ.",
+        "ml-IN": "ഇനി മുകളിൽ ബാറ്ററിക്കടുത്ത് ബാക്കിയുള്ള ശതമാനം കാണാം."
+      }
+    },
+    {
+      "id": "switch",
+      "switch": [
+        "Battery percentage",
+        "Show battery percentage",
+        "Battery percent"
+      ],
+      "switch_is": "off",
+      "tap_switch": true,
+      "say": {
+        "hi-IN": "'{label}' के सामने वाला बटन दबाइए, वह चालू हो जाएगा।",
+        "en-IN": "Press the switch next to '{label}' to turn it on.",
+        "ta-IN": "'{label}' அருகே உள்ள பொத்தானை அழுத்துங்கள், அது இயங்கும்.",
+        "te-IN": "'{label}' పక్కన ఉన్న బటన్ నొక్కండి, అది ఆన్ అవుతుంది.",
+        "kn-IN": "'{label}' ಪಕ್ಕದ ಬಟನ್ ಒತ್ತಿ, ಅದು ಆನ್ ಆಗುತ್ತದೆ.",
+        "ml-IN": "'{label}'-ന് അടുത്തുള്ള ബട്ടൺ അമർത്തുക, അത് ഓണാകും."
+      }
+    },
+    {
+      "id": "statusbar",
+      "target": [
+        "Status bar"
+      ],
+      "exact": true,
+      "say": {
+        "hi-IN": "'{label}' पर दबाइए।",
+        "en-IN": "Press '{label}'.",
+        "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
+        "te-IN": "'{label}' నొక్కండి.",
+        "kn-IN": "'{label}' ಒತ್ತಿ.",
+        "ml-IN": "'{label}' അമർത്തുക."
+      }
+    },
+    {
+      "id": "samsung",
+      "screen_has": [
+        [
+          "Sounds and vibration",
+          "Connections"
+        ]
+      ],
+      "target": [
+        "Notifications"
+      ],
+      "say": {
+        "hi-IN": "'{label}' पर दबाइए।",
+        "en-IN": "Press '{label}'.",
+        "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
+        "te-IN": "'{label}' నొక్కండి.",
+        "kn-IN": "'{label}' ಒತ್ತಿ.",
+        "ml-IN": "'{label}' അമർത്തുക."
+      }
+    },
+    {
+      "id": "open",
+      "screen_has": [
+        [
+          "Network & internet",
+          "Connections",
+          "Connected devices",
+          "Battery",
+          "Notifications",
+          "Sound & vibration",
+          "Sounds and vibration",
+          "Apps"
+        ]
+      ],
+      "target": [
+        "Battery"
+      ],
+      "say": {
+        "hi-IN": "'{label}' पर दबाइए।",
+        "en-IN": "Press '{label}'.",
+        "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
+        "te-IN": "'{label}' నొక్కండి.",
+        "kn-IN": "'{label}' ಒತ್ತಿ.",
+        "ml-IN": "'{label}' അമർത്തുക."
+      }
+    },
+    {
+      "id": "scroll",
+      "screen_has": [
+        [
+          "Network & internet",
+          "Connections",
+          "Connected devices",
+          "Battery",
+          "Notifications",
+          "Sound & vibration",
+          "Sounds and vibration",
+          "Apps"
+        ]
+      ],
+      "max_repeats": 4,
+      "say": {
+        "hi-IN": "स्क्रीन पर उंगली रखकर ऊपर की ओर सरकाइए।",
+        "en-IN": "Put your finger on the screen and slide it upwards.",
+        "ta-IN": "திரையில் விரலை வைத்து மேலே தள்ளுங்கள்.",
+        "te-IN": "స్క్రీన్‌పై వేలు పెట్టి పైకి జరపండి.",
+        "kn-IN": "ಪರದೆಯ ಮೇಲೆ ಬೆರಳಿಟ್ಟು ಮೇಲಕ್ಕೆ ಸರಿಸಿ.",
+        "ml-IN": "സ്ക്രീനിൽ വിരൽ വെച്ച് മുകളിലേക്ക് നീക്കുക."
+      }
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "id": "tip-answer-call",
-  "version": 2,
+  "version": 3,
   "goal": "answer a phone call",
   "apps": [
     "*"
@@ -93,5 +93,26 @@
         "en-IN": "When the phone rings, slide the green round button up with your finger, or press it."
       }
     }
+  ],
+  "unless": [
+    "काट",
+    "कट कर",
+    "cut",
+    "end the call",
+    "disconnect",
+    "reject",
+    "फ़ोन रख",
+    "फोन रख",
+    "मना कर",
+    "துண்டி",
+    "கட் பண்ண",
+    "கட் செய்",
+    "కట్ చేయ",
+    "కట్ చెయ్య",
+    "పెట్టేయ",
+    "ಕಟ್ ಮಾಡ",
+    "ಮುಗಿಸ",
+    "കട്ട് ചെയ്യ",
+    "കട്ടാക്ക"
   ]
 }

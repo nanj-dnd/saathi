@@ -1,0 +1,183 @@
+{
+  "id": "settings-emergency-contacts",
+  "version": 1,
+  "goal": "add an emergency contact",
+  "apps": [
+    "com.android.settings"
+  ],
+  "app_label": "Settings",
+  "app_names": [
+    "Settings",
+    "सेटिंग",
+    "सेटिंग्स",
+    "அமைப்புகள்",
+    "సెట్టింగ్‌లు",
+    "ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
+    "ക്രമീകരണങ്ങൾ"
+  ],
+  "triggers": [
+    {
+      "all": [
+        [
+          "emergency",
+          "इमरजेंसी",
+          "एमरजेंसी",
+          "आपातकालीन",
+          "sos",
+          "एसओएस",
+          "அவசர",
+          "எமர்ஜென்சி",
+          "అత్యవసర",
+          "ఎమర్జెన్సీ",
+          "ತುರ್ತು",
+          "ಎಮರ್ಜೆನ್ಸಿ",
+          "അടിയന്തര",
+          "എമർജൻസി"
+        ],
+        [
+          "contact",
+          "कॉन्टैक्ट",
+          "संपर्क",
+          "नंबर",
+          "number",
+          "தொடர்பு",
+          "காண்டாக்ட்",
+          "நம்பர்",
+          "కాంటాక్ట్",
+          "నంబర్",
+          "ಸಂಪರ್ಕ",
+          "ಕಾಂಟ್ಯಾಕ್ಟ್",
+          "ನಂಬರ್",
+          "കോൺടാക്ട്",
+          "നമ്പർ"
+        ],
+        [
+          "add",
+          "ऐड",
+          "जोड़",
+          "जोड",
+          "डाल",
+          "सेव",
+          "save",
+          "சேர்க்க",
+          "சேர்",
+          "சேமி",
+          "జోడి",
+          "యాడ్",
+          "చేర్చ",
+          "సేవ్",
+          "ಸೇರಿಸ",
+          "ಆ್ಯಡ್",
+          "ಸೇವ್",
+          "ചേർക്ക",
+          "ആഡ്",
+          "സേവ്"
+        ]
+      ]
+    }
+  ],
+  "examples": {
+    "hi-IN": [
+      "फ़ोन में इमरजेंसी कॉन्टैक्ट जोड़ना है"
+    ],
+    "en-IN": [
+      "add an emergency contact number"
+    ],
+    "ta-IN": [
+      "அவசர தொடர்பு எண்ணைச் சேர்க்க வேண்டும்"
+    ],
+    "te-IN": [
+      "అత్యవసర కాంటాక్ట్ జోడించాలి"
+    ],
+    "kn-IN": [
+      "ತುರ್ತು ಸಂಪರ್ಕ ಸೇರಿಸಬೇಕು"
+    ],
+    "ml-IN": [
+      "എമർജൻസി കോൺടാക്ട് ചേർക്കണം"
+    ]
+  },
+  "steps": [
+    {
+      "id": "add",
+      "target": [
+        "Add contact",
+        "Add emergency contact",
+        "Add member"
+      ],
+      "status": "done",
+      "say": {
+        "hi-IN": "'{label}' दबाइए और बेटे या बेटी का नाम चुनिए। मुसीबत में फ़ोन इन्हें जल्दी बुला पाएगा।",
+        "en-IN": "Tap '{label}' and choose your son's or daughter's name. In an emergency the phone can reach them quickly.",
+        "ta-IN": "'{label}' ஐ அழுத்தி மகன் அல்லது மகள் பெயரைத் தேர்ந்தெடுங்கள். அவசரத்தில் போன் அவர்களை விரைவாக அழைக்கும்.",
+        "te-IN": "'{label}' నొక్కి అబ్బాయి లేదా అమ్మాయి పేరు ఎంచుకోండి. అత్యవసరంలో ఫోన్ వాళ్ళను త్వరగా పిలుస్తుంది.",
+        "kn-IN": "'{label}' ಒತ್ತಿ ಮಗ ಅಥವಾ ಮಗಳ ಹೆಸರು ಆಯ್ಕೆ ಮಾಡಿ. ತುರ್ತು ಸಮಯದಲ್ಲಿ ಫೋನ್ ಅವರನ್ನು ಬೇಗ ಕರೆಯುತ್ತದೆ.",
+        "ml-IN": "'{label}' അമർത്തി മകന്റെയോ മകളുടെയോ പേര് തിരഞ്ഞെടുക്കുക. അടിയന്തര ഘട്ടത്തിൽ ഫോൺ അവരെ വേഗം വിളിക്കും."
+      }
+    },
+    {
+      "id": "contacts",
+      "target": [
+        "Emergency contacts"
+      ],
+      "say": {
+        "hi-IN": "'{label}' पर दबाइए।",
+        "en-IN": "Press '{label}'.",
+        "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
+        "te-IN": "'{label}' నొక్కండి.",
+        "kn-IN": "'{label}' ಒತ್ತಿ.",
+        "ml-IN": "'{label}' അമർത്തുക."
+      }
+    },
+    {
+      "id": "open",
+      "screen_has": [
+        [
+          "Network & internet",
+          "Connections",
+          "Connected devices",
+          "Battery",
+          "Notifications",
+          "Sound & vibration",
+          "Sounds and vibration",
+          "Apps"
+        ]
+      ],
+      "target": [
+        "Safety & emergency",
+        "Safety and emergency"
+      ],
+      "say": {
+        "hi-IN": "'{label}' पर दबाइए।",
+        "en-IN": "Press '{label}'.",
+        "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
+        "te-IN": "'{label}' నొక్కండి.",
+        "kn-IN": "'{label}' ಒತ್ತಿ.",
+        "ml-IN": "'{label}' അമർത്തുക."
+      }
+    },
+    {
+      "id": "scroll",
+      "screen_has": [
+        [
+          "Network & internet",
+          "Connections",
+          "Connected devices",
+          "Battery",
+          "Notifications",
+          "Sound & vibration",
+          "Sounds and vibration",
+          "Apps"
+        ]
+      ],
+      "max_repeats": 4,
+      "say": {
+        "hi-IN": "स्क्रीन पर उंगली रखकर ऊपर की ओर सरकाइए।",
+        "en-IN": "Put your finger on the screen and slide it upwards.",
+        "ta-IN": "திரையில் விரலை வைத்து மேலே தள்ளுங்கள்.",
+        "te-IN": "స్క్రీన్‌పై వేలు పెట్టి పైకి జరపండి.",
+        "kn-IN": "ಪರದೆಯ ಮೇಲೆ ಬೆರಳಿಟ್ಟು ಮೇಲಕ್ಕೆ ಸರಿಸಿ.",
+        "ml-IN": "സ്ക്രീനിൽ വിരൽ വെച്ച് മുകളിലേക്ക് നീക്കുക."
+      }
+    }
+  ]
+}

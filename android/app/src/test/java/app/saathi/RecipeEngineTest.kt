@@ -265,6 +265,10 @@ class RecipeEngineTest {
             "फोटो जोड़नी है", "इसका मतलब क्या है", "पोते को एक ऐप इंस्टॉल करना है", "एक बात पूछनी है", "मेरी स्क्रीन पर काला धब्बा है",
             // Words that contain a trigger word inside them.
             "अलार्म के लिए गाना लगाना नहीं",
+            // Close to a scam warning or a settings script, but a different wish.
+            "पुलिस में शिकायत करनी है", "ग्रुप में बेटे को जोड़ना है", "केरल लॉटरी का रिज़ल्ट देखना है",
+            "बेटे को स्क्रीन शेयर करके दिखाना है", "फ़ोन में नेटवर्क नहीं मिल रहा", "पति के फ़ोन में पैसे भेजने हैं",
+            "क्रेडिट स्कोर देखना है", "ग्रुप से ऐडमिन हटाना है", "फ़ोन से पैसे चोरी हो गए",
             // English problems and negations.
             "do not disturb is not turning off", "why is my phone so slow", "WhatsApp is not working",
         )
@@ -272,6 +276,67 @@ class RecipeEngineTest {
             engine.match(said, "com.google.android.apps.nexuslauncher")?.let { "\"$said\" -> ${it.id}" }
         }
         assertTrue(wrong.joinToString("\n"), wrong.isEmpty())
+    }
+
+    @Test fun `similar requests pick the more specific script`() {
+        val expected = mapOf(
+            "अक्षर बड़े करने हैं" to "settings-text-size",
+            "WhatsApp के अक्षर बड़े करने हैं" to "whatsapp-font-size",
+            "बैटरी कितनी बची है" to "tip-battery-level",
+            "बैटरी का प्रतिशत ऊपर दिखाना है" to "settings-battery-percent",
+            "फ़ोन बंद करना है" to "tip-power-off",
+            "WhatsApp कॉल काटनी है" to "tip-end-call",
+            "फ़ोन का सॉफ्टवेयर अपडेट करना है" to "settings-software-update",
+            "WhatsApp अपडेट करना है" to "playstore-update",
+            "यूट्यूब पर भजन सुनना है" to "youtube-watch",
+            "यूट्यूब म्यूजिक पर भजन सुनने हैं" to "youtube-music-play",
+            "अमेज़न प्राइम पर फ़िल्म देखनी है" to "primevideo-watch",
+            "अमेज़न से चप्पल मंगानी है" to "amazon-order",
+            "SMS पढ़कर सुनाओ" to "read-screen",
+            "इमरजेंसी है, एम्बुलेंस चाहिए" to "tip-emergency",
+            "इमरजेंसी कॉन्टैक्ट जोड़ना है" to "settings-emergency-contacts",
+            "बुज़ुर्गों की हेल्पलाइन का नंबर क्या है" to "tip-senior-helpline",
+            "कस्टमर केयर का नंबर चाहिए" to "safety-customer-care",
+            "अलार्म की घंटी सेट करनी है" to "clock-alarm",
+        )
+        val wrong = expected.mapNotNull { (said, id) ->
+            val got = engine.match(said, "com.google.android.apps.nexuslauncher")?.id ?: "model"
+            if (got != id) "\"$said\" -> $got, want $id" else null
+        }
+        assertTrue(wrong.joinToString("\n"), wrong.isEmpty())
+        assertEquals("read-screen", engine.match("नीचे लिखा हुआ पढ़कर सुनाओ", "com.google.android.youtube")?.id)
+    }
+
+    @Test fun `WhatsApp safety settings are walked through from the chat list`() {
+        val chats = """
+            n1 TextView "WhatsApp" [40,120,500,200]
+            n2 ImageButton "More options" [980,120,1060,200] click
+            n3 TextView "Chats" [40,2250,260,2330] click
+            n4 LinearLayout "Ramesh Kal milte hain" [0,400,1080,560] click
+        """.trimIndent()
+        val said = "अनजान नंबर से WhatsApp कॉल आते हैं, उन्हें चुप करना है"
+        val steps = mutableListOf<Guide>()
+        fun next(tree: String, utterance: String? = null): Guide =
+            engine.guide(req(tree, app = "com.whatsapp", utterance = utterance, goal = steps.firstOrNull()?.goal.orEmpty(),
+                history = steps.map { past(it, "com.whatsapp") }))!!.also { steps += it }
+
+        assertEquals("n2", next(chats, said).nodeId)
+        val menu = "n1 TextView \"New group\" [500,150,1060,250] click\nn2 TextView \"Linked devices\" [500,250,1060,350] click\nn3 TextView \"Settings\" [500,350,1060,450] click"
+        assertEquals("n3", next(menu).nodeId)
+        // Real rows carry a summary under the title, so their label is "Title Summary".
+        val settings = "n1 LinearLayout \"Account Security notifications, change number\" [0,400,1080,520] click\nn2 LinearLayout \"Privacy Block contacts, disappearing messages\" [0,520,1080,640] click\nn3 LinearLayout \"Chats Theme, wallpapers, chat history\" [0,640,1080,760] click\nn4 LinearLayout \"Storage and data Network usage, auto-download\" [0,760,1080,880] click"
+        assertEquals("n2", next(settings).nodeId)
+        val privacy = "n1 LinearLayout \"Last seen and online Nobody\" [0,400,1080,520] click\nn2 LinearLayout \"Read receipts\" [0,520,1080,640] click\nn3 LinearLayout \"Calls Silence unknown callers\" [0,640,1080,760] click"
+        assertEquals("n3", next(privacy).nodeId)
+        val calls = "n1 LinearLayout \"Silence unknown callers\" [0,400,900,560] click\nn2 Switch \"\" [920,440,1040,520] click unchecked"
+        assertEquals("n2", next(calls).nodeId)
+        val done = next(calls.replace("unchecked", "checked"))
+        assertEquals(Status.DONE, done.status)
+
+        // Asked from inside a chat: first back out to the list.
+        val inChat = "n1 ImageButton \"Navigate up\" [0,120,100,200] click\nn2 ImageButton \"Attach\" [700,2250,800,2330] click"
+        steps.clear()
+        assertEquals("n1", next(inChat, "WhatsApp में टू स्टेप वेरिफिकेशन लगाना है").nodeId)
     }
 
     @Test fun `spoken tips work in any app and finish at once`() {

@@ -1,0 +1,72 @@
+{
+  "id": "tip-cricket-score",
+  "version": 1,
+  "goal": "see the cricket score",
+  "apps": [
+    "*"
+  ],
+  "app_label": "",
+  "triggers": [
+    {
+      "all": [
+        [
+          "score",
+          "स्कोर",
+          "ஸ்கோர்",
+          "స్కోర్",
+          "ಸ್ಕೋರ್",
+          "സ്കോർ"
+        ]
+      ]
+    }
+  ],
+  "unless": [
+    "cibil",
+    "सिबिल",
+    "credit",
+    "क्रेडिट",
+    "sugar",
+    "शुगर",
+    "क्रेडिट स्कोर",
+    "சிபில்",
+    "కిబిల్",
+    "సిబిల్",
+    "ಸಿಬಿಲ್",
+    "സിബിൽ"
+  ],
+  "examples": {
+    "hi-IN": [
+      "आज के मैच का स्कोर क्या है",
+      "क्रिकेट का स्कोर देखना है"
+    ],
+    "en-IN": [
+      "what is the cricket score"
+    ],
+    "ta-IN": [
+      "இன்றைய போட்டியின் ஸ்கோர் என்ன"
+    ],
+    "te-IN": [
+      "ఈరోజు మ్యాచ్ స్కోర్ ఎంత"
+    ],
+    "kn-IN": [
+      "ಇಂದಿನ ಪಂದ್ಯದ ಸ್ಕೋರ್ ಎಷ್ಟು"
+    ],
+    "ml-IN": [
+      "ഇന്നത്തെ കളിയുടെ സ്കോർ എത്ര"
+    ]
+  },
+  "steps": [
+    {
+      "id": "say",
+      "status": "done",
+      "say": {
+        "hi-IN": "Google में 'cricket score' बोलकर या लिखकर खोजिए, चल रहे मैच का स्कोर सबसे ऊपर दिखेगा। मैच देखना हो तो JioHotstar ऐप खोलिए।",
+        "en-IN": "Search Google for 'cricket score' by speaking or typing; the live match score shows at the top. To watch the match, open the JioHotstar app.",
+        "ta-IN": "Google-ல் 'cricket score' என்று சொல்லி அல்லது எழுதித் தேடுங்கள், நடக்கும் போட்டியின் ஸ்கோர் மேலே தெரியும். போட்டியைப் பார்க்க JioHotstar ஆப்பைத் திறங்கள்.",
+        "te-IN": "Google లో 'cricket score' అని చెప్పి లేదా రాసి వెతకండి, జరుగుతున్న మ్యాచ్ స్కోర్ పైన కనిపిస్తుంది. మ్యాచ్ చూడాలంటే JioHotstar యాప్ తెరవండి.",
+        "kn-IN": "Google ನಲ್ಲಿ 'cricket score' ಎಂದು ಹೇಳಿ ಅಥವಾ ಬರೆದು ಹುಡುಕಿ, ನಡೆಯುತ್ತಿರುವ ಪಂದ್ಯದ ಸ್ಕೋರ್ ಮೇಲೆ ಕಾಣುತ್ತದೆ. ಪಂದ್ಯ ನೋಡಬೇಕಾದರೆ JioHotstar ಆ್ಯಪ್ ತೆರೆಯಿರಿ.",
+        "ml-IN": "Google-ൽ 'cricket score' എന്ന് പറഞ്ഞോ എഴുതിയോ തിരയുക, നടക്കുന്ന മത്സരത്തിന്റെ സ്കോർ മുകളിൽ കാണാം. മത്സരം കാണണമെങ്കിൽ JioHotstar ആപ്പ് തുറക്കുക."
+      }
+    }
+  ]
+}
