@@ -48,7 +48,8 @@
           "ఆపాలి",
           "ఆపే",
           "ನಿಲ್ಲಿಸ",
-          "നിർത്ത"
+          "നിർത്ത",
+          "ഓഫാ"
         ]
       ]
     }
@@ -127,6 +128,9 @@
       "target": [
         "App notifications",
         "App settings"
+      ],
+      "screen_lacks": [
+        "Default apps"
       ],
       "say": {
         "hi-IN": "'{label}' पर दबाइए।",

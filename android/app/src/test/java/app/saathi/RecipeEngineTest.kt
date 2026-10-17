@@ -307,9 +307,10 @@ class RecipeEngineTest {
         assertEquals("n2", next(chats, said).nodeId)
         val menu = "n1 TextView \"New group\" [500,150,1060,250] click\nn2 TextView \"Linked devices\" [500,250,1060,350] click\nn3 TextView \"Settings\" [500,350,1060,450] click"
         assertEquals("n3", next(menu).nodeId)
-        val settings = "n1 LinearLayout \"Account\" [0,400,1080,520] click\nn2 LinearLayout \"Privacy\" [0,520,1080,640] click\nn3 LinearLayout \"Chats\" [0,640,1080,760] click\nn4 LinearLayout \"Storage and data\" [0,760,1080,880] click"
+        // Real rows carry a summary under the title, so their label is "Title Summary".
+        val settings = "n1 LinearLayout \"Account Security notifications, change number\" [0,400,1080,520] click\nn2 LinearLayout \"Privacy Block contacts, disappearing messages\" [0,520,1080,640] click\nn3 LinearLayout \"Chats Theme, wallpapers, chat history\" [0,640,1080,760] click\nn4 LinearLayout \"Storage and data Network usage, auto-download\" [0,760,1080,880] click"
         assertEquals("n2", next(settings).nodeId)
-        val privacy = "n1 LinearLayout \"Last seen and online\" [0,400,1080,520] click\nn2 LinearLayout \"Read receipts\" [0,520,1080,640] click\nn3 LinearLayout \"Calls\" [0,640,1080,760] click"
+        val privacy = "n1 LinearLayout \"Last seen and online Nobody\" [0,400,1080,520] click\nn2 LinearLayout \"Read receipts\" [0,520,1080,640] click\nn3 LinearLayout \"Calls Silence unknown callers\" [0,640,1080,760] click"
         assertEquals("n3", next(privacy).nodeId)
         val calls = "n1 LinearLayout \"Silence unknown callers\" [0,400,900,560] click\nn2 Switch \"\" [920,440,1040,520] click unchecked"
         assertEquals("n2", next(calls).nodeId)

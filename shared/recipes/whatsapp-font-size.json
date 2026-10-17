@@ -114,13 +114,18 @@
   ],
   "unless": [
     "small",
-    "chhot",
-    "छोट",
     "சிறி",
     "చిన్న",
     "ಸಣ್ಣ",
     "ಚಿಕ್ಕ",
-    "ചെറു"
+    "ചെറു",
+    "chhota kar",
+    "chhote kar",
+    "छोटा कर",
+    "छोटे कर",
+    "छोटी कर",
+    "കുറയ്ക്ക",
+    "കുറക്ക"
   ],
   "examples": {
     "hi-IN": [
@@ -182,7 +187,14 @@
       "target": [
         "Font size"
       ],
-      "exact": true,
+      "screen_has": [
+        [
+          "Enter is send",
+          "Media visibility",
+          "Keep chats archived",
+          "Chat backup"
+        ]
+      ],
       "say": {
         "hi-IN": "'{label}' पर दबाइए।",
         "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
@@ -204,7 +216,6 @@
       "target": [
         "Chats"
       ],
-      "exact": true,
       "say": {
         "hi-IN": "'{label}' पर दबाइए।",
         "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",

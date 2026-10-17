@@ -89,6 +89,12 @@
         "min": 1
       },
       "status": "done",
+      "apps": [
+        "com.android.settings",
+        "com.google.android.soundpicker",
+        "com.android.soundpicker",
+        "com.android.thememanager"
+      ],
       "say": {
         "hi-IN": "नाम पर दबाकर हर धुन सुन सकते हैं। जो पसंद आए उसे चुनिए; 'Save' या 'OK' दिखे तो उसे दबाइए, फिर पीछे आ जाइए।",
         "ta-IN": "பெயரை அழுத்தி ஒவ்வொரு இசையையும் கேட்கலாம். பிடித்ததைத் தேர்ந்தெடுங்கள்; 'Save' அல்லது 'OK' தெரிந்தால் அழுத்துங்கள், பிறகு பின்னால் வாருங்கள்.",
@@ -102,6 +108,11 @@
       "target": [
         "Phone ringtone",
         "Ringtone"
+      ],
+      "screen_lacks": [
+        "Network & internet",
+        "Connections",
+        "Connected devices"
       ],
       "say": {
         "hi-IN": "'{label}' पर दबाइए।",

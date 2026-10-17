@@ -73,7 +73,15 @@
     "വാട്ട്സ്ആപ്പ്",
     "വാട്സ്ആപ്പ്",
     "വാട്സാപ്പ്",
-    "വാട്സപ്പ്"
+    "വാട്സപ്പ്",
+    "ஓடிபி",
+    "ஓ.டி.பி",
+    "ஃபார்வர்ட்",
+    "பார்வர்ட்",
+    "ഒടിപി",
+    "ഓടിപി",
+    "ഫോർവേഡ്",
+    "ഫോർവേർഡ്"
   ],
   "examples": {
     "hi-IN": [
@@ -101,7 +109,11 @@
       },
       "target": [
         "Send SMS",
+        "Send MMS",
         "Send message",
+        "Send RCS message",
+        "Send encrypted message",
+        "Send end-to-end encrypted message",
         "Send"
       ],
       "exact": true,

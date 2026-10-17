@@ -114,7 +114,13 @@
     "ಎಲ್ಲಿ",
     "ಯಾವಾಗ ಬರುತ್ತದೆ",
     "എവിടെ",
-    "എപ്പോൾ വരും"
+    "എപ്പോൾ വരും",
+    "ക്യാൻസൽ",
+    "കാൻസൽ",
+    "റദ്ദ",
+    "റീഫണ്ട്",
+    "റിട്ടേൺ",
+    "തിരിച്ച"
   ],
   "examples": {
     "hi-IN": [
@@ -140,8 +146,7 @@
         [
           "Select Payment Method",
           "Payment Method",
-          "Place Order",
-          "Cash on Delivery"
+          "Place Order"
         ]
       ],
       "status": "user_must_do",

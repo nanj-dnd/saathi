@@ -136,7 +136,6 @@
       "target": [
         "Notifications"
       ],
-      "exact": true,
       "say": {
         "hi-IN": "'{label}' पर दबाइए।",
         "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
