@@ -30,7 +30,8 @@
           "നഷ്ടപ്പെട്ട",
           "കളഞ്ഞുപോയ",
           "മോഷ്ടി",
-          "മോഷണ"
+          "മോഷണ",
+          "missing"
         ],
         [
           "phone",
@@ -79,6 +80,9 @@
       "मेरा फ़ोन खो गया है",
       "पति का मोबाइल चोरी हो गया"
     ],
+    "en-IN": [
+      "my phone is lost"
+    ],
     "ta-IN": [
       "என் போன் தொலைந்துவிட்டது"
     ],
@@ -98,6 +102,7 @@
       "status": "done",
       "say": {
         "hi-IN": "किसी दूसरे फ़ोन पर google.com/android/find खोलिए और खोए फ़ोन वाले Google खाते से जुड़िए। वहाँ से उसकी घंटी बजा सकते हैं, नक्शे पर देख सकते हैं या ताला लगा सकते हैं। सिम कंपनी को फ़ोन करके सिम बंद कराइए। पुलिस में शिकायत लिखाकर sancharsaathi.gov.in पर फ़ोन ब्लॉक करा सकते हैं।",
+        "en-IN": "On another phone, open google.com/android/find and sign in with the lost phone's Google account. From there you can ring it, see it on the map, or lock it. Call your SIM company to block the SIM. After a police complaint, you can block the phone at sancharsaathi.gov.in.",
         "ta-IN": "வேறொரு போனில் google.com/android/find திறந்து, தொலைந்த போனின் Google கணக்கில் உள்நுழையுங்கள். அங்கிருந்து அதை ஒலிக்கச் செய்யலாம், வரைபடத்தில் பார்க்கலாம், அல்லது பூட்டலாம். சிம் நிறுவனத்தை அழைத்து சிம்மை நிறுத்துங்கள். போலீஸில் புகார் கொடுத்து, sancharsaathi.gov.in-ல் போனை பிளாக் செய்யலாம்.",
         "te-IN": "వేరే ఫోన్‌లో google.com/android/find తెరిచి, పోయిన ఫోన్ Google ఖాతాతో లాగిన్ అవ్వండి. అక్కడి నుంచి దాన్ని మోగించవచ్చు, మ్యాప్‌లో చూడవచ్చు, లేదా లాక్ చేయవచ్చు. సిమ్ కంపెనీకి ఫోన్ చేసి సిమ్ ఆపించండి. పోలీసులకు ఫిర్యాదు ఇచ్చి, sancharsaathi.gov.in లో ఫోన్ బ్లాక్ చేయించవచ్చు.",
         "kn-IN": "ಬೇರೆ ಫೋನಿನಲ್ಲಿ google.com/android/find ತೆರೆದು, ಕಳೆದುಹೋದ ಫೋನಿನ Google ಖಾತೆಯಿಂದ ಲಾಗಿನ್ ಆಗಿ. ಅಲ್ಲಿಂದ ಅದನ್ನು ರಿಂಗ್ ಮಾಡಿಸಬಹುದು, ನಕ್ಷೆಯಲ್ಲಿ ನೋಡಬಹುದು, ಅಥವಾ ಲಾಕ್ ಮಾಡಬಹುದು. ಸಿಮ್ ಕಂಪನಿಗೆ ಕರೆ ಮಾಡಿ ಸಿಮ್ ನಿಲ್ಲಿಸಿ. ಪೊಲೀಸರಿಗೆ ದೂರು ನೀಡಿ, sancharsaathi.gov.in ನಲ್ಲಿ ಫೋನ್ ಬ್ಲಾಕ್ ಮಾಡಿಸಬಹುದು.",

@@ -103,7 +103,8 @@ class RecipeEngineTest {
     @Test fun `the whole text size task runs on the phone`() {
         val first = engine.guide(req(displayScreen, utterance = "अक्षर बड़े करने हैं"))!!
         assertEquals("n4", first.nodeId) // the clickable row, not its non-clickable title
-        assertEquals("'Display & touch Dark theme, font size, brightness' पर दबाइए। अक्षरों का साइज़ इसी में है।", first.say)
+        // The row's text includes its summary; the senior only hears the title they need to find.
+        assertEquals("'Display & touch' पर दबाइए। अक्षरों का साइज़ इसी में है।", first.say)
 
         var history = listOf(past(first))
         val larger = engine.guide(req(fontScreen, goal = first.goal, history = history))!!
@@ -216,6 +217,19 @@ class RecipeEngineTest {
         assertEquals(r.version + 1, merged.byGoal(r.goal)!!.version)
     }
 
+    @Test fun `a negation must be a whole word`() {
+        // "not " used to match inside "notifications", sending every such request to the model.
+        assertEquals("tip-notifications", engine.match("show me my notifications", "com.google.android.apps.nexuslauncher")?.id)
+        assertEquals("settings-dnd-off", engine.match("switch off do not disturb", "com.google.android.apps.nexuslauncher")?.id)
+        assertEquals(null, engine.match("my notifications are not coming", "com.google.android.apps.nexuslauncher")?.id)
+    }
+
+    @Test fun `an unreadable screen is left to the model, not taken as outside the app`() {
+        // Android 14+ hides "data sensitive" pages (Wi-Fi) from the tree, so the app comes back blank.
+        val g = engine.guide(req("", app = "", utterance = "please turn on the wifi", language = "en-IN"))
+        assertEquals(null, g)
+    }
+
     @Test fun `typed debug requests start a recipe from the goal`() {
         val g = RecipeEngine(book).guide(req(settingsHome, goal = "how do I make the text bigger"))
         assertEquals("make the text bigger", g!!.goal)
@@ -255,6 +269,8 @@ class RecipeEngineTest {
             "पुलिस में शिकायत करनी है", "ग्रुप में बेटे को जोड़ना है", "केरल लॉटरी का रिज़ल्ट देखना है",
             "बेटे को स्क्रीन शेयर करके दिखाना है", "फ़ोन में नेटवर्क नहीं मिल रहा", "पति के फ़ोन में पैसे भेजने हैं",
             "क्रेडिट स्कोर देखना है", "ग्रुप से ऐडमिन हटाना है", "फ़ोन से पैसे चोरी हो गए",
+            // English problems and negations.
+            "do not disturb is not turning off", "why is my phone so slow", "WhatsApp is not working",
         )
         val wrong = forModel.mapNotNull { said ->
             engine.match(said, "com.google.android.apps.nexuslauncher")?.let { "\"$said\" -> ${it.id}" }

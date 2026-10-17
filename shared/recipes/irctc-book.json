@@ -1,6 +1,6 @@
 {
   "id": "irctc-book",
-  "version": 1,
+  "version": 2,
   "goal": "book a train ticket on IRCTC",
   "apps": [
     "cris.org.in.prs.ima"
@@ -72,6 +72,9 @@
     ],
     "ml-IN": [
       "ട്രെയിൻ ടിക്കറ്റ് ബുക്ക് ചെയ്യണം"
+    ],
+    "en-IN": [
+      "book a train ticket"
     ]
   },
   "steps": [
@@ -92,7 +95,8 @@
         "ta-IN": "'Search Trains' ஐ அழுத்துங்கள்.",
         "te-IN": "'Search Trains' నొక్కండి.",
         "kn-IN": "'Search Trains' ಒತ್ತಿ.",
-        "ml-IN": "'Search Trains' അമർത്തുക."
+        "ml-IN": "'Search Trains' അമർത്തുക.",
+        "en-IN": "Press 'Search Trains'."
       }
     },
     {
@@ -110,7 +114,8 @@
         "ta-IN": "'From' ஐ அழுத்தி புறப்படும் நிலையத்தின் பெயரை எழுதுங்கள், பிறகு 'To'-வில் போகும் இடம்.",
         "te-IN": "'From' నొక్కి బయలుదేరే స్టేషన్ పేరు రాయండి, తర్వాత 'To' లో వెళ్ళే చోటు.",
         "kn-IN": "'From' ಒತ್ತಿ ಹೊರಡುವ ನಿಲ್ದಾಣದ ಹೆಸರು ಬರೆಯಿರಿ, ನಂತರ 'To' ನಲ್ಲಿ ಹೋಗುವ ಸ್ಥಳ.",
-        "ml-IN": "'From' അമർത്തി പുറപ്പെടുന്ന സ്റ്റേഷന്റെ പേര് എഴുതുക, പിന്നെ 'To'-ൽ പോകേണ്ട സ്ഥലം."
+        "ml-IN": "'From' അമർത്തി പുറപ്പെടുന്ന സ്റ്റേഷന്റെ പേര് എഴുതുക, പിന്നെ 'To'-ൽ പോകേണ്ട സ്ഥലം.",
+        "en-IN": "Press 'From' and write the station you are leaving from, then in 'To' write where you are going."
       }
     },
     {
@@ -124,7 +129,8 @@
         "ta-IN": "'Book Ticket' ஐ அழுத்துங்கள்.",
         "te-IN": "'Book Ticket' నొక్కండి.",
         "kn-IN": "'Book Ticket' ಒತ್ತಿ.",
-        "ml-IN": "'Book Ticket' അമർത്തുക."
+        "ml-IN": "'Book Ticket' അമർത്തുക.",
+        "en-IN": "Press 'Book Ticket'."
       }
     }
   ]

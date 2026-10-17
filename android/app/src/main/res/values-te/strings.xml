@@ -45,4 +45,5 @@
     <string name="speed_normal">సాధారణం</string>
     <string name="offline_download">ఇంటర్నెట్ లేకుండా వినడానికి వాయిస్ గుర్తింపు డౌన్‌లోడ్ చేయండి</string>
     <string name="offline_started">డౌన్‌లోడ్ అవుతోంది. ఫోన్‌ను Wi-Fi లో ఉంచండి.</string>
+    <string name="access_summary">బటన్లు చూపించడానికి సాథీ స్క్రీన్ చూడాలి. అది తనంతట తాను ఏదీ నొక్కదు.</string>
 </resources>

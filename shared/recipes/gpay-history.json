@@ -1,6 +1,6 @@
 {
   "id": "gpay-history",
-  "version": 1,
+  "version": 2,
   "goal": "see payment history on Google Pay",
   "apps": [
     "com.google.android.apps.nbu.paisa.user"
@@ -83,6 +83,9 @@
     ],
     "ml-IN": [
       "ഗൂഗിൾ പേയിൽ ഇടപാട് കാണണം"
+    ],
+    "en-IN": [
+      "see my transaction history on Google Pay"
     ]
   },
   "steps": [
@@ -100,7 +103,8 @@
         "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
         "te-IN": "'{label}' నొక్కండి.",
         "kn-IN": "'{label}' ಒತ್ತಿ.",
-        "ml-IN": "'{label}' അമർത്തുക."
+        "ml-IN": "'{label}' അമർത്തുക.",
+        "en-IN": "Press '{label}'."
       }
     },
     {
@@ -121,7 +125,8 @@
         "ta-IN": "திரையில் விரலை வைத்து மேலே தள்ளுங்கள்.",
         "te-IN": "స్క్రీన్‌పై వేలు పెట్టి పైకి జరపండి.",
         "kn-IN": "ಪರದೆಯ ಮೇಲೆ ಬೆರಳಿಟ್ಟು ಮೇಲಕ್ಕೆ ಸರಿಸಿ.",
-        "ml-IN": "സ്ക്രീനിൽ വിരൽ വെച്ച് മുകളിലേക്ക് നീക്കുക."
+        "ml-IN": "സ്ക്രീനിൽ വിരൽ വെച്ച് മുകളിലേക്ക് നീക്കുക.",
+        "en-IN": "Put your finger on the screen and slide it upwards."
       }
     }
   ]

@@ -1,6 +1,6 @@
 {
   "id": "tip-uninstall",
-  "version": 1,
+  "version": 2,
   "goal": "remove an app",
   "apps": [
     "*"
@@ -45,6 +45,9 @@
     ],
     "ml-IN": [
       "ആവശ്യമില്ലാത്ത ആപ്പ് നീക്കണം"
+    ],
+    "en-IN": [
+      "uninstall an app"
     ]
   },
   "steps": [
@@ -56,7 +59,8 @@
         "ta-IN": "Home திரையில் அந்த ஆப்பின் மேல் விரலை அழுத்திப் பிடித்து, 'Uninstall' அல்லது 'App info' அழுத்தி 'Uninstall' ஐத் தேர்ந்தெடுங்கள். WhatsApp போன்ற தேவையான ஆப்களை நீக்காதீர்கள்.",
         "te-IN": "Home స్క్రీన్‌లో ఆ యాప్ మీద వేలు నొక్కి పట్టుకుని, 'Uninstall' లేదా 'App info' నొక్కి 'Uninstall' ఎంచుకోండి. WhatsApp లాంటి అవసరమైన యాప్‌లు తీసేయకండి.",
         "kn-IN": "Home ಪರದೆಯಲ್ಲಿ ಆ ಆ್ಯಪ್ ಮೇಲೆ ಬೆರಳು ಒತ್ತಿ ಹಿಡಿದು, 'Uninstall' ಅಥವಾ 'App info' ಒತ್ತಿ 'Uninstall' ಆಯ್ಕೆ ಮಾಡಿ. WhatsApp ನಂತಹ ಅಗತ್ಯ ಆ್ಯಪ್‌ಗಳನ್ನು ತೆಗೆಯಬೇಡಿ.",
-        "ml-IN": "Home സ്ക്രീനിൽ ആ ആപ്പിൽ വിരൽ അമർത്തിപ്പിടിച്ച്, 'Uninstall' അല്ലെങ്കിൽ 'App info' അമർത്തി 'Uninstall' തിരഞ്ഞെടുക്കുക. WhatsApp പോലുള്ള ആവശ്യമുള്ള ആപ്പുകൾ നീക്കരുത്."
+        "ml-IN": "Home സ്ക്രീനിൽ ആ ആപ്പിൽ വിരൽ അമർത്തിപ്പിടിച്ച്, 'Uninstall' അല്ലെങ്കിൽ 'App info' അമർത്തി 'Uninstall' തിരഞ്ഞെടുക്കുക. WhatsApp പോലുള്ള ആവശ്യമുള്ള ആപ്പുകൾ നീക്കരുത്.",
+        "en-IN": "On the home screen, press and hold that app, then press 'Uninstall', or 'App info' and then 'Uninstall'. Don't remove important apps like WhatsApp."
       }
     }
   ]

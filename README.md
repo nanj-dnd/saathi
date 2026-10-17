@@ -6,7 +6,7 @@ Saathi only points and talks; it never taps anything. OTP, PIN and payment scree
 
 Most steps never reach Claude. The phone answers common tasks itself with scripted [recipes](shared/recipes) (177 today: WhatsApp calls, photos and safety settings, SMS and email, Settings switches, UPI balance and bills, Blinkit and other shopping and returns, YouTube and other video apps, Maps, DigiLocker, spoken tips, scam warnings, reading the screen aloud), and it remembers answers it already got for the same screen. Those steps are free, instant and work offline.
 
-Languages: Hindi, Tamil, Telugu, Kannada, Malayalam. Android 11+ (API 30).
+Languages: Hindi, English, Tamil, Telugu, Kannada, Malayalam. Android 11+ (API 30).
 
 ```
 android/          Kotlin app: accessibility service, overlay, voice, guide loop, onboarding
@@ -16,7 +16,7 @@ worker/           Cloudflare Worker: one /turn call = screen + what was said →
 
 ## How a turn works
 
-1. **Ears** ([SpeechListener.kt](android/app/src/main/java/app/saathi/voice/SpeechListener.kt)) use the phone's own speech recognition (Google's on most phones, free, all five languages) to turn speech into text. A mic foreground service is held only while listening.
+1. **Ears** ([SpeechListener.kt](android/app/src/main/java/app/saathi/voice/SpeechListener.kt)) use the phone's own speech recognition (Google's on most phones, free, all six languages) to turn speech into text. A mic foreground service is held only while listening.
 2. **Eyes** ([ScreenReader.kt](android/app/src/main/java/app/saathi/capture/ScreenReader.kt)) read the foreground app's accessibility tree and take a screenshot, except when the screen mentions an OTP, PIN or password: then only the masked tree is sent. On Android 14+ only the app window is captured, and secure (PIN/OTP) windows refuse. On older versions a black frame is treated as secure. [NodeTree.kt](android/app/src/main/java/app/saathi/capture/NodeTree.kt) turns the tree into compact lines (`n12 Button "ADD" [l,t,r,b] click`). Typed text, passwords and numbers near "OTP/PIN" are never sent.
 3. **On the phone first** ([LocalFirstBrain.kt](android/app/src/main/java/app/saathi/brain/LocalFirstBrain.kt)): a screen the phone couldn't capture gets a fixed "do this part yourself" line; then a [recipe](shared/recipes/README.md) answers if one fits what was said and what is on screen; then the phone's own cache ([TurnCache.kt](android/app/src/main/java/app/saathi/brain/TurnCache.kt)) answers if it has seen this screen, goal and progress before. A screen or question with scam signs skips the last two so the model always sees it; if the model can't be reached, the scripted scam warning that fits is given instead. Offline, an expired cached answer is still used.
 4. **Worker** `/turn` ([index.ts](worker/src/index.ts)) makes one Claude call with structured output. Claude returns `{say, target: node id or x,y, status, danger}`. Node ids are checked against the tree, so a made-up target becomes "no pointer". Before calling Claude it checks a cache shared between phones ([cache.ts](worker/src/cache.ts)), only for screens of non-personal apps (Settings, shopping catalogues), only when the senior said nothing, and only for an exact match of the screen's text. Every response says who answered (`source`).
@@ -61,7 +61,7 @@ adb shell "am broadcast -a app.saathi.DEBUG_ASK --es text 'how do I make the tex
 cd worker && npm test && npm run typecheck
 cd android && ./gradlew testDebugUnitTest
 ```
-The Android tests run every recipe's example phrases in all five languages and check each reaches its own recipe and no other, that a list of requests meant for Claude (bills, payments, complaints) reaches it, and that no recipe points at a payment or PIN control.
+The Android tests run every recipe's example phrases in all six languages and check each reaches its own recipe and no other, that a list of requests meant for Claude (bills, payments, complaints) reaches it, and that no recipe points at a payment or PIN control.
 
 Debug builds save every turn request, including what the senior said, to `/sdcard/Android/data/app.saathi/files/fixtures/`. To build a regression set, pull interesting ones into `worker/fixtures/` and replay them against the Worker in any language:
 ```bash

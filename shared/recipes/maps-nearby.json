@@ -99,6 +99,9 @@
       "पास में ATM कहाँ है",
       "नज़दीक की दवाई की दुकान ढूंढनी है"
     ],
+    "en-IN": [
+      "find an ATM near me"
+    ],
     "ta-IN": [
       "அருகில் உள்ள ஏடிஎம் எங்கே"
     ],
@@ -122,6 +125,7 @@
       "status": "done",
       "say": {
         "hi-IN": "जो चाहिए उसका नाम लिखिए, जैसे 'ATM' या 'medical store'। नक्शे पर पास वाली जगहें दूरी के साथ दिखेंगी; किसी पर दबाकर 'Directions' से रास्ता देख सकते हैं।",
+        "en-IN": "Write what you need, like 'ATM' or 'medical store'. Nearby places will show on the map with their distance; tap one and then 'Directions' to see the way.",
         "ta-IN": "வேண்டியதன் பெயரை எழுதுங்கள், உதாரணமாக 'ATM' அல்லது 'medical store'. அருகிலுள்ள இடங்கள் தூரத்துடன் வரைபடத்தில் தெரியும்; ஒன்றை அழுத்தி 'Directions'-ல் வழி பார்க்கலாம்.",
         "te-IN": "కావాల్సిన దాని పేరు రాయండి, ఉదాహరణకు 'ATM' లేదా 'medical store'. దగ్గర్లోని చోట్లు దూరంతో మ్యాప్‌లో కనిపిస్తాయి; ఒకదాన్ని నొక్కి 'Directions' తో దారి చూడవచ్చు.",
         "kn-IN": "ಬೇಕಾದುದರ ಹೆಸರು ಬರೆಯಿರಿ, ಉದಾಹರಣೆಗೆ 'ATM' ಅಥವಾ 'medical store'. ಹತ್ತಿರದ ಜಾಗಗಳು ದೂರದೊಂದಿಗೆ ನಕ್ಷೆಯಲ್ಲಿ ಕಾಣುತ್ತವೆ; ಒಂದನ್ನು ಒತ್ತಿ 'Directions' ನಿಂದ ದಾರಿ ನೋಡಬಹುದು.",
@@ -136,6 +140,7 @@
       ],
       "say": {
         "hi-IN": "ऊपर 'Search here' वाले डिब्बे पर दबाइए।",
+        "en-IN": "Press the 'Search here' box at the top.",
         "ta-IN": "மேலே 'Search here' பெட்டியை அழுத்துங்கள்.",
         "te-IN": "పైన 'Search here' పెట్టె నొక్కండి.",
         "kn-IN": "ಮೇಲಿನ 'Search here' ಪೆಟ್ಟಿಗೆ ಒತ್ತಿ.",

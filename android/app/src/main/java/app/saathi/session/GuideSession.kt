@@ -121,6 +121,9 @@ class GuideSession(
 ) {
     companion object {
         const val MAX_AUTO_TURNS = 15
+        /** How long a screen gets to finish loading after the senior acts, in looks 500ms apart. */
+        const val SETTLE_TRIES = 4
+        const val SETTLE_STEP_MS = 500L
         const val WATCH_TIMEOUT_MS = 120_000L
         const val HISTORY = 8
         const val POINT_RADIUS_PX = 90
@@ -169,7 +172,7 @@ class GuideSession(
             setState(GuideState.WATCHING)
             delay(event.settleMs)
             setState(GuideState.THINKING)
-            val snap = eyes.look()
+            val snap = lookSettled()
             if (!event.progress && unchanged(snap)) {
                 // A scroll that went nowhere or a dialog that flickered: keep the same step on
                 // screen, without asking again or repeating it out loud.
@@ -181,6 +184,24 @@ class GuideSession(
             autoTurns++
             runTurn(utterance = null, seen = snap)
         }
+    }
+
+    /**
+     * Looks until two looks in a row read the same, so a page that fills in after it opens
+     * (Android's Internet page adds its Wi-Fi switch a moment later) is judged whole rather than
+     * half-loaded. Busy screens (carousels, videos) never settle, so it gives up after a few tries
+     * and uses the latest look.
+     */
+    private suspend fun lookSettled(): Snapshot {
+        var snap = eyes.look()
+        repeat(SETTLE_TRIES) {
+            delay(SETTLE_STEP_MS)
+            val again = eyes.look()
+            // An empty read (no window content yet) never counts as settled.
+            if (again.app.isNotEmpty() && again.app == snap.app && again.tree == snap.tree) return again
+            if (again.app.isNotEmpty() || snap.app.isEmpty()) snap = again
+        }
+        return snap
     }
 
     private fun unchanged(snap: Snapshot): Boolean {

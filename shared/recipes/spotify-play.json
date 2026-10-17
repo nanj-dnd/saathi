@@ -1,6 +1,6 @@
 {
   "id": "spotify-play",
-  "version": 1,
+  "version": 2,
   "goal": "play music on Spotify",
   "apps": [
     "com.spotify.music"
@@ -61,6 +61,9 @@
     ],
     "ml-IN": [
       "സ്പോട്ടിഫൈയിൽ പാട്ട് കേൾക്കണം"
+    ],
+    "en-IN": [
+      "play songs on Spotify"
     ]
   },
   "steps": [
@@ -76,7 +79,8 @@
         "ta-IN": "'Search' ஐ அழுத்தி, பாடலின் பெயரைச் சொல்லுங்கள் அல்லது எழுதுங்கள், பிறகு அதை அழுத்துங்கள்.",
         "te-IN": "'Search' నొక్కి, పాట పేరు చెప్పండి లేదా రాయండి, తర్వాత దాని మీద నొక్కండి.",
         "kn-IN": "'Search' ಒತ್ತಿ, ಹಾಡಿನ ಹೆಸರು ಹೇಳಿ ಅಥವಾ ಬರೆಯಿರಿ, ನಂತರ ಅದರ ಮೇಲೆ ಒತ್ತಿ.",
-        "ml-IN": "'Search' അമർത്തി, പാട്ടിന്റെ പേര് പറയുക അല്ലെങ്കിൽ എഴുതുക, പിന്നെ അതിൽ അമർത്തുക."
+        "ml-IN": "'Search' അമർത്തി, പാട്ടിന്റെ പേര് പറയുക അല്ലെങ്കിൽ എഴുതുക, പിന്നെ അതിൽ അമർത്തുക.",
+        "en-IN": "Press 'Search' at the top or bottom, say or write the name of the song or bhajan, then press it."
       }
     }
   ]

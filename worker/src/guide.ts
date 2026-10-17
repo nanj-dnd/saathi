@@ -70,6 +70,7 @@ export async function askGuide(
 
 const SORRY: Record<TurnRequest["language"], string> = {
   "hi-IN": "माफ़ कीजिए, मैं अभी समझ नहीं पाया। फिर से बोलिए।",
+  "en-IN": "Sorry, I didn't understand that. Please say it again.",
   "ta-IN": "மன்னிக்கவும், எனக்குப் புரியவில்லை. மீண்டும் சொல்லுங்கள்.",
   "te-IN": "క్షమించండి, నాకు అర్థం కాలేదు. మళ్ళీ చెప్పండి.",
   "kn-IN": "ಕ್ಷಮಿಸಿ, ನನಗೆ ಅರ್ಥವಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಹೇಳಿ.",

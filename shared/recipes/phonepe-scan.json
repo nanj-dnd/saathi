@@ -1,6 +1,6 @@
 {
   "id": "phonepe-scan",
-  "version": 1,
+  "version": 2,
   "goal": "pay a shop by scanning a QR code on PhonePe",
   "apps": [
     "com.phonepe.app"
@@ -70,6 +70,9 @@
     ],
     "ml-IN": [
       "ഫോൺപേയിൽ QR സ്കാൻ ചെയ്യണം"
+    ],
+    "en-IN": [
+      "scan a QR code with PhonePe"
     ]
   },
   "steps": [
@@ -90,7 +93,8 @@
         "ta-IN": "'Scan & Pay' ஐ அழுத்தி, கேமராவை கடையின் QR குறியீட்டின் மேல் வையுங்கள். கடையின் பெயரைப் பாருங்கள்; தொகையையும் PIN-ஐயும் நீங்களே போடுங்கள்.",
         "te-IN": "'Scan & Pay' నొక్కి, కెమెరాను దుకాణం QR కోడ్ మీద పెట్టండి. దుకాణం పేరు చూడండి; మొత్తం, PIN మీరే వేయండి.",
         "kn-IN": "'Scan & Pay' ಒತ್ತಿ, ಕ್ಯಾಮೆರಾವನ್ನು ಅಂಗಡಿಯ QR ಕೋಡ್ ಮೇಲೆ ಇಡಿ. ಅಂಗಡಿಯ ಹೆಸರು ನೋಡಿ; ಮೊತ್ತ ಮತ್ತು PIN ನೀವೇ ಹಾಕಿ.",
-        "ml-IN": "'Scan & Pay' അമർത്തി, ക്യാമറ കടയുടെ QR കോഡിൽ വെക്കുക. കടയുടെ പേര് നോക്കുക; തുകയും PIN-ഉം നിങ്ങൾ തന്നെ ഇടുക."
+        "ml-IN": "'Scan & Pay' അമർത്തി, ക്യാമറ കടയുടെ QR കോഡിൽ വെക്കുക. കടയുടെ പേര് നോക്കുക; തുകയും PIN-ഉം നിങ്ങൾ തന്നെ ഇടുക.",
+        "en-IN": "Press 'Scan & Pay' and hold the camera over the shop's QR code. Check the shop's name; enter the amount and PIN yourself."
       }
     }
   ]

@@ -18,6 +18,10 @@ class RecipeEngine(private val book: RecipeBook) {
 
     fun guide(req: TurnRequest): Guide? {
         if (book.recipes.isEmpty()) return null
+        // No app means the screen couldn't be read (Android 14+ hides "data sensitive" pages such
+        // as Wi-Fi from non-tool accessibility services). That is not "outside the app": leave it
+        // to the model, which still gets the screenshot.
+        if (req.app.isBlank()) return null
         val recipe = active(req) ?: return null
         val screen = ScreenText.parse(req.tree)
         val home = recipe.anyApp || req.app in recipe.apps
@@ -37,9 +41,8 @@ class RecipeEngine(private val book: RecipeBook) {
     internal fun match(said: String, app: String): Recipe? {
         val text = ScreenText.norm(said)
         if (text.isEmpty()) return null
-        val negated = book.common.unless.any { contains(text, it, wordStart = false) }
         val scored = book.recipes.mapNotNull { r ->
-            if (negated && !r.skipCommonUnless) return@mapNotNull null
+            if (!r.skipCommonUnless && negated(text, r)) return@mapNotNull null
             if (r.unless.any { contains(text, it, wordStart = false) }) return@mapNotNull null
             // More matched groups is a more specific fit. On a tie, the recipe for the app that is
             // already open wins: "call" inside WhatsApp is a WhatsApp call, not the phone dialler.
@@ -51,6 +54,20 @@ class RecipeEngine(private val book: RecipeBook) {
         }
         val top = scored.maxOfOrNull { it.second } ?: return null
         return scored.filter { it.second == top }.singleOrNull()?.first
+    }
+
+    /**
+     * True if [text] carries one of the shared negations ("not ", "why", "नहीं"…) outside this
+     * recipe's own phrases, so "do not disturb" can still start the Do Not Disturb recipe while
+     * "do not disturb is not turning off" goes to the model.
+     */
+    private fun negated(text: String, r: Recipe): Boolean {
+        var rest = text
+        for (phrase in r.triggers.flatMap { t -> t.all.flatten() }) {
+            val p = ScreenText.norm(phrase)
+            if (' ' in p) rest = rest.replace(p, " ")
+        }
+        return book.common.unless.any { contains(rest, it, wordStart = false) }
     }
 
     /** The first step that fits this screen. [home] is true when the recipe's own app is in front. */
@@ -66,7 +83,7 @@ class RecipeEngine(private val book: RecipeBook) {
                 if (n < after.min || n > after.max) continue
             }
             var node = if (step.target.isEmpty()) null else screen.find(step.target, step.exact) ?: continue
-            var label = node?.label.orEmpty()
+            var label = node?.let { screen.spokenLabel(it, step.target) }.orEmpty()
             if (step.switch.isNotEmpty()) {
                 val sw = screen.switchFor(step.switch) ?: continue
                 if (sw.on != (step.switchIs == "on")) continue
@@ -148,16 +165,22 @@ class RecipeEngine(private val book: RecipeBook) {
         fun contains(text: String, phrase: String, wordStart: Boolean = true): Boolean {
             val p = ScreenText.norm(phrase)
             if (p.isEmpty()) return false
+            // A phrase written with a trailing space must end a word: "not " is the word "not",
+            // and must not fire inside "notifications" or "note".
+            if (phrase.last().isWhitespace()) return found(text, p, wordStart, wordEnd = true)
             if (found(text, p, wordStart)) return true
             val s = stem(p)
             return s != p && found(text, s, wordStart)
         }
 
-        private fun found(text: String, p: String, wordStart: Boolean): Boolean {
-            if (!wordStart) return p in text
+        private fun found(text: String, p: String, wordStart: Boolean, wordEnd: Boolean = false): Boolean {
+            if (!wordStart && !wordEnd) return p in text
             var i = text.indexOf(p)
             while (i >= 0) {
-                if (i == 0 || isBoundary(text[i - 1])) return true
+                val end = i + p.length
+                val startOk = !wordStart || i == 0 || isBoundary(text[i - 1])
+                val endOk = !wordEnd || end == text.length || isBoundary(text[end])
+                if (startOk && endOk) return true
                 i = text.indexOf(p, i + 1)
             }
             return false

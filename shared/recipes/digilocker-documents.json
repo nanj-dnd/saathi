@@ -1,6 +1,6 @@
 {
   "id": "digilocker-documents",
-  "version": 1,
+  "version": 2,
   "goal": "see my documents in DigiLocker",
   "apps": [
     "com.digilocker.android"
@@ -77,6 +77,9 @@
     ],
     "ml-IN": [
       "ഡിജിലോക്കറിൽ ആധാർ കാണണം"
+    ],
+    "en-IN": [
+      "show my Aadhaar in DigiLocker"
     ]
   },
   "steps": [
@@ -92,7 +95,8 @@
         "ta-IN": "பார்க்க வேண்டிய ஆவணத்தின் பெயரை அழுத்துங்கள்.",
         "te-IN": "చూడాల్సిన పత్రం పేరు మీద నొక్కండి.",
         "kn-IN": "ನೋಡಬೇಕಾದ ದಾಖಲೆಯ ಹೆಸರಿನ ಮೇಲೆ ಒತ್ತಿ.",
-        "ml-IN": "കാണേണ്ട രേഖയുടെ പേരിൽ അമർത്തുക."
+        "ml-IN": "കാണേണ്ട രേഖയുടെ പേരിൽ അമർത്തുക.",
+        "en-IN": "Press the name of the document you want to see."
       }
     },
     {
@@ -107,7 +111,8 @@
         "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
         "te-IN": "'{label}' నొక్కండి.",
         "kn-IN": "'{label}' ಒತ್ತಿ.",
-        "ml-IN": "'{label}' അമർത്തുക."
+        "ml-IN": "'{label}' അമർത്തുക.",
+        "en-IN": "Press '{label}'."
       }
     }
   ]

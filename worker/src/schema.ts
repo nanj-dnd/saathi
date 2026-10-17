@@ -2,6 +2,7 @@
 
 export const LANGUAGES = {
   "hi-IN": "Hindi",
+  "en-IN": "English (simple Indian English)",
   "ta-IN": "Tamil",
   "te-IN": "Telugu",
   "kn-IN": "Kannada",

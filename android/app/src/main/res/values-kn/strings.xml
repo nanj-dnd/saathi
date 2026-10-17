@@ -45,4 +45,5 @@
     <string name="speed_normal">ಸಾಮಾನ್ಯ</string>
     <string name="offline_download">ಇಂಟರ್ನೆಟ್ ಇಲ್ಲದೆ ಕೇಳಲು ಧ್ವನಿ ಗುರುತಿಸುವಿಕೆ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ</string>
     <string name="offline_started">ಡೌನ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ. ಫೋನನ್ನು Wi-Fi ನಲ್ಲಿ ಇಡಿ.</string>
+    <string name="access_summary">ಬಟನ್‌ಗಳನ್ನು ತೋರಿಸಲು ಸಾಥಿ ಪರದೆಯನ್ನು ನೋಡಬೇಕು. ಅದು ತಾನಾಗಿ ಏನನ್ನೂ ಒತ್ತುವುದಿಲ್ಲ.</string>
 </resources>

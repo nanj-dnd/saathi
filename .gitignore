@@ -9,3 +9,7 @@ local.properties
 .idea/
 .DS_Store
 demo/
+.impeccable/review/
+
+# demo renders
+*.mp4

@@ -1,6 +1,6 @@
 {
   "id": "phonepe-history",
-  "version": 1,
+  "version": 2,
   "goal": "see payment history on PhonePe",
   "apps": [
     "com.phonepe.app"
@@ -86,6 +86,9 @@
     ],
     "ml-IN": [
       "ഫോൺപേയിൽ ഹിസ്റ്ററി കാണണം"
+    ],
+    "en-IN": [
+      "see my history on PhonePe"
     ]
   },
   "steps": [
@@ -101,7 +104,8 @@
         "ta-IN": "கீழே '{label}' ஐ அழுத்துங்கள்.",
         "te-IN": "కింద '{label}' నొక్కండి.",
         "kn-IN": "ಕೆಳಗೆ '{label}' ಒತ್ತಿ.",
-        "ml-IN": "താഴെ '{label}' അമർത്തുക."
+        "ml-IN": "താഴെ '{label}' അമർത്തുക.",
+        "en-IN": "Press '{label}' at the bottom."
       }
     }
   ]

@@ -75,7 +75,7 @@ class LocalFirstBrain(
             throw e
         }
         if (key != null && worthKeeping(response.guide)) cache.put(key, response.guide)
-        log("turn ${request.app} via ${response.source}: ${response.guide.label}")
+        log("turn ${request.app} via ${response.source}: ${response.guide.label} | ${response.guide.say}")
         return response
     }
 

@@ -12,7 +12,7 @@ without shipping a new APK.
 
 1. **What was said** is matched against `triggers`. A trigger is a list of groups, and each group
    needs one of its phrases somewhere in the sentence. `{"all": [["whatsapp", "व्हाट्सएप"], ["video", "वीडियो"]]}`
-   needs both a WhatsApp word and a video word. Phrases from all five languages sit side by side.
+   needs both a WhatsApp word and a video word. Phrases from all six languages sit side by side.
 2. Phrases must **start a word**, so `गाना` (song) does not fire inside `लगाना` (to set). A phrase ending
    in a virama, a Malayalam chillu letter or an anusvara also matches its inflected forms (`ബ്ലിങ്കിറ്റ്` matches
    `ബ്ലിങ്കിറ്റിൽ`). For other endings, add the stem yourself (`மருந்து சீட்ட` for `சீட்டு`/`சீட்டை`).
@@ -63,7 +63,7 @@ how to get there, using the shared lines in `_common.json`.
 ## Adding or fixing a recipe
 
 1. Copy a similar file. Give it a unique `id` and `goal`, and bump `version` when editing a shipped one.
-2. Write `examples` in all five languages: phrases a senior would really say. They are not used at
+2. Write `examples` in all six languages: phrases a senior would really say. They are not used at
    run time; the tests check that each one picks this recipe and no other.
 3. Run the tests:
    ```bash

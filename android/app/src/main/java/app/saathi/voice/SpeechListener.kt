@@ -16,7 +16,7 @@ import kotlin.coroutines.resume
 
 /**
  * Transcribes one utterance with the phone's own speech service (Google's on most phones), which
- * covers all five languages for free. Offline, it uses the on-device recogniser when the language
+ * covers all six languages for free. Offline, it uses the on-device recogniser when the language
  * pack is downloaded, so scripted recipes keep working with no network at all. Main thread only.
  */
 class SpeechListener(
@@ -106,10 +106,11 @@ class SpeechListener(
             else -> if (online) Heard.Silence else Heard.Offline
         }
 
-        fun isOnline(context: Context): Boolean {
+        /** Assumes online if the check itself fails: a wrong guess costs one recogniser choice, a crash costs the turn. */
+        fun isOnline(context: Context): Boolean = runCatching {
             val cm = context.getSystemService(ConnectivityManager::class.java) ?: return true
             val caps = cm.getNetworkCapabilities(cm.activeNetwork) ?: return false
-            return caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-        }
+            caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        }.getOrDefault(true)
     }
 }

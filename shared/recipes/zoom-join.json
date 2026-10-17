@@ -1,6 +1,6 @@
 {
   "id": "zoom-join",
-  "version": 1,
+  "version": 2,
   "goal": "join a Zoom meeting",
   "apps": [
     "us.zoom.videomeetings"
@@ -90,6 +90,9 @@
     ],
     "ml-IN": [
       "സൂം മീറ്റിംഗിൽ ചേരണം"
+    ],
+    "en-IN": [
+      "join the Zoom meeting"
     ]
   },
   "steps": [
@@ -107,7 +110,8 @@
         "ta-IN": "நீங்கள் கேட்கவும் பேசவும் '{label}' ஐ அழுத்துங்கள்.",
         "te-IN": "మీరు వినడానికి, మాట్లాడడానికి '{label}' నొక్కండి.",
         "kn-IN": "ನೀವು ಕೇಳಲು ಮತ್ತು ಮಾತನಾಡಲು '{label}' ಒತ್ತಿ.",
-        "ml-IN": "നിങ്ങൾക്ക് കേൾക്കാനും സംസാരിക്കാനും '{label}' അമർത്തുക."
+        "ml-IN": "നിങ്ങൾക്ക് കേൾക്കാനും സംസാരിക്കാനും '{label}' അമർത്തുക.",
+        "en-IN": "Press '{label}' so that you can hear and speak."
       }
     },
     {
@@ -128,7 +132,8 @@
         "ta-IN": "மீட்டிங் எண்ணை (ID) எழுதி, பிறகு கீழே 'Join' ஐ அழுத்துங்கள்.",
         "te-IN": "మీటింగ్ నంబర్ (ID) రాసి, తర్వాత కింద 'Join' నొక్కండి.",
         "kn-IN": "ಮೀಟಿಂಗ್ ನಂಬರ್ (ID) ಬರೆದು, ನಂತರ ಕೆಳಗೆ 'Join' ಒತ್ತಿ.",
-        "ml-IN": "മീറ്റിംഗ് നമ്പർ (ID) എഴുതി, പിന്നെ താഴെ 'Join' അമർത്തുക."
+        "ml-IN": "മീറ്റിംഗ് നമ്പർ (ID) എഴുതി, പിന്നെ താഴെ 'Join' അമർത്തുക.",
+        "en-IN": "Write the meeting number (ID), then press 'Join' at the bottom."
       }
     },
     {
@@ -144,7 +149,8 @@
         "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
         "te-IN": "'{label}' నొక్కండి.",
         "kn-IN": "'{label}' ಒತ್ತಿ.",
-        "ml-IN": "'{label}' അമർത്തുക."
+        "ml-IN": "'{label}' അമർത്തുക.",
+        "en-IN": "Press '{label}'."
       }
     }
   ]

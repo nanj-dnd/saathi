@@ -45,4 +45,5 @@
     <string name="speed_normal">सामान्य</string>
     <string name="offline_download">बिना इंटरनेट के सुनने के लिए आवाज़ पहचान डाउनलोड करें</string>
     <string name="offline_started">डाउनलोड हो रहा है। फ़ोन वाई-फाई पर रखिए।</string>
+    <string name="access_summary">बटन दिखाने के लिए साथी को स्क्रीन देखनी होती है। यह खुद कभी कुछ नहीं दबाता।</string>
 </resources>

@@ -83,6 +83,9 @@
       "बैंक में कितना बैलेंस है देखना है",
       "खाते में कितने पैसे हैं"
     ],
+    "en-IN": [
+      "check my bank balance"
+    ],
     "ta-IN": [
       "வங்கி பேலன்ஸ் பார்க்க வேண்டும்"
     ],
@@ -102,6 +105,7 @@
       "status": "done",
       "say": {
         "hi-IN": "अपने UPI ऐप, जैसे Google Pay या PhonePe में 'Check balance' दबाइए और PIN खुद डालिए। बिना इंटरनेट के: बैंक से जुड़े नंबर से *99# मिलाइए और 'Check Balance' के आगे लिखा अंक भेजिए; Jio सिम पर यह अक्सर नहीं चलता। पासबुक में एंट्री के लिए बैंक भी जा सकते हैं।",
+        "en-IN": "In your UPI app, like Google Pay or PhonePe, tap 'Check balance' and enter the PIN yourself. Without internet: from the number linked to your bank, dial *99# and send the number shown next to 'Check Balance'; it often does not work on a Jio SIM. You can also go to the bank to update your passbook.",
         "ta-IN": "உங்கள் UPI ஆப்பில், உதாரணமாக Google Pay அல்லது PhonePe-ல், 'Check balance' ஐ அழுத்தி PIN-ஐ நீங்களே போடுங்கள். இணையம் இல்லாமல்: வங்கியுடன் இணைந்த எண்ணிலிருந்து *99# அழைத்து, 'Check Balance' அருகே உள்ள எண்ணை அனுப்புங்கள்; Jio சிம்மில் இது பெரும்பாலும் வேலை செய்யாது. பாஸ்புக் பதிவுக்கு வங்கிக்கும் போகலாம்.",
         "te-IN": "మీ UPI యాప్‌లో, ఉదాహరణకు Google Pay లేదా PhonePe లో, 'Check balance' నొక్కి PIN మీరే వేయండి. ఇంటర్నెట్ లేకుండా: బ్యాంక్‌తో లింక్ అయిన నంబర్ నుంచి *99# డయల్ చేసి, 'Check Balance' పక్కన ఉన్న అంకె పంపండి; Jio సిమ్‌లో ఇది చాలాసార్లు పని చేయదు. పాస్‌బుక్ ఎంట్రీ కోసం బ్యాంకుకు కూడా వెళ్ళవచ్చు.",
         "kn-IN": "ನಿಮ್ಮ UPI ಆ್ಯಪ್‌ನಲ್ಲಿ, ಉದಾಹರಣೆಗೆ Google Pay ಅಥವಾ PhonePe ನಲ್ಲಿ, 'Check balance' ಒತ್ತಿ PIN ನೀವೇ ಹಾಕಿ. ಇಂಟರ್ನೆಟ್ ಇಲ್ಲದೆ: ಬ್ಯಾಂಕ್‌ಗೆ ಜೋಡಿಸಿದ ನಂಬರ್‌ನಿಂದ *99# ಡಯಲ್ ಮಾಡಿ, 'Check Balance' ಪಕ್ಕದ ಅಂಕಿ ಕಳುಹಿಸಿ; Jio ಸಿಮ್‌ನಲ್ಲಿ ಇದು ಹೆಚ್ಚಾಗಿ ಕೆಲಸ ಮಾಡುವುದಿಲ್ಲ. ಪಾಸ್‌ಬುಕ್ ಎಂಟ್ರಿಗೆ ಬ್ಯಾಂಕಿಗೂ ಹೋಗಬಹುದು.",
