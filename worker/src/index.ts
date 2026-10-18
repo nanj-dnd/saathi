@@ -109,7 +109,7 @@ export default {
             req,
           );
           source = "model";
-          if (cache && key && shareable(guide)) ctx.waitUntil(writeShared(cache, key, guide));
+          if (cache && key && shareable(guide)) ctx.waitUntil(writeShared(cache, key, guide).catch((e) => console.error(`answer not cached: ${e.message}`)));
         }
       }
       const timings = { guide: Date.now() - t0 };
@@ -158,11 +158,14 @@ async function speak(request: Request, env: Env, ctx: ExecutionContext, deviceId
     const t0 = Date.now();
     const body = await synthesize(env.SARVAM_API_KEY, req, speaker);
     console.log(JSON.stringify({ deviceId, speech: req.language, chars: req.text.length, ms: Date.now() - t0 }));
-    if (cache) ctx.waitUntil(writeSpeech(cache, key, body));
+    if (cache) ctx.waitUntil(writeSpeech(cache, key, body).catch((e) => console.error(`speech not cached: ${e.message}`)));
     return audio(body, "sarvam");
   } catch (err) {
     if (err instanceof UpstreamError) {
       console.error(err.message);
+      // Out of Sarvam credits (402) or a bad key (401/403): there is no voice until someone fixes the
+      // account, so tell phones "none" (501) and they stop asking for a while instead of every line.
+      if (err.status === 402 || err.status === 401 || err.status === 403) return json({ error: "no voice available" }, 501);
       return json({ error: "voice" }, err.status === 429 ? 503 : 502);
     }
     throw err;

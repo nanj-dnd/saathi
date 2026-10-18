@@ -101,6 +101,12 @@ describe("/speak", () => {
     expect((await worker.fetch(speakReq({ text: "one", language: "en-IN" }), env as never, ctx())).status).toBe(200);
   });
 
+  it("tells phones there is no voice when the Sarvam account is out of credits", async () => {
+    sarvam.mockResolvedValueOnce(new Response('{"error":{"code":"insufficient_quota_error"}}', { status: 402 }));
+    const res = await worker.fetch(speakReq({ text: "hello", language: "en-IN" }), env as never, ctx());
+    expect(res.status).toBe(501);
+  });
+
   it("maps a Sarvam failure to an error the phone treats as 'use your own voice'", async () => {
     sarvam.mockResolvedValueOnce(new Response("quota", { status: 429 }));
     const res = await worker.fetch(speakReq({ text: "hello", language: "en-IN" }), env as never, ctx());

@@ -40,6 +40,12 @@ export async function underDailyLimit(
   const key = `turns:${new Date().toISOString().slice(0, 10)}:${deviceId}`;
   const used = Number((await kv.get(key)) ?? "0");
   if (used >= limit) return false;
-  await kv.put(key, String(used + 1), { expirationTtl: 60 * 60 * 48 });
+  try {
+    await kv.put(key, String(used + 1), { expirationTtl: 60 * 60 * 48 });
+  } catch (err) {
+    // KV refuses writes past its daily quota (1,000 a day on the free plan). This counter is a
+    // courtesy limit; the global SpendGuard still caps spend, so a full KV must not stop the senior.
+    console.error(`usage counter not saved: ${(err as Error).message}`);
+  }
   return true;
 }
