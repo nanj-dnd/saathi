@@ -79,6 +79,16 @@ class Speaker(
         }
     }
 
+    /**
+     * Starts the phone's speech engine ahead of time. Some phones take seconds to bring it up, and
+     * the first step of a task (or the fallback when the natural voice can't be had) shouldn't wait.
+     */
+    suspend fun warmUp() {
+        val engine = engine() ?: return
+        val locale = Locale.forLanguageTag(language())
+        if (engine.setLanguage(locale) >= TextToSpeech.LANG_AVAILABLE) VoicePicker.apply(context, engine, locale)
+    }
+
     override fun stop() {
         cloud?.stop()
         tts?.stop()

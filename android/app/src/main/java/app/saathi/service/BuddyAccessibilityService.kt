@@ -80,6 +80,7 @@ class BuddyAccessibilityService : AccessibilityService() {
             withContext(Dispatchers.IO) { recipes.load() }
             refreshRecipes(recipes, worker)
         }
+        scope.launch { speaker.warmUp() }
         overlay = OverlayController(
             service = this,
             prefs = prefs,

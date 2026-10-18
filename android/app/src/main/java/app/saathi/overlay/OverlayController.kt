@@ -121,6 +121,7 @@ class OverlayController(
         this.caption.render(caption, kind, res.getString(R.string.btn_repeat), res.getString(R.string.btn_close))
         placeCaption(if (danger == Danger.SCAM) null else target)
         this.caption.visibility = View.VISIBLE
+        moveBubbleOffCaption()
 
         if (target != null && danger != Danger.SCAM) {
             moveBubbleOffTarget(target)
@@ -171,6 +172,22 @@ class OverlayController(
         service.windows.firstOrNull { it.type == AccessibilityWindowInfo.TYPE_INPUT_METHOD }
             ?.let { Rect().also(it::getBoundsInScreen).top }
     }.getOrNull()
+
+    /**
+     * If the pill sits where the caption now floats (a senior who keeps it at the top), it steps just
+     * clear of the card for this step, and goes back to the senior's spot at idle.
+     */
+    private fun moveBubbleOffCaption() {
+        val s = screen
+        val capH = caption.measuredHeight
+        val top = captionParams.gravity and Gravity.VERTICAL_GRAVITY_MASK == Gravity.TOP
+        val capTop = if (top) captionParams.y else s.height() - captionParams.y - capH
+        val capBottom = capTop + capH
+        val h = bubbleHeight()
+        if (bubbleParams.y >= capBottom || bubbleParams.y + h <= capTop) return
+        bubbleParams.y = (if (top) capBottom else capTop - h).coerceIn(0, (s.height() - h).coerceAtLeast(0))
+        wm.updateViewLayout(bubble, bubbleParams)
+    }
 
     /** If the bubble sits on the button the senior must press, slide it to the other side. */
     private fun moveBubbleOffTarget(target: Box) {
