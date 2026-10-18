@@ -7,6 +7,7 @@ import app.saathi.brain.FileCacheStore
 import app.saathi.brain.LocalFirstBrain
 import app.saathi.brain.ScreenKey
 import app.saathi.brain.TurnCache
+import app.saathi.net.Action
 import app.saathi.net.Danger
 import app.saathi.net.Guide
 import app.saathi.net.PastStep
@@ -15,6 +16,7 @@ import app.saathi.net.Status
 import app.saathi.net.TurnRequest
 import app.saathi.net.TurnResponse
 import app.saathi.recipes.RecipeBook
+import app.saathi.recipes.RecipeEngine
 import app.saathi.session.Brain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
@@ -55,16 +57,59 @@ class LocalFirstBrainTest {
 
     private val addMilk = Guide(say = "Amul के पास 'ADD' दबाइए", goal = "order milk", targetKind = "node", nodeId = "n4", label = "ADD")
 
-    private fun brain(remote: Brain, store: CacheStore = MemoryStore(), clock: () -> Long = { 0L }, books: RecipeBook = RecipeBook.EMPTY) =
+    private fun brain(
+        remote: Brain,
+        store: CacheStore = MemoryStore(),
+        clock: () -> Long = { 0L },
+        books: RecipeBook = RecipeBook.EMPTY,
+        canOpen: ((String) -> Boolean)? = null,
+    ) =
         LocalFirstBrain(
             recipes = { books },
             cache = TurnCache(store, now = clock, io = Dispatchers.Unconfined),
             remote = remote,
             sensitiveLine = { "yourself:$it" },
+            canOpen = canOpen,
         )
 
     private fun auto(tree: String = blinkitHome, history: List<PastStep> = emptyList()) =
         req(tree, app = "com.grofers.customerapp", goal = "order milk", history = history)
+
+    private val launcher = "n1 TextView \"Phone\" [40,2000,200,2100] click\nn2 TextView \"Chrome\" [240,2000,400,2100] click"
+
+    /** A turn no recipe answers: a task with no script, mid-way. */
+    private fun modelTurn() = req(
+        launcher, app = "com.android.launcher3", goal = "send a voice note to my grandson",
+        history = listOf(PastStep("x", "", Status.NEXT_STEP, "com.android.launcher3")),
+    )
+
+    private fun openWhatsApp() = Guide(
+        say = "WhatsApp खोल रही हूँ।", goal = "call on WhatsApp", label = "WhatsApp",
+        action = Action.OPEN_APP, actionArg = "com.whatsapp",
+    )
+
+    @Test fun `an app the model opens is opened when it is here`() = runTest {
+        val r = brain(FakeRemote(openWhatsApp()), books = book, canOpen = { it == "com.whatsapp" })
+            .turn(modelTurn())
+        assertEquals(Action.OPEN_APP, r.guide.action)
+        assertEquals("com.whatsapp", r.guide.actionArg)
+    }
+
+    @Test fun `an app the model opens but the phone lacks becomes its Play Store page`() = runTest {
+        val r = brain(FakeRemote(openWhatsApp()), books = book, canOpen = { it == "com.android.vending" })
+            .turn(modelTurn())
+        assertEquals(Action.OPEN_STORE_PAGE, r.guide.action)
+        assertEquals("'WhatsApp' अभी इस फ़ोन में नहीं है। Play Store में उसका पेज खोल रही हूँ।", r.guide.say)
+        assertEquals(RecipeEngine.STORE_GOAL, r.guide.goal)
+    }
+
+    @Test fun `without a Play Store the senior hears where to look instead`() = runTest {
+        val r = brain(FakeRemote(openWhatsApp()), books = book, canOpen = { false })
+            .turn(modelTurn())
+        assertEquals("", r.guide.action)
+        assertTrue(r.guide.say.contains("WhatsApp"))
+        assertTrue(!r.guide.say.contains("खोल रही"))
+    }
 
     @Test fun `secure screens are answered on the phone`() = runTest {
         val remote = FakeRemote(addMilk)

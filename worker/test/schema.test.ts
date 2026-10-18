@@ -88,3 +88,27 @@ describe("auth", () => {
     expect(await verifyToken("secret", null)).toBeNull();
   });
 });
+
+describe("guide actions", () => {
+  const base = {
+    say: "WhatsApp खोल रही हूँ।", goal: "call on WhatsApp", target_kind: "none", node_id: "", x: -1, y: -1,
+    label: "WhatsApp", status: "next_step", danger: "none", expect: "",
+  };
+  const ids = new Set(["n1"]);
+
+  it("keeps a safe action with a real package", () => {
+    const g = normaliseGuide({ ...base, action: "open_app", action_arg: "com.whatsapp" }, ids);
+    expect(g.action).toBe("open_app");
+    expect(g.action_arg).toBe("com.whatsapp");
+    expect(normaliseGuide({ ...base, action: "scroll_down", action_arg: "x" }, ids)).toMatchObject({ action: "scroll_down", action_arg: "" });
+  });
+
+  it("drops actions on warnings, the senior's own steps, pointed steps and made-up packages", () => {
+    expect(normaliseGuide({ ...base, action: "open_app", action_arg: "com.whatsapp", danger: "scam_suspected" }, ids).action).toBe("");
+    expect(normaliseGuide({ ...base, action: "scroll_down", status: "user_must_do" }, ids).action).toBe("");
+    expect(normaliseGuide({ ...base, action: "scroll_down", target_kind: "node", node_id: "n1" }, ids).action).toBe("");
+    expect(normaliseGuide({ ...base, action: "open_store_page", action_arg: "WhatsApp app" }, ids).action).toBe("");
+    expect(normaliseGuide({ ...base, action: "tap", action_arg: "com.whatsapp" }, ids).action).toBe("");
+    expect(normaliseGuide({ ...base, action: "none" }, ids).action).toBe("");
+  });
+});

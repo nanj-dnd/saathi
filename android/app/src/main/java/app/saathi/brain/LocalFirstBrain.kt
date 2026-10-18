@@ -1,6 +1,7 @@
 package app.saathi.brain
 
 import app.saathi.capture.ScreenText
+import app.saathi.net.Action
 import app.saathi.net.Danger
 import app.saathi.net.Guide
 import app.saathi.net.Source
@@ -62,7 +63,7 @@ class LocalFirstBrain(
         if (!risky) RecipeEngine(recipes(), canOpen).guide(request)?.let { return local(it, Source.RECIPE) }
 
         val key = if (!risky && cacheable(request)) ScreenKey.turnKey(request) else null
-        if (key != null) cache.get(key)?.takeIf { fits(it, request) }?.let { return local(it, Source.CACHE) }
+        if (key != null) cache.get(key)?.takeIf { fits(it, request) }?.let { return local(checked(it, request.language), Source.CACHE) }
 
         val response = try {
             remote.turn(request)
@@ -70,15 +71,45 @@ class LocalFirstBrain(
             throw e
         } catch (e: Exception) {
             // Offline: an old answer for this exact screen is still better than "no internet".
-            key?.let { cache.get(it, allowStale = true) }?.takeIf { fits(it, request) }?.let { return local(it, Source.CACHE) }
+            key?.let { cache.get(it, allowStale = true) }?.takeIf { fits(it, request) }?.let { return local(checked(it, request.language), Source.CACHE) }
             // A scam-looking turn skipped the recipes for the model; without it, a scripted warning
             // is still far better than silence.
             if (risky) scamWarning(request)?.let { return local(it, Source.RECIPE) }
             throw e
         }
         if (key != null && worthKeeping(response.guide)) cache.put(key, response.guide)
-        log("turn ${request.app} via ${response.source}: ${response.guide.label} | ${response.guide.say}")
-        return response
+        val guide = checked(response.guide, request.language)
+        log("turn ${request.app} via ${response.source}: ${guide.label} | ${guide.say}${if (guide.action.isNotEmpty()) " [${guide.action} ${guide.actionArg}]" else ""}")
+        return response.copy(guide = guide)
+    }
+
+    /**
+     * An action the model chose, made safe for this phone. An app it named that isn't installed (or
+     * a package it got wrong) becomes that app's Play Store page; without a Play Store, the senior
+     * hears where to look. Unknown actions are dropped. With [canOpen] unknown, nothing changes.
+     */
+    private fun checked(g: Guide, language: String): Guide {
+        val open = canOpen ?: return g
+        return when (g.action) {
+            "", Action.SCROLL_DOWN -> g
+            Action.OPEN_APP -> when {
+                open(g.actionArg) -> g
+                open(RecipeEngine.PLAY_STORE) && g.label.isNotBlank() -> g.copy(
+                    action = Action.OPEN_STORE_PAGE,
+                    say = (RecipeEngine.NOT_INSTALLED[language] ?: RecipeEngine.NOT_INSTALLED.getValue("en-IN")).replace("{app}", g.label),
+                    goal = RecipeEngine.STORE_GOAL,
+                )
+                else -> findInstead(g, language)
+            }
+            Action.OPEN_STORE_PAGE -> if (open(RecipeEngine.PLAY_STORE)) g.copy(goal = RecipeEngine.STORE_GOAL) else findInstead(g, language)
+            else -> g.copy(action = "", actionArg = "")
+        }
+    }
+
+    private fun findInstead(g: Guide, language: String): Guide {
+        val line = recipes().common.lines["drawer"]?.get(language)
+        val say = if (line != null && g.label.isNotBlank()) line.replace("{app}", g.label) else g.say
+        return g.copy(action = "", actionArg = "", say = say)
     }
 
     /** The scripted scam warning that fits what was said, ignoring ordinary scripts that might outrank it in this app. */

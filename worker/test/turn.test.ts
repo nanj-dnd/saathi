@@ -13,6 +13,8 @@ const reply: Guide = {
   status: "next_step",
   danger: "none",
   expect: "",
+  action: "",
+  action_arg: "",
 };
 const askGuide = vi.fn(async () => reply);
 vi.mock("../src/guide.ts", async (orig) => ({ ...(await orig<typeof import("../src/guide.ts")>()), askGuide }));

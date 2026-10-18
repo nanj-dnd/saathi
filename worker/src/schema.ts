@@ -47,6 +47,15 @@ export type GuideStatus =
 
 export type Danger = "none" | "scam_suspected" | "sensitive_screen";
 
+/**
+ * The only things Saathi may do itself, never a tap: scroll the main list down, open an app, or open
+ * an app's install page in the Play Store. "" is none. The phone checks it can before doing it.
+ */
+export type GuideAction = "" | "scroll_down" | "open_app" | "open_store_page";
+const ACTIONS = new Set<GuideAction>(["scroll_down", "open_app", "open_store_page"]);
+/** An Android package name: com.whatsapp, in.swiggy.android. */
+const PACKAGE = /^[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z0-9_]+)+$/;
+
 export interface Guide {
   say: string;
   goal: string;
@@ -58,6 +67,10 @@ export interface Guide {
   status: GuideStatus;
   danger: Danger;
   expect: string;
+  /** Something Saathi does for the senior instead of asking them to; see [GuideAction]. */
+  action?: GuideAction;
+  /** The package for open_app / open_store_page. */
+  action_arg?: string;
 }
 
 /** Who answered: the model, the shared cache, or a dev stand-in. The phone adds its own sources. */
@@ -84,6 +97,8 @@ export const GUIDE_JSON_SCHEMA = {
     "status",
     "danger",
     "expect",
+    "action",
+    "action_arg",
   ],
   properties: {
     say: {
@@ -121,6 +136,15 @@ export const GUIDE_JSON_SCHEMA = {
     expect: {
       type: "string",
       description: "In English, what the screen should show after the senior does this step.",
+    },
+    action: {
+      type: "string",
+      enum: ["none", "scroll_down", "open_app", "open_store_page"],
+      description: "Something Saathi does itself instead of asking the senior. Usually none.",
+    },
+    action_arg: {
+      type: "string",
+      description: "Android package name for open_app or open_store_page (e.g. com.whatsapp), else empty.",
     },
   },
 } as const;
@@ -198,6 +222,16 @@ export function normaliseGuide(raw: unknown, nodeIds: Set<string>): Guide {
     y = -1;
   }
 
+  // Actions are harmless moves, but still never on a warning or a screen that is the senior's alone,
+  // never with something to point at (then the senior acts), and only with a real package name.
+  let action = String(g.action ?? "none") as GuideAction;
+  let actionArg = String(g.action_arg ?? "").trim();
+  if (!ACTIONS.has(action)) action = "";
+  const risky = danger === "scam_suspected" || danger === "sensitive_screen" || status === "user_must_do";
+  if (action && (risky || kind !== "none")) action = "";
+  if (action && action !== "scroll_down" && !PACKAGE.test(actionArg)) action = "";
+  if (action !== "open_app" && action !== "open_store_page") actionArg = "";
+
   return {
     say: String(g.say ?? "").trim(),
     goal: String(g.goal ?? "").trim(),
@@ -209,6 +243,8 @@ export function normaliseGuide(raw: unknown, nodeIds: Set<string>): Guide {
     status: STATUSES.has(status) ? status : "next_step",
     danger: danger === "scam_suspected" || danger === "sensitive_screen" ? danger : "none",
     expect: String(g.expect ?? ""),
+    action,
+    action_arg: actionArg,
   };
 }
 
