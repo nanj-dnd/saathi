@@ -34,6 +34,13 @@ class MemoryStorage {
 
 const MP3 = "ID3-fake-mp3";
 let sarvam: ReturnType<typeof vi.fn>;
+/** A SPEECH binding: one in-memory store, as "clips" is the only name used. */
+function speechNamespace() {
+  const clips = new Map<string, ArrayBuffer>();
+  const store = { read: async (k: string) => clips.get(k) ?? null, write: async (k: string, v: ArrayBuffer) => void clips.set(k, v) };
+  return { clips, idFromName: () => "clips", get: () => store };
+}
+
 let env: Record<string, unknown>;
 let pending: Promise<unknown>[];
 let token: string;
@@ -55,7 +62,8 @@ beforeEach(async () => {
     SARVAM_API_KEY: "k",
     USAGE: new MemoryKV(),
     GUIDE_CACHE: new MemoryKV(),
-    SPEND: { idFromName: () => "speech", get: () => guard },
+    SPEND: { idFromName: () => "global", get: () => guard },
+    SPEECH: speechNamespace(),
   };
   token = await issueToken("s");
   sarvam = vi.fn(async () => new Response(JSON.stringify({ audios: [btoa(MP3)] })));
@@ -79,6 +87,15 @@ describe("/speak", () => {
     const again = await worker.fetch(speakReq({ text: "'Display & touch' पर दबाइए।", language: "hi-IN" }), env as never, ctx());
     expect(again.headers.get("X-Saathi-Source")).toBe("cache");
     expect(sarvam).toHaveBeenCalledTimes(1);
+  });
+
+  it("still serves lines cached in KV before the speech store existed", async () => {
+    const req = parseSpeakRequest({ text: "पुरानी लाइन", language: "hi-IN" });
+    await (env.GUIDE_CACHE as MemoryKV).put(await speechKey(req, "priya"), new TextEncoder().encode("old-mp3").buffer);
+    const res = await worker.fetch(speakReq({ text: "पुरानी लाइन", language: "hi-IN" }), env as never, ctx());
+    expect(res.headers.get("X-Saathi-Source")).toBe("cache");
+    expect(new TextDecoder().decode(await res.arrayBuffer())).toBe("old-mp3");
+    expect(sarvam).not.toHaveBeenCalled();
   });
 
   it("answers 501 without a Sarvam key, so the phone uses its own voice", async () => {

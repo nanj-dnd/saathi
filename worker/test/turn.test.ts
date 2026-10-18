@@ -75,6 +75,13 @@ const body = {
   history: [],
 };
 
+/** A SPEECH binding: one in-memory store, as "clips" is the only name used. */
+function speechNamespace() {
+  const clips = new Map<string, ArrayBuffer>();
+  const store = { read: async (k: string) => clips.get(k) ?? null, write: async (k: string, v: ArrayBuffer) => void clips.set(k, v) };
+  return { clips, idFromName: () => "clips", get: () => store };
+}
+
 let env: Record<string, unknown>;
 let pending: Promise<unknown>[];
 const ctx = () => ({ waitUntil: (p: Promise<unknown>) => pending.push(p), passThroughOnException() {} }) as unknown as ExecutionContext;
@@ -109,6 +116,7 @@ beforeEach(async () => {
     GUIDE_CACHE: new MemoryKV(),
     GLOBAL_DAILY_LIMIT: "3000",
     SPEND: spendNamespace(),
+    SPEECH: speechNamespace(),
   };
 });
 

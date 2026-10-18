@@ -1,11 +1,12 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { issueToken, underDailyLimit, verifyToken } from "./auth.ts";
+import { issueToken, verifyToken } from "./auth.ts";
 import { demoGuide } from "./demo.ts";
 import { readShared, shareable, sharedKey, writeShared } from "./cache.ts";
 import { askGuide, mockGuide } from "./guide.ts";
 import { SpendGuard, today } from "./spend.ts";
+import { SpeechStore } from "./speech-store.ts";
 import recipeBundle from "./recipe-bundle.json";
-import { BadSpeakRequest, DEFAULT_SPEAKER, parseSpeakRequest, readSpeech, speechKey, synthesize, UpstreamError, writeSpeech } from "./speech.ts";
+import { BadSpeakRequest, DEFAULT_SPEAKER, parseSpeakRequest, readSpeech, speechKey, synthesize, UpstreamError } from "./speech.ts";
 import { BadRequest, parseTurnRequest, type Guide, type Source, type TurnResponse } from "./schema.ts";
 
 // Listening happens on the phone (Android SpeechRecognizer), so a turn is one model call: screen +
@@ -21,6 +22,8 @@ export interface Env {
   /** Model calls per day across all phones; a ceiling on the Anthropic bill. */
   GLOBAL_DAILY_LIMIT: string;
   SPEND: DurableObjectNamespace<SpendGuard>;
+  /** The natural voice's shared cache (src/speech-store.ts). */
+  SPEECH: DurableObjectNamespace<SpeechStore>;
   /** "1" = scripted Settings walkthrough for recording demos (src/demo.ts). Local only. */
   DEMO?: string;
   USAGE: KVNamespace;
@@ -36,12 +39,14 @@ export interface Env {
   DEVICE_SPEECH_LIMIT?: string;
 }
 
-export { SpendGuard };
+export { SpendGuard, SpeechStore };
 
-function underGlobalLimit(env: Env): Promise<boolean> {
-  const guard = env.SPEND.get(env.SPEND.idFromName("global"));
-  return guard.take(today(), Number(env.GLOBAL_DAILY_LIMIT) || 3000);
+/** Takes one call from a daily budget kept by the SpendGuard (see its take()). */
+function under(env: Env, counter: string, limit: number): Promise<boolean> {
+  return env.SPEND.get(env.SPEND.idFromName("global")).take(today(), limit, counter);
 }
+
+const underGlobalLimit = (env: Env) => under(env, "day", Number(env.GLOBAL_DAILY_LIMIT) || 3000);
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -76,7 +81,7 @@ export default {
     if (!deviceId) return json({ error: "unauthorised" }, 401);
     if (url.pathname === "/speak") return speak(request, env, ctx, deviceId);
     // The daily limit guards model spend, so it is counted only for turns that reach the model.
-    const allowed = () => underDailyLimit(env.USAGE, deviceId, Number(env.DAILY_TURN_LIMIT) || 300);
+    const allowed = () => under(env, `turns-${deviceId}`, Number(env.DAILY_TURN_LIMIT) || 300);
 
     try {
       const req = parseTurnRequest(await request.json());
@@ -144,21 +149,20 @@ async function speak(request: Request, env: Env, ctx: ExecutionContext, deviceId
   const audio = (body: ArrayBuffer, source: string) =>
     new Response(body, { headers: { "Content-Type": "audio/mpeg", "X-Saathi-Source": source } });
 
-  const cache = env.GUIDE_CACHE;
   const key = await speechKey(req, speaker);
-  const hit = cache ? await readSpeech(cache, key) : null;
+  const store = env.SPEECH.get(env.SPEECH.idFromName("clips"));
+  // Lines cached in KV before the store existed are still served from there.
+  const hit = (await store.read(key)) ?? (env.GUIDE_CACHE ? await readSpeech(env.GUIDE_CACHE, key) : null);
   if (hit) return audio(hit, "cache");
 
   // Only new lines cost money, so only they count against the limits.
-  const perDevice = Number(env.DEVICE_SPEECH_LIMIT) || 400;
-  if (!(await underDailyLimit(env.USAGE, `speech:${deviceId}`, perDevice))) return json({ error: "daily limit reached" }, 429);
-  const guard = env.SPEND.get(env.SPEND.idFromName("speech"));
-  if (!(await guard.take(today(), Number(env.SPEECH_DAILY_LIMIT) || 4000))) return json({ error: "busy" }, 503);
+  if (!(await under(env, `speech-${deviceId}`, Number(env.DEVICE_SPEECH_LIMIT) || 400))) return json({ error: "daily limit reached" }, 429);
+  if (!(await under(env, "speech", Number(env.SPEECH_DAILY_LIMIT) || 4000))) return json({ error: "busy" }, 503);
   try {
     const t0 = Date.now();
     const body = await synthesize(env.SARVAM_API_KEY, req, speaker);
     console.log(JSON.stringify({ deviceId, speech: req.language, chars: req.text.length, ms: Date.now() - t0 }));
-    if (cache) ctx.waitUntil(writeSpeech(cache, key, body).catch((e) => console.error(`speech not cached: ${e.message}`)));
+    ctx.waitUntil(store.write(key, body).catch((e) => console.error(`speech not cached: ${e.message}`)));
     return audio(body, "sarvam");
   } catch (err) {
     if (err instanceof UpstreamError) {

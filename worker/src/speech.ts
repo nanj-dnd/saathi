@@ -1,14 +1,13 @@
 import { LANGUAGES, type Language } from "./schema.ts";
 
 // Natural voices from Sarvam (bulbul), for the phone to play instead of its own text-to-speech.
-// Every line is cached: recipe steps are fixed sentences, so each one is paid for once, ever,
-// across every phone. Only the model's own replies are new text.
+// Every line is cached (src/speech-store.ts): recipe steps are fixed sentences, so each one is paid
+// for once, ever, across every phone. Only the model's own replies are new text.
 
 export const SPEECH_MODEL = "bulbul:v3";
 export const DEFAULT_SPEAKER = "priya";
 /** Longest line accepted, in characters. Captions are a sentence or two; this is generous. */
 export const MAX_TEXT = 600;
-const TTL_SECONDS = 60 * 60 * 24 * 90;
 
 export class UpstreamError extends Error {
   constructor(readonly status: number, detail: string) {
@@ -48,13 +47,11 @@ export async function speechKey(req: SpeakRequest, speaker: string): Promise<str
   return `tts:${hex}`;
 }
 
+/** Lines cached in KV before SpeechStore existed. */
 export async function readSpeech(cache: KVNamespace, key: string): Promise<ArrayBuffer | null> {
   return cache.get(key, "arrayBuffer");
 }
 
-export async function writeSpeech(cache: KVNamespace, key: string, audio: ArrayBuffer): Promise<void> {
-  await cache.put(key, audio, { expirationTtl: TTL_SECONDS });
-}
 
 /** Asks Sarvam for [req] in [speaker]'s voice and returns MP3 bytes. */
 export async function synthesize(apiKey: string, req: SpeakRequest, speaker: string): Promise<ArrayBuffer> {
