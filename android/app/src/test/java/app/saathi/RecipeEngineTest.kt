@@ -112,7 +112,7 @@ class RecipeEngineTest {
         val home = opener.guide(req(launcher, app = "com.miui.home", utterance = "अक्षर बड़े करने हैं"))!!
         assertEquals(Action.OPEN_APP, home.action)
         assertEquals("com.android.settings", home.actionArg)
-        assertEquals("'Settings' खोल रहा हूँ।", home.say)
+        assertEquals("'Settings' खोल रही हूँ।", home.say)
 
         val fromAnotherApp = opener.guide(req(launcher, app = "com.google.android.youtube", utterance = "अक्षर बड़े करने हैं"))!!
         assertEquals(Action.OPEN_APP, fromAnotherApp.action)

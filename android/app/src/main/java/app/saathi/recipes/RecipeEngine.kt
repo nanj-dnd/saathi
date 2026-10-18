@@ -150,9 +150,9 @@ class RecipeEngine(
         /** The step id recipes give their "slide the screen up" step. */
         const val SCROLL_STEP = "scroll"
 
-        /** Said while Saathi opens the app; a recipe bundle's "opening" common line overrides it. */
+        /** Said while Saathi opens the app; a recipe bundle's "opening" common line overrides it. Hindi is feminine: the voice is a woman's. */
         val OPENING = mapOf(
-            "hi-IN" to "'{app}' खोल रहा हूँ।",
+            "hi-IN" to "'{app}' खोल रही हूँ।",
             "en-IN" to "Opening '{app}' for you.",
             "ta-IN" to "'{app}' ஐத் திறக்கிறேன்.",
             "te-IN" to "'{app}' తెరుస్తున్నాను.",
