@@ -147,6 +147,22 @@ class LocalFirstBrainTest {
         assertEquals(3, remote.calls.size)
     }
 
+    @Test fun `offline, a scam-looking question still gets the scripted warning`() = runTest {
+        val remote = FakeRemote(addMilk)
+        val b = brain(remote, books = book)
+        val kyc = req(RecipeEngineTest.settingsHome, app = "com.whatsapp", utterance = "KYC अपडेट करने का मैसेज आया है")
+        assertEquals(Source.MODEL, b.turn(kyc).source) // online, the model sees the screen and warns
+
+        remote.fail = true
+        val r = b.turn(kyc)
+        assertEquals(Source.RECIPE, r.source)
+        assertEquals(Danger.SCAM, r.guide.danger)
+
+        // An ordinary script is not given on a scam-looking screen, even offline.
+        val scam = RecipeEngineTest.settingsHome + "\nn99 TextView \"Your KYC expires today\" [0,100,1080,200]"
+        assertTrue(runCatching { b.turn(req(scam, utterance = "अक्षर बड़े करने हैं")) }.exceptionOrNull() is IOException)
+    }
+
     @Test fun `screens that are mostly a picture are not cached`() = runTest {
         val remote = FakeRemote(addMilk)
         val b = brain(remote)

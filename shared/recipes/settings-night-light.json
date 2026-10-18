@@ -1,0 +1,196 @@
+{
+  "id": "settings-night-light",
+  "version": 1,
+  "goal": "turn on Night Light to rest the eyes",
+  "apps": [
+    "com.android.settings"
+  ],
+  "app_label": "Settings",
+  "app_names": [
+    "Settings",
+    "सेटिंग",
+    "सेटिंग्स",
+    "அமைப்புகள்",
+    "సెట్టింగ్‌లు",
+    "ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
+    "ക്രമീകരണങ്ങൾ"
+  ],
+  "triggers": [
+    {
+      "all": [
+        [
+          "night light",
+          "नाइट लाइट",
+          "आँखों को आराम",
+          "आंखों को आराम",
+          "आँखों पर ज़ोर",
+          "आंखों पर जोर",
+          "eye comfort",
+          "reading mode",
+          "blue light",
+          "நைட் லைட்",
+          "கண்ணுக்கு இதமான",
+          "నైట్ లైట్",
+          "కళ్ళకు హాయి",
+          "ನೈಟ್ ಲೈಟ್",
+          "ಕಣ್ಣಿಗೆ ಹಿತ",
+          "നൈറ്റ് ലൈറ്റ്",
+          "കണ്ണിന് ആശ്വാസ"
+        ]
+      ]
+    }
+  ],
+  "unless": [
+    "off",
+    "बंद",
+    "ऑफ",
+    "ஆஃப்",
+    "அணை",
+    "నిలిపి",
+    "ఆఫ్",
+    "ಆಫ್",
+    "ഓഫ്",
+    "ఆపు",
+    "ఆపే",
+    "ఆపాలి",
+    "ఆపండి",
+    "తీసేయ",
+    "ഓഫാ",
+    "കെടുത്ത"
+  ],
+  "examples": {
+    "hi-IN": [
+      "आँखों को आराम वाला नाइट लाइट चालू करना है",
+      "night light on karo"
+    ],
+    "en-IN": [
+      "turn on night light"
+    ],
+    "ta-IN": [
+      "நைட் லைட் ஆன் செய்ய வேண்டும்"
+    ],
+    "te-IN": [
+      "నైట్ లైట్ ఆన్ చేయాలి"
+    ],
+    "kn-IN": [
+      "ನೈಟ್ ಲೈಟ್ ಆನ್ ಮಾಡಬೇಕು"
+    ],
+    "ml-IN": [
+      "നൈറ്റ് ലൈറ്റ് ഓണാക്കണം"
+    ]
+  },
+  "steps": [
+    {
+      "id": "done",
+      "switch": [
+        "Use Night Light",
+        "Eye comfort shield",
+        "Night Light",
+        "Night light",
+        "Reading mode",
+        "Eye comfort"
+      ],
+      "switch_is": "on",
+      "status": "done",
+      "say": {
+        "hi-IN": "आँखों को आराम देने वाली पीली रोशनी चालू है। रात में पढ़ने में आसानी होगी।",
+        "en-IN": "The soft yellow light that rests your eyes is on. Reading at night will be easier.",
+        "ta-IN": "கண்ணுக்கு இதமான மஞ்சள் ஒளி இயக்கத்தில் உள்ளது. இரவில் படிக்க எளிதாக இருக்கும்.",
+        "te-IN": "కళ్ళకు హాయినిచ్చే పసుపు వెలుతురు ఆన్‌లో ఉంది. రాత్రి చదవడం సులువు.",
+        "kn-IN": "ಕಣ್ಣಿಗೆ ಹಿತ ನೀಡುವ ಹಳದಿ ಬೆಳಕು ಆನ್ ಆಗಿದೆ. ರಾತ್ರಿ ಓದಲು ಸುಲಭ.",
+        "ml-IN": "കണ്ണിന് ആശ്വാസം നൽകുന്ന മഞ്ഞ വെളിച്ചം ഓണാണ്. രാത്രി വായിക്കാൻ എളുപ്പമാകും."
+      }
+    },
+    {
+      "id": "switch",
+      "switch": [
+        "Use Night Light",
+        "Eye comfort shield",
+        "Night Light",
+        "Night light",
+        "Reading mode",
+        "Eye comfort"
+      ],
+      "switch_is": "off",
+      "tap_switch": true,
+      "say": {
+        "hi-IN": "'{label}' के सामने वाला बटन दबाइए, वह चालू हो जाएगा।",
+        "en-IN": "Press the switch next to '{label}' to turn it on.",
+        "ta-IN": "'{label}' அருகே உள்ள பொத்தானை அழுத்துங்கள், அது இயங்கும்.",
+        "te-IN": "'{label}' పక్కన ఉన్న బటన్ నొక్కండి, అది ఆన్ అవుతుంది.",
+        "kn-IN": "'{label}' ಪಕ್ಕದ ಬಟನ್ ಒತ್ತಿ, ಅದು ಆನ್ ಆಗುತ್ತದೆ.",
+        "ml-IN": "'{label}'-ന് അടുത്തുള്ള ബട്ടൺ അമർത്തുക, അത് ഓണാകും."
+      }
+    },
+    {
+      "id": "row",
+      "target": [
+        "Night Light",
+        "Night light",
+        "Eye comfort shield",
+        "Reading mode",
+        "Eye comfort"
+      ],
+      "say": {
+        "hi-IN": "'{label}' पर दबाइए।",
+        "en-IN": "Press '{label}'.",
+        "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
+        "te-IN": "'{label}' నొక్కండి.",
+        "kn-IN": "'{label}' ಒತ್ತಿ.",
+        "ml-IN": "'{label}' അമർത്തുക."
+      }
+    },
+    {
+      "id": "open",
+      "screen_has": [
+        [
+          "Network & internet",
+          "Connections",
+          "Connected devices",
+          "Battery",
+          "Notifications",
+          "Sound & vibration",
+          "Sounds and vibration",
+          "Apps"
+        ]
+      ],
+      "target": [
+        "Display",
+        "Display & brightness",
+        "Display and brightness"
+      ],
+      "say": {
+        "hi-IN": "'{label}' पर दबाइए।",
+        "en-IN": "Press '{label}'.",
+        "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
+        "te-IN": "'{label}' నొక్కండి.",
+        "kn-IN": "'{label}' ಒತ್ತಿ.",
+        "ml-IN": "'{label}' അമർത്തുക."
+      }
+    },
+    {
+      "id": "scroll",
+      "screen_has": [
+        [
+          "Network & internet",
+          "Connections",
+          "Connected devices",
+          "Battery",
+          "Notifications",
+          "Sound & vibration",
+          "Sounds and vibration",
+          "Apps"
+        ]
+      ],
+      "max_repeats": 4,
+      "say": {
+        "hi-IN": "स्क्रीन पर उंगली रखकर ऊपर की ओर सरकाइए।",
+        "en-IN": "Put your finger on the screen and slide it upwards.",
+        "ta-IN": "திரையில் விரலை வைத்து மேலே தள்ளுங்கள்.",
+        "te-IN": "స్క్రీన్‌పై వేలు పెట్టి పైకి జరపండి.",
+        "kn-IN": "ಪರದೆಯ ಮೇಲೆ ಬೆರಳಿಟ್ಟು ಮೇಲಕ್ಕೆ ಸರಿಸಿ.",
+        "ml-IN": "സ്ക്രീനിൽ വിരൽ വെച്ച് മുകളിലേക്ക് നീക്കുക."
+      }
+    }
+  ]
+}
