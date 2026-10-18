@@ -76,6 +76,15 @@ class WorkerClient(
         }
     }
 
+    /** Opens (or keeps open) the connection to the Worker, so the next request skips the handshake. */
+    suspend fun warm() = withContext(Dispatchers.IO) {
+        runCatching {
+            val req = Request.Builder().url(baseUrl.trimEnd('/') + "/ping").get().build()
+            http.newCall(req).await().close()
+        }
+        Unit
+    }
+
     /** The Worker's current recipe bundle (shared/recipes), as JSON. */
     suspend fun fetchRecipes(): String = withContext(Dispatchers.IO) {
         val req = Request.Builder().url(baseUrl.trimEnd('/') + "/recipes").get().build()

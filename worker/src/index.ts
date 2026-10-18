@@ -60,6 +60,10 @@ export default {
         headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "public, max-age=3600" },
       });
     }
+    if (request.method === "GET" && url.pathname === "/ping") {
+      // Phones call this when the senior taps Help, so the connection is open before speech is needed.
+      return new Response(null, { status: 204 });
+    }
     if (request.method !== "POST") return json({ error: "not found" }, 404);
 
     if (url.pathname === "/register") {

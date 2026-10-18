@@ -76,11 +76,14 @@ interface Hands {
     suspend fun scrollDown(): Boolean
     /** Opens [pkg] as its home-screen icon would. */
     fun openApp(pkg: String): Boolean
+    /** Opens [pkg]'s install page in the Play Store. */
+    fun openStorePage(pkg: String): Boolean
 }
 
 object NoHands : Hands {
     override suspend fun scrollDown() = false
     override fun openApp(pkg: String) = false
+    override fun openStorePage(pkg: String) = false
 }
 
 /** Localised lines the session speaks without asking the server. */
@@ -371,10 +374,11 @@ class GuideSession(
             val done = when (guide.action) {
                 Action.SCROLL_DOWN -> hands.scrollDown()
                 Action.OPEN_APP -> hands.openApp(guide.actionArg)
+                Action.OPEN_STORE_PAGE -> hands.openStorePage(guide.actionArg)
                 else -> false
             }
             if (!done) return@coroutineScope false
-            val line = if (guide.action == Action.OPEN_APP) guide.say else lines().scrolling
+            val line = if (guide.action == Action.SCROLL_DOWN) lines().scrolling else guide.say
             // A run of scrolls is announced once, not every page.
             val repeated = history.size >= 2 && history[history.size - 2].say == guide.say
             pointer.point(null, line, Danger.NONE)
@@ -390,8 +394,10 @@ class GuideSession(
             // runTurn turns THINKING straight away, which ignores screen events on its own.
             acting = false
         }
-        if (autoTurns >= MAX_AUTO_TURNS) {
+        if (guide.status == Status.DONE || autoTurns >= MAX_AUTO_TURNS) {
+            // Opening an app that was asked for is the whole task: let the line finish, then rest.
             speaking?.join()
+            if (guide.status == Status.DONE) delay(readingTimeMs(guide.say))
             reset()
             return@coroutineScope true
         }

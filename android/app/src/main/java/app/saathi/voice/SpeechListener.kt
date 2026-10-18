@@ -9,6 +9,8 @@ import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import android.util.Log
+import app.saathi.BuildConfig
 import app.saathi.session.Ears
 import app.saathi.session.Heard
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -46,6 +48,11 @@ class SpeechListener(
             SpeechRecognizer.createSpeechRecognizer(context)
         }
         recognizer = sr
+        val t0 = System.currentTimeMillis()
+        fun trace(what: String) {
+            if (BuildConfig.DEBUG) Log.d("Saathi", "listen +${System.currentTimeMillis() - t0}ms $what")
+        }
+        trace(if (onDevice) "start (on device)" else "start")
         try {
             return suspendCancellableCoroutine { cont ->
                 fun done(heard: Heard) {
@@ -54,14 +61,21 @@ class SpeechListener(
                 sr.setRecognitionListener(object : RecognitionListener {
                     override fun onResults(results: Bundle) {
                         val text = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull()?.trim()
+                        trace("heard \"${text.orEmpty()}\"")
                         done(if (text.isNullOrEmpty()) Heard.Silence else Heard.Words(text))
                     }
-                    override fun onError(error: Int) = done(outcome(error, online))
-                    override fun onReadyForSpeech(params: Bundle?) = onReady()
-                    override fun onBeginningOfSpeech() {}
+                    override fun onError(error: Int) {
+                        trace("error $error")
+                        done(outcome(error, online))
+                    }
+                    override fun onReadyForSpeech(params: Bundle?) {
+                        trace("mic open")
+                        onReady()
+                    }
+                    override fun onBeginningOfSpeech() = trace("speech began")
                     override fun onRmsChanged(rmsdB: Float) {}
                     override fun onBufferReceived(buffer: ByteArray?) {}
-                    override fun onEndOfSpeech() {}
+                    override fun onEndOfSpeech() = trace("speech ended")
                     override fun onPartialResults(partialResults: Bundle?) {}
                     override fun onEvent(eventType: Int, params: Bundle?) {}
                 })

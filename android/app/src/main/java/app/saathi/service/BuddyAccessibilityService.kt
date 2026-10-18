@@ -22,12 +22,16 @@ import app.saathi.brain.FileCacheStore
 import app.saathi.brain.LocalFirstBrain
 import app.saathi.brain.TurnCache
 import app.saathi.capture.ScreenReader
+import app.saathi.net.Source
+import app.saathi.net.TurnRequest
+import app.saathi.net.TurnResponse
 import app.saathi.net.WorkerClient
 import app.saathi.overlay.OverlayController
 import app.saathi.playbooks.PlaybookStore
 import app.saathi.recipes.RecipeSource
 import app.saathi.safety.ScamGuard
 import app.saathi.session.GuideSession
+import app.saathi.session.Brain
 import app.saathi.session.Hands
 import app.saathi.session.Lines
 import app.saathi.session.ScreenEvent
@@ -36,6 +40,7 @@ import app.saathi.voice.SpeechListener
 import app.saathi.voice.Speaker
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
@@ -68,7 +73,7 @@ class BuddyAccessibilityService : AccessibilityService() {
         )
         speaker = Speaker(this, language = { prefs.language }, rate = { prefs.speechRate }, cloud = CloudVoice(this, worker::speak))
         // Scripted recipes, then answers this phone already got, then the Worker.
-        val brain = LocalFirstBrain(
+        val local = LocalFirstBrain(
             recipes = { recipes.book },
             cache = TurnCache(FileCacheStore(File(cacheDir, "turn-cache.json"))),
             remote = worker,
@@ -76,11 +81,27 @@ class BuddyAccessibilityService : AccessibilityService() {
             log = { if (BuildConfig.DEBUG) Log.d(TAG, it) },
             canOpen = { packageManager.getLaunchIntentForPackage(it) != null },
         )
+        // Once a recipe is running, its other lines are fetched in the natural voice while the senior
+        // acts, so every step of a task sounds the same and plays at once.
+        val brain = object : Brain {
+            private var prefetching: Job? = null
+            override suspend fun turn(request: TurnRequest): TurnResponse {
+                val response = local.turn(request)
+                val recipe = recipes.book.byGoal(response.guide.goal)
+                if (response.source == Source.RECIPE && recipe != null && prefetching?.isActive != true) {
+                    val lines = recipe.steps.mapNotNull { it.say[request.language] }
+                        .filter { "{" !in it && it != response.guide.say }
+                    prefetching = scope.launch { speaker.prefetch(lines) }
+                }
+                return response
+            }
+        }
         scope.launch {
             withContext(Dispatchers.IO) { recipes.load() }
             refreshRecipes(recipes, worker)
         }
         scope.launch { speaker.warmUp() }
+        scope.launch { worker.warm() }
         overlay = OverlayController(
             service = this,
             prefs = prefs,
@@ -95,7 +116,10 @@ class BuddyAccessibilityService : AccessibilityService() {
             ears = SpeechListener(
                 context = this,
                 language = { prefs.language },
-                onStart = { MicService.start(this) },
+                onStart = {
+                    MicService.start(this)
+                    scope.launch { worker.warm() }
+                },
                 onEnd = { MicService.stop(this) },
                 onReady = { overlay.listeningCue() },
             ),
@@ -151,6 +175,14 @@ class BuddyAccessibilityService : AccessibilityService() {
             val launch = packageManager.getLaunchIntentForPackage(pkg) ?: return false
             return runCatching { startActivity(launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }.isSuccess
         }
+
+        override fun openStorePage(pkg: String): Boolean = runCatching {
+            startActivity(
+                Intent(Intent.ACTION_VIEW, android.net.Uri.parse("market://details?id=$pkg"))
+                    .setPackage("com.android.vending")
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+            )
+        }.isSuccess
     }
 
     /**

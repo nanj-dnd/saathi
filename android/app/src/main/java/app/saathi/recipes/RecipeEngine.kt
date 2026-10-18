@@ -17,8 +17,11 @@ import app.saathi.safety.ScreenSafety
  */
 class RecipeEngine(
     private val book: RecipeBook,
-    /** True if this phone can open [pkg] directly (it has a launcher entry). */
-    private val canOpen: (pkg: String) -> Boolean = { false },
+    /**
+     * True if this phone can open [pkg] directly (it has a launcher entry). Null when unknown (tests,
+     * tools): then Saathi never opens apps itself and never concludes an app is missing.
+     */
+    private val canOpen: ((pkg: String) -> Boolean)? = null,
 ) {
 
     fun guide(req: TurnRequest): Guide? {
@@ -27,6 +30,9 @@ class RecipeEngine(
         // as Wi-Fi from non-tool accessibility services). That is not "outside the app": leave it
         // to the model, which still gets the screenshot.
         if (req.app.isBlank()) return null
+        // A fresh request, spoken or typed (a typed one arrives as a goal with no history yet).
+        val fresh = req.utterance?.takeIf { it.isNotBlank() } ?: req.goal.takeIf { it.isNotBlank() && req.history.isEmpty() }
+        fresh?.let { said -> download(said, req)?.let { return it } }
         val recipe = active(req) ?: return null
         val screen = ScreenText.parse(req.tree)
         val home = recipe.anyApp || req.app in recipe.apps
@@ -111,9 +117,12 @@ class RecipeEngine(
 
     /** Not in the app yet: point at its icon on the home screen, or say how to get there. */
     private fun outside(recipe: Recipe, req: TurnRequest, screen: ScreenText): Guide? {
+        val open = canOpen
+        // The app isn't on this phone: hunting for its icon would never end. Offer its Play Store page.
+        if (open != null && storeApp(recipe) && recipe.apps.none(open)) storePage(recipe, req)?.let { return it }
         // At the start of a task, or from the home screen, Saathi opens the app itself. Mid-task in
         // another app (a share sheet, say) it never pulls the senior away; it says where to go.
-        val pkg = recipe.apps.firstOrNull { it != ANY_APP && canOpen(it) }
+        val pkg = recipe.apps.firstOrNull { it != ANY_APP && open?.invoke(it) == true }
         if (pkg != null && (req.history.isEmpty() || isLauncher(req.app))) {
             val line = (book.common.lines["opening"] ?: OPENING)[req.language] ?: OPENING.getValue("en-IN")
             val say = line.replace("{app}", recipe.appLabel)
@@ -134,6 +143,49 @@ class RecipeEngine(
         return guide(recipe, which, say, icon, icon?.label.orEmpty(), Status.NEXT_STEP, Danger.NONE)
     }
 
+    /**
+     * "Download Blinkit", "I want to install WhatsApp": an app named alongside a download word. Saathi
+     * opens the app if it is already here, or its Play Store page if not, rather than starting that
+     * app's own task. A safety tip ("someone asked me to install an app") still speaks first.
+     */
+    private fun download(said: String, req: TurnRequest): Guide? {
+        val open = canOpen ?: return null
+        val text = ScreenText.norm(said)
+        if (DOWNLOAD_WORDS.none { contains(text, it, wordStart = false) }) return null
+        if (UNINSTALL_WORDS.any { contains(text, it, wordStart = false) }) return null
+        if (match(said, req.app)?.anyApp == true) return null
+        val recipe = book.recipes.firstOrNull { !it.anyApp && storeApp(it) && names(it, text) } ?: return null
+        val installed = recipe.apps.firstOrNull(open)
+        if (installed == null) return storePage(recipe, req)
+        val say = line(ALREADY, req.language).replace("{app}", recipe.appLabel)
+        return Guide(say = say, status = Status.DONE, action = Action.OPEN_APP, actionArg = installed, expect = "download ${recipe.id}/already")
+    }
+
+    /** Opens [recipe]'s app's page in the Play Store, and hands over to the Play Store install recipe. */
+    private fun storePage(recipe: Recipe, req: TurnRequest): Guide? {
+        if (canOpen?.invoke(PLAY_STORE) != true) return null
+        val say = line(NOT_INSTALLED, req.language).replace("{app}", recipe.appLabel)
+        if (repeats(req.history, say) >= OUTSIDE_REPEATS) return null
+        return Guide(
+            say = say,
+            goal = STORE_GOAL,
+            action = Action.OPEN_STORE_PAGE,
+            actionArg = recipe.apps.first(),
+            expect = "download ${recipe.id}/store",
+        )
+    }
+
+    /** True if [text] names [recipe]'s app: its launcher names, or a trigger group that is its name in each language. */
+    private fun names(recipe: Recipe, text: String): Boolean {
+        fun compact(s: String) = ScreenText.norm(s).replace(" ", "")
+        val label = compact(recipe.appLabel)
+        val nameGroups = recipe.triggers.flatMap { it.all }.filter { g -> g.any { compact(it) == label } }
+        val said = compact(text)
+        return (recipe.appNames + recipe.appLabel + nameGroups.flatten()).any { val n = compact(it); n.length >= 3 && n in said }
+    }
+
+    private fun line(lines: Map<String, String>, language: String) = lines[language] ?: lines.getValue("en-IN")
+
     private fun guide(recipe: Recipe, stepId: String, say: String, node: TreeNode?, label: String, status: String, danger: String) = Guide(
         say = say,
         goal = recipe.goal,
@@ -149,6 +201,45 @@ class RecipeEngine(
         const val OUTSIDE_REPEATS = 3
         /** The step id recipes give their "slide the screen up" step. */
         const val SCROLL_STEP = "scroll"
+
+        const val PLAY_STORE = "com.android.vending"
+        /** The goal of shared/recipes/playstore-install.json, which runs on an app's Play Store page. */
+        const val STORE_GOAL = "download an app from the Play Store"
+
+        /**
+         * Packages that come with the phone (and differ by maker), never "missing, go download it":
+         * a phone whose camera is com.lava.camera still has a camera.
+         */
+        private val SYSTEM_PREFIXES = listOf(
+            "com.android.", "com.google.android.", "com.samsung.", "com.sec.", "com.miui.", "com.coloros.",
+            "com.oppo.", "com.vivo.", "com.oneplus.", "com.motorola.", "com.transsion.",
+        )
+
+        fun storeApp(r: Recipe) = !r.anyApp && r.apps.none { p -> SYSTEM_PREFIXES.any { p.startsWith(it) } }
+
+        private val DOWNLOAD_WORDS = listOf(
+            "download", "install", "डाउनलोड", "इंस्टॉल", "इनस्टॉल", "इंस्टाल", "டவுன்லோட்", "இன்ஸ்டால்", "நிறுவ",
+            "డౌన్‌లోడ్", "ఇన్‌స్టాల్", "ಡೌನ್‌ಲೋಡ್", "ಇನ್‌ಸ್ಟಾಲ್", "ഡൗൺലോഡ്", "ഇൻസ്റ്റാൾ",
+        )
+        private val UNINSTALL_WORDS = listOf("uninstall", "अनइंस्टॉल", "அன்இன்ஸ்டால்", "అన్‌ఇన్‌స్టాల్", "ಅನ್‌ಇನ್‌ಸ್ಟಾಲ್", "അൺഇൻസ്റ്റാൾ")
+
+        /** Hindi is feminine: the voice is a woman's. */
+        val NOT_INSTALLED = mapOf(
+            "hi-IN" to "'{app}' अभी इस फ़ोन में नहीं है। Play Store में उसका पेज खोल रही हूँ।",
+            "en-IN" to "'{app}' is not on this phone yet. Opening its page in Play Store.",
+            "ta-IN" to "'{app}' இந்த போனில் இன்னும் இல்லை. Play Store-ல் அதன் பக்கத்தைத் திறக்கிறேன்.",
+            "te-IN" to "'{app}' ఈ ఫోన్‌లో ఇంకా లేదు. Play Store లో దాని పేజీ తెరుస్తున్నాను.",
+            "kn-IN" to "'{app}' ಈ ಫೋನ್‌ನಲ್ಲಿ ಇನ್ನೂ ಇಲ್ಲ. Play Store ನಲ್ಲಿ ಅದರ ಪುಟ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.",
+            "ml-IN" to "'{app}' ഈ ഫോണിൽ ഇതുവരെ ഇല്ല. Play Store-ൽ അതിന്റെ പേജ് തുറക്കുന്നു.",
+        )
+        val ALREADY = mapOf(
+            "hi-IN" to "'{app}' पहले से इस फ़ोन में है। उसे खोल रही हूँ।",
+            "en-IN" to "'{app}' is already on this phone. Opening it for you.",
+            "ta-IN" to "'{app}' ஏற்கனவே இந்த போனில் இருக்கிறது. அதைத் திறக்கிறேன்.",
+            "te-IN" to "'{app}' ఇప్పటికే ఈ ఫోన్‌లో ఉంది. దాన్ని తెరుస్తున్నాను.",
+            "kn-IN" to "'{app}' ಈಗಾಗಲೇ ಈ ಫೋನ್‌ನಲ್ಲಿದೆ. ಅದನ್ನು ತೆರೆಯುತ್ತಿದ್ದೇನೆ.",
+            "ml-IN" to "'{app}' ഇതിനകം ഈ ഫോണിലുണ്ട്. അത് തുറക്കുന്നു.",
+        )
 
         /** Said while Saathi opens the app; a recipe bundle's "opening" common line overrides it. Hindi is feminine: the voice is a woman's. */
         val OPENING = mapOf(

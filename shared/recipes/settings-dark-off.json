@@ -1,152 +1,192 @@
 {
-  "id": "settings-dark-off",
-  "version": 2,
-  "goal": "turn off dark mode",
-  "apps": [
-    "com.android.settings"
-  ],
-  "app_label": "Settings",
-  "app_names": [
-    "Settings",
-    "सेटिंग",
-    "सेटिंग्स",
-    "அமைப்புகள்",
-    "సెట్టింగ్‌లు",
-    "ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
-    "ക്രമീകരണങ്ങൾ"
-  ],
-  "triggers": [
-    {
-      "all": [
-        [
-          "dark mode",
-          "dark theme",
-          "डार्क मोड",
-          "डार्क थीम",
-          "काली स्क्रीन",
-          "स्क्रीन काली",
-          "டார்க் மோட்",
-          "டார்க் தீம்",
-          "డార్క్ మోడ్",
-          "ಡಾರ್ಕ್ ಮೋಡ್",
-          "ഡാർക്ക് മോഡ്"
-        ]
-      ]
-    }
-  ],
-  "unless": [
-    "चालू कर",
-    "ऑन कर",
-    "लगाना"
-  ],
-  "examples": {
-    "hi-IN": [
-      "डार्क मोड हटाना है",
-      "स्क्रीन काली हो गई है"
+ "id": "settings-dark-off",
+ "version": 3,
+ "goal": "turn off dark mode",
+ "apps": [
+  "com.android.settings"
+ ],
+ "app_label": "Settings",
+ "app_names": [
+  "Settings",
+  "सेटिंग",
+  "सेटिंग्स",
+  "அமைப்புகள்",
+  "సెట్టింగ్‌లు",
+  "ಸೆಟ್ಟಿಂಗ್‌ಗಳು",
+  "ക്രമീകരണങ്ങൾ"
+ ],
+ "triggers": [
+  {
+   "all": [
+    [
+     "dark mode",
+     "dark theme",
+     "डार्क मोड",
+     "डार्क थीम",
+     "काली स्क्रीन",
+     "स्क्रीन काली",
+     "டார்க் மோட்",
+     "டார்க் தீம்",
+     "డార్క్ మోడ్",
+     "ಡಾರ್ಕ್ ಮೋಡ್",
+     "ഡാർക്ക് മോഡ്"
     ],
-    "ta-IN": [
-      "டார்க் மோடை அணைக்க வேண்டும்"
-    ],
-    "te-IN": [
-      "డార్క్ మోడ్ తీసేయాలి"
-    ],
-    "kn-IN": [
-      "ಡಾರ್ಕ್ ಮೋಡ್ ತೆಗೆಯಬೇಕು"
-    ],
-    "ml-IN": [
-      "ഡാർക്ക് മോഡ് മാറ്റണം"
-    ],
-    "en-IN": [
-      "remove dark mode"
+    [
+     "off",
+     "band",
+     "बंद",
+     "हटा",
+     "हटाना",
+     "normal",
+     "सामान्य",
+     "light",
+     "सफ़ेद",
+     "सफेद",
+     "அணை",
+     "நிறுத்த",
+     "எடு",
+     "ఆఫ్",
+     "తీసే",
+     "ఆపు",
+     "ಆಫ್",
+     "ತೆಗೆ",
+     "ನಿಲ್ಲಿಸ",
+     "ഓഫ്",
+     "മാറ്റ",
+     "നിർത്ത",
+     "remove",
+     "get rid",
+     "stop"
     ]
+   ]
   },
-  "steps": [
-    {
-      "id": "done",
-      "switch": [
-        "Dark theme",
-        "Dark mode",
-        "Use Dark theme"
-      ],
-      "switch_is": "off",
-      "status": "done",
-      "say": {
-        "hi-IN": "डार्क मोड बंद है। स्क्रीन अब सफ़ेद रहेगी।",
-        "ta-IN": "டார்க் மோட் அணைந்துள்ளது. திரை இனி வெள்ளையாக இருக்கும்.",
-        "te-IN": "డార్క్ మోడ్ ఆఫ్‌లో ఉంది. స్క్రీన్ ఇక తెల్లగా ఉంటుంది.",
-        "kn-IN": "ಡಾರ್ಕ್ ಮೋಡ್ ಆಫ್ ಆಗಿದೆ. ಪರದೆ ಇನ್ನು ಬಿಳಿಯಾಗಿರುತ್ತದೆ.",
-        "ml-IN": "ഡാർക്ക് മോഡ് ഓഫാണ്. സ്ക്രീൻ ഇനി വെളുത്തിരിക്കും.",
-        "en-IN": "Dark mode is off. The screen will stay white now."
-      }
-    },
-    {
-      "id": "switch",
-      "switch": [
-        "Dark theme",
-        "Dark mode",
-        "Use Dark theme"
-      ],
-      "switch_is": "on",
-      "tap_switch": true,
-      "say": {
-        "hi-IN": "'{label}' के सामने वाला बटन दबाकर बंद कीजिए।",
-        "ta-IN": "'{label}' அருகே உள்ள பொத்தானை அழுத்தி அணையுங்கள்.",
-        "te-IN": "'{label}' పక్కన ఉన్న బటన్ నొక్కి ఆఫ్ చేయండి.",
-        "kn-IN": "'{label}' ಪಕ್ಕದ ಬಟನ್ ಒತ್ತಿ ಆಫ್ ಮಾಡಿ.",
-        "ml-IN": "'{label}'-ന് അടുത്തുള്ള ബട്ടൺ അമർത്തി ഓഫാക്കുക.",
-        "en-IN": "Press the switch next to '{label}' to turn it off."
-      }
-    },
-    {
-      "id": "open",
-      "screen_has": [
-        [
-          "Network & internet",
-          "Connections",
-          "Connected devices",
-          "Battery",
-          "Notifications",
-          "Sound & vibration",
-          "Sounds and vibration",
-          "Apps"
-        ]
-      ],
-      "target": [
-        "Display & touch",
-        "Display"
-      ],
-      "say": {
-        "hi-IN": "'{label}' पर दबाइए।",
-        "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
-        "te-IN": "'{label}' నొక్కండి.",
-        "kn-IN": "'{label}' ಒತ್ತಿ.",
-        "ml-IN": "'{label}' അമർത്തുക.",
-        "en-IN": "Press '{label}'."
-      }
-    },
-    {
-      "id": "scroll",
-      "screen_has": [
-        [
-          "Network & internet",
-          "Connections",
-          "Connected devices",
-          "Battery",
-          "Notifications",
-          "Sound & vibration",
-          "Sounds and vibration",
-          "Apps"
-        ]
-      ],
-      "max_repeats": 4,
-      "say": {
-        "hi-IN": "स्क्रीन पर उंगली रखकर ऊपर की ओर सरकाइए।",
-        "ta-IN": "திரையில் விரலை வைத்து மேலே தள்ளுங்கள்.",
-        "te-IN": "స్క్రీన్‌పై వేలు పెట్టి పైకి జరపండి.",
-        "kn-IN": "ಪರದೆಯ ಮೇಲೆ ಬೆರಳಿಟ್ಟು ಮೇಲಕ್ಕೆ ಸರಿಸಿ.",
-        "ml-IN": "സ്ക്രീനിൽ വിരൽ വെച്ച് മുകളിലേക്ക് നീക്കുക.",
-        "en-IN": "Put your finger on the screen and slide it upwards."
-      }
-    }
+  {
+   "all": [
+    [
+     "काली स्क्रीन",
+     "स्क्रीन काली"
+    ]
+   ]
+  }
+ ],
+ "unless": [
+  "enable",
+  "on kar",
+  "switch on",
+  "turn on",
+  "ऑन कर",
+  "चालू",
+  "चालू कर",
+  "लगाना"
+ ],
+ "examples": {
+  "hi-IN": [
+   "डार्क मोड हटाना है",
+   "स्क्रीन काली हो गई है"
+  ],
+  "ta-IN": [
+   "டார்க் மோடை அணைக்க வேண்டும்"
+  ],
+  "te-IN": [
+   "డార్క్ మోడ్ తీసేయాలి"
+  ],
+  "kn-IN": [
+   "ಡಾರ್ಕ್ ಮೋಡ್ ತೆಗೆಯಬೇಕು"
+  ],
+  "ml-IN": [
+   "ഡാർക്ക് മോഡ് മാറ്റണം"
+  ],
+  "en-IN": [
+   "remove dark mode"
   ]
+ },
+ "steps": [
+  {
+   "id": "done",
+   "switch": [
+    "Dark theme",
+    "Dark mode",
+    "Use Dark theme"
+   ],
+   "switch_is": "off",
+   "status": "done",
+   "say": {
+    "hi-IN": "डार्क मोड बंद है। स्क्रीन अब सफ़ेद रहेगी।",
+    "ta-IN": "டார்க் மோட் அணைந்துள்ளது. திரை இனி வெள்ளையாக இருக்கும்.",
+    "te-IN": "డార్క్ మోడ్ ఆఫ్‌లో ఉంది. స్క్రీన్ ఇక తెల్లగా ఉంటుంది.",
+    "kn-IN": "ಡಾರ್ಕ್ ಮೋಡ್ ಆಫ್ ಆಗಿದೆ. ಪರದೆ ಇನ್ನು ಬಿಳಿಯಾಗಿರುತ್ತದೆ.",
+    "ml-IN": "ഡാർക്ക് മോഡ് ഓഫാണ്. സ്ക്രീൻ ഇനി വെളുത്തിരിക്കും.",
+    "en-IN": "Dark mode is off. The screen will stay white now."
+   }
+  },
+  {
+   "id": "switch",
+   "switch": [
+    "Dark theme",
+    "Dark mode",
+    "Use Dark theme"
+   ],
+   "switch_is": "on",
+   "tap_switch": true,
+   "say": {
+    "hi-IN": "'{label}' के सामने वाला बटन दबाकर बंद कीजिए।",
+    "ta-IN": "'{label}' அருகே உள்ள பொத்தானை அழுத்தி அணையுங்கள்.",
+    "te-IN": "'{label}' పక్కన ఉన్న బటన్ నొక్కి ఆఫ్ చేయండి.",
+    "kn-IN": "'{label}' ಪಕ್ಕದ ಬಟನ್ ಒತ್ತಿ ಆಫ್ ಮಾಡಿ.",
+    "ml-IN": "'{label}'-ന് അടുത്തുള്ള ബട്ടൺ അമർത്തി ഓഫാക്കുക.",
+    "en-IN": "Press the switch next to '{label}' to turn it off."
+   }
+  },
+  {
+   "id": "open",
+   "screen_has": [
+    [
+     "Network & internet",
+     "Connections",
+     "Connected devices",
+     "Battery",
+     "Notifications",
+     "Sound & vibration",
+     "Sounds and vibration",
+     "Apps"
+    ]
+   ],
+   "target": [
+    "Display & touch",
+    "Display"
+   ],
+   "say": {
+    "hi-IN": "'{label}' पर दबाइए।",
+    "ta-IN": "'{label}' ஐ அழுத்துங்கள்.",
+    "te-IN": "'{label}' నొక్కండి.",
+    "kn-IN": "'{label}' ಒತ್ತಿ.",
+    "ml-IN": "'{label}' അമർത്തുക.",
+    "en-IN": "Press '{label}'."
+   }
+  },
+  {
+   "id": "scroll",
+   "screen_has": [
+    [
+     "Network & internet",
+     "Connections",
+     "Connected devices",
+     "Battery",
+     "Notifications",
+     "Sound & vibration",
+     "Sounds and vibration",
+     "Apps"
+    ]
+   ],
+   "max_repeats": 4,
+   "say": {
+    "hi-IN": "स्क्रीन पर उंगली रखकर ऊपर की ओर सरकाइए।",
+    "ta-IN": "திரையில் விரலை வைத்து மேலே தள்ளுங்கள்.",
+    "te-IN": "స్క్రీన్‌పై వేలు పెట్టి పైకి జరపండి.",
+    "kn-IN": "ಪರದೆಯ ಮೇಲೆ ಬೆರಳಿಟ್ಟು ಮೇಲಕ್ಕೆ ಸರಿಸಿ.",
+    "ml-IN": "സ്ക്രീനിൽ വിരൽ വെച്ച് മുകളിലേക്ക് നീക്കുക.",
+    "en-IN": "Put your finger on the screen and slide it upwards."
+   }
+  }
+ ]
 }

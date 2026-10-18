@@ -33,20 +33,36 @@ class CloudVoice(
     /** The line as a playable file: from this phone's cache, or fetched within [FETCH_BUDGET_MS]. */
     suspend fun clip(text: String, language: String, pace: Float): File? = withContext(Dispatchers.IO) {
         val file = File(dir, name(text, language, pace))
-        if (file.length() > 0) return@withContext file.also { it.setLastModified(System.currentTimeMillis()) }
+        if (file.length() > 0) {
+            Log.d(TAG, "voice: from phone cache")
+            return@withContext file.also { it.setLastModified(System.currentTimeMillis()) }
+        }
         if (System.currentTimeMillis() < offUntil) return@withContext null
+        val t0 = System.currentTimeMillis()
         val bytes = withTimeoutOrNull(FETCH_BUDGET_MS) {
             runCatching { fetch(text, language, pace) }.onFailure {
                 if (it is VoiceUnavailable) pause()
                 Log.w(TAG, "natural voice unavailable: ${it.message}")
             }.getOrNull()
         }
+        Log.d(TAG, "voice: fetch ${if (bytes == null) "gave up" else "${bytes.size} bytes"} after ${System.currentTimeMillis() - t0}ms")
         if (bytes == null || bytes.isEmpty()) return@withContext null
         val tmp = File(dir, file.name + ".part")
         tmp.writeBytes(bytes)
         tmp.renameTo(file)
         prune()
         file
+    }
+
+    /**
+     * Fetches [lines] into the phone's cache in the background, one at a time, so the rest of a
+     * task's steps play at once in the natural voice. Lines already here cost nothing.
+     */
+    suspend fun prefetch(lines: List<String>, language: String, pace: Float) {
+        for (line in lines) {
+            if (System.currentTimeMillis() < offUntil) return
+            clip(line, language, pace)
+        }
     }
 
     /** The Worker has no voice configured: stop asking for ten minutes. */
@@ -107,7 +123,7 @@ class CloudVoice(
     private companion object {
         const val TAG = "Saathi"
         /** Longer than this and the phone's own voice speaks instead: silence is worse than a plainer voice. */
-        const val FETCH_BUDGET_MS = 3_500L
+        const val FETCH_BUDGET_MS = 5_000L
         const val MAX_BYTES = 40L * 1024 * 1024
     }
 }

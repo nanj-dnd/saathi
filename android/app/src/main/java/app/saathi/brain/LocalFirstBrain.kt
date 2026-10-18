@@ -34,8 +34,8 @@ class LocalFirstBrain(
     private val sensitiveLine: (language: String) -> String,
     private val clock: () -> Long = System::currentTimeMillis,
     private val log: (String) -> Unit = {},
-    /** True if this phone can open a package directly; recipes then open apps themselves. */
-    private val canOpen: (String) -> Boolean = { false },
+    /** True if this phone can open a package directly; recipes then open apps themselves. Null: unknown. */
+    private val canOpen: ((String) -> Boolean)? = null,
 ) : Brain {
 
     override suspend fun turn(request: TurnRequest): TurnResponse {

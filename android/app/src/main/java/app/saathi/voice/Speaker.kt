@@ -79,6 +79,11 @@ class Speaker(
         }
     }
 
+    /** Fetches a task's coming lines in the natural voice, at the speed they'll be spoken. */
+    suspend fun prefetch(lines: List<String>) {
+        cloud?.prefetch(lines, language(), naturalPace(rate()))
+    }
+
     /**
      * Starts the phone's speech engine ahead of time. Some phones take seconds to bring it up, and
      * the first step of a task (or the fallback when the natural voice can't be had) shouldn't wait.

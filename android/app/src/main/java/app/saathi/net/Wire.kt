@@ -57,6 +57,8 @@ object Action {
     const val SCROLL_DOWN = "scroll_down"
     /** Open the app the task needs, as its home-screen icon would. */
     const val OPEN_APP = "open_app"
+    /** Open an app's install page in the Play Store (the argument is the app's package). */
+    const val OPEN_STORE_PAGE = "open_store_page"
 }
 
 object Status {

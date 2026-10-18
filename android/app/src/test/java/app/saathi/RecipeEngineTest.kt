@@ -130,6 +130,53 @@ class RecipeEngineTest {
         assertEquals("n3", notInstalled.nodeId)
     }
 
+    @Test fun `asking to download an app opens its Play Store page, not that app's own task`() {
+        val phone = setOf("com.android.vending", "com.android.settings")
+        val opener = RecipeEngine(book, canOpen = { it in phone })
+        val g = opener.guide(req(launcher, app = "com.android.launcher3", utterance = "I don't have blink it but I want to download and use it", language = "en-IN"))!!
+        assertEquals(Action.OPEN_STORE_PAGE, g.action)
+        assertEquals("com.grofers.customerapp", g.actionArg)
+        assertEquals("'Blinkit' is not on this phone yet. Opening its page in Play Store.", g.say)
+        assertEquals(RecipeEngine.STORE_GOAL, g.goal)
+
+        // Already installed: Saathi just opens it, and that is the whole task.
+        val installed = RecipeEngine(book, canOpen = { it in phone || it == "com.grofers.customerapp" })
+        val have = installed.guide(req(launcher, app = "com.android.launcher3", utterance = "Blinkit डाउनलोड करना है"))!!
+        assertEquals(Action.OPEN_APP, have.action)
+        assertEquals(Status.DONE, have.status)
+        assertEquals("'Blinkit' पहले से इस फ़ोन में है। उसे खोल रही हूँ।", have.say)
+
+        // Uninstalling is a different wish entirely.
+        assertTrue(opener.guide(req(launcher, app = "com.android.launcher3", utterance = "uninstall blinkit", language = "en-IN"))?.action != Action.OPEN_STORE_PAGE)
+    }
+
+    @Test fun `a task in an app the phone doesn't have offers the Play Store, built-in apps never do`() {
+        val opener = RecipeEngine(book, canOpen = { it == "com.android.vending" })
+        val blinkit = opener.guide(req(launcher, app = "com.android.launcher3", utterance = "ब्लिंकिट से दूध मंगाना है"))!!
+        assertEquals(Action.OPEN_STORE_PAGE, blinkit.action)
+        // Settings is not openable in this fake, but a built-in app is never "missing, go download it".
+        val settings = opener.guide(req(launcher, app = "com.android.launcher3", utterance = "अक्षर बड़े करने हैं"))
+        assertTrue(settings == null || settings.action != Action.OPEN_STORE_PAGE)
+    }
+
+    @Test fun `the Play Store page points at Install, waits while it downloads, then at Open`() {
+        val history = listOf(PastStep("x", "", Status.NEXT_STEP, "com.android.launcher3"))
+        fun step(tree: String) = engine.guide(req(tree, app = "com.android.vending", goal = RecipeEngine.STORE_GOAL, history = history, language = "en-IN"))!!
+        val page = "n1 TextView \"Blinkit: Grocery in 10 minutes\" [40,300,1040,380]\nn2 Button \"Install\" [40,900,1040,1010] click"
+        assertEquals("n2", step(page).nodeId)
+        val downloading = "n1 TextView \"Blinkit: Grocery in 10 minutes\" [40,300,1040,380]\nn2 Button \"Cancel\" [40,900,520,1010] click\nn3 Button \"Open\" [560,900,1040,1010]"
+        assertEquals("none", step(downloading).targetKind)
+        val done = "n1 TextView \"Blinkit: Grocery in 10 minutes\" [40,300,1040,380]\nn2 Button \"Uninstall\" [40,900,520,1010] click\nn3 Button \"Open\" [560,900,1040,1010] click"
+        val finished = step(done)
+        assertEquals("n3", finished.nodeId)
+        assertEquals(Status.DONE, finished.status)
+    }
+
+    @Test fun `turning dark mode on never runs the turn-it-off recipe`() {
+        assertTrue(engine.guide(req(settingsHome, utterance = "how do I turn on dark mode", language = "en-IN"))?.goal != "turn off dark mode")
+        assertEquals("turn off dark mode", engine.guide(req(settingsHome, utterance = "remove dark mode", language = "en-IN"))?.goal)
+    }
+
     @Test fun `the whole text size task runs on the phone`() {
         val first = engine.guide(req(displayScreen, utterance = "अक्षर बड़े करने हैं"))!!
         assertEquals("n4", first.nodeId) // the clickable row, not its non-clickable title

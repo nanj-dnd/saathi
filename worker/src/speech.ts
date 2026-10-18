@@ -38,8 +38,11 @@ export function parseSpeakRequest(body: unknown): SpeakRequest {
   return { text, language: language as Language, pace };
 }
 
+/** 16 kHz is plenty for a voice, and a third the size of 48 kHz MP3 on a slow phone connection. */
+export const SAMPLE_RATE = 16000;
+
 export async function speechKey(req: SpeakRequest, speaker: string): Promise<string> {
-  const material = [SPEECH_MODEL, speaker, req.language, req.pace.toFixed(2), req.text].join("\n");
+  const material = [SPEECH_MODEL, speaker, SAMPLE_RATE, req.language, req.pace.toFixed(2), req.text].join("\n");
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(material));
   const hex = [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
   return `tts:${hex}`;
@@ -64,7 +67,7 @@ export async function synthesize(apiKey: string, req: SpeakRequest, speaker: str
       model: SPEECH_MODEL,
       speaker,
       pace: req.pace,
-      speech_sample_rate: 24000,
+      speech_sample_rate: SAMPLE_RATE,
       output_audio_codec: "mp3",
     }),
   });
