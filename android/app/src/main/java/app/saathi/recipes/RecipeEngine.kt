@@ -49,22 +49,54 @@ class RecipeEngine(
         return if (req.history.isEmpty() && req.goal.isNotBlank()) match(req.goal, req.app) else null
     }
 
+    /** Every recipe [said] matches, with its score: for tests and for tuning word families. */
+    internal fun candidates(said: String, app: String): List<Pair<String, Int>> = scored(said, app).map { it.first.id to it.second }
+
     internal fun match(said: String, app: String): Recipe? {
+        val scored = scored(said, app)
+        val top = scored.maxOfOrNull { it.second } ?: return null
+        return scored.filter { it.second == top }.singleOrNull()?.first
+    }
+
+    private fun scored(said: String, app: String): List<Pair<Recipe, Int>> {
         val text = ScreenText.norm(said)
-        if (text.isEmpty()) return null
+        if (text.isEmpty()) return emptyList()
+        val asked = book.mentions(text)
         val scored = book.recipes.mapNotNull { r ->
             if (!r.skipCommonUnless && negated(text, r)) return@mapNotNull null
             if (r.unless.any { contains(text, it, wordStart = false) }) return@mapNotNull null
+            // Safety warnings (spoken in any app) always speak, whatever else was asked.
+            val warning = r.anyApp && r.steps.any { it.danger != Danger.NONE }
+            if (!warning && !fits(asked, r)) return@mapNotNull null
             // More matched groups is a more specific fit. On a tie, the recipe for the app that is
             // already open wins: "call" inside WhatsApp is a WhatsApp call, not the phone dialler.
-            val best = r.triggers
-                .filter { !it.inApp || app in r.apps }
-                .filter { t -> t.all.all { group -> group.any { contains(text, it) } } }
-                .maxOfOrNull { it.all.size * 2 + if (it.inApp) 1 else 0 } ?: return@mapNotNull null
+            // A script that matched in its own words beats one that matched only through a shared
+            // word family, so families add tolerance without overriding a script's precise wording.
+            val best = book.triggers.getValue(r.id).zip(r.triggers)
+                .filter { (wide, _) -> !wide.inApp || app in r.apps }
+                .filter { (wide, _) -> wide.all.all { group -> group.any { contains(text, it) } } }
+                .maxOfOrNull { (wide, own) ->
+                    val exact = own.all.all { group -> group.any { contains(text, it) } }
+                    wide.all.size * 4 + (if (exact) 2 else 0) + (if (wide.inApp) 1 else 0)
+                } ?: return@mapNotNull null
             r to best
         }
-        val top = scored.maxOfOrNull { it.second } ?: return null
-        return scored.filter { it.second == top }.singleOrNull()?.first
+        return scored
+    }
+
+    /**
+     * The failsafes against the right words in the wrong script. A request that asks for something
+     * the script doesn't do ("download Blinkit" against Blinkit's ordering script), or for the
+     * opposite of what it does ("turn on" against a "turn off" script), never picks it.
+     */
+    private fun fits(asked: Set<String>, r: Recipe): Boolean {
+        val covers = book.covers.getValue(r.id)
+        val exclusive = book.common.concepts.filterValues { it.exclusive }.keys
+        if (asked.any { it in exclusive && it !in covers }) return false
+        return book.common.opposites.none { pair ->
+            pair.size == 2 && (pair[0] in asked && pair[1] in covers && pair[0] !in covers ||
+                pair[1] in asked && pair[0] in covers && pair[1] !in covers)
+        }
     }
 
     /**
@@ -74,7 +106,7 @@ class RecipeEngine(
      */
     private fun negated(text: String, r: Recipe): Boolean {
         var rest = text
-        for (phrase in r.triggers.flatMap { t -> t.all.flatten() }) {
+        for (phrase in book.triggers.getValue(r.id).flatMap { t -> t.all.flatten() }) {
             val p = ScreenText.norm(phrase)
             if (' ' in p) rest = rest.replace(p, " ")
         }
@@ -288,10 +320,66 @@ class RecipeEngine(
             if (p.isEmpty()) return false
             // A phrase written with a trailing space must end a word: "not " is the word "not",
             // and must not fire inside "notifications" or "note".
-            if (phrase.last().isWhitespace()) return found(text, p, wordStart, wordEnd = true)
+            if (phrase.last().isWhitespace()) return found(text, p, wordStart, wordEnd = true) || wordStart && heardAs(text, p)
             if (found(text, p, wordStart)) return true
             val s = stem(p)
-            return s != p && found(text, s, wordStart)
+            if (s != p && found(text, s, wordStart)) return true
+            return wordStart && heardAs(text, p)
+        }
+
+        /**
+         * Speech recognisers split and misspell names: "blink it" for Blinkit, "whatsap", "youtub".
+         * For a Latin phrase, spaces don't count, and a long enough word may be a letter or two off.
+         * Indian scripts are left exact: recognisers spell them consistently, and short words there
+         * differ by one sign in meaning.
+         */
+        private fun heardAs(text: String, p: String): Boolean {
+            if (p.any { !(it in 'a'..'z' || it == ' ' || it == '-') }) return false
+            val compact = p.replace(" ", "").replace("-", "")
+            if (compact.length >= 5 && joinsTo(text, compact)) return true
+            // Five-letter words are too close to each other to forgive a slip ("prime" and "prize").
+            if (' ' in p || compact.length < 6) return false
+            val allowed = if (compact.length >= 9) 2 else 1
+            return text.split(' ').any { w ->
+                w.length >= 5 && w.all { it in 'a'..'z' } && kotlin.math.abs(w.length - compact.length) <= allowed &&
+                    w[0] == compact[0] && distance(w, compact) <= allowed
+            }
+        }
+
+        /**
+         * True if some run of whole words in [text], joined without spaces, is exactly [compact]:
+         * "blink it" is "blinkit", but "uninstall" never contains "install".
+         */
+        private fun joinsTo(text: String, compact: String): Boolean {
+            val words = text.split(' ', '-').filter { it.isNotEmpty() }
+            for (start in words.indices) {
+                val acc = StringBuilder()
+                for (end in start until words.size) {
+                    acc.append(words[end])
+                    if (acc.length >= compact.length) {
+                        if (acc.toString() == compact) return true
+                        break
+                    }
+                }
+            }
+            return false
+        }
+
+        /** True if [n] appears in [p] as whole words, not as the start of a longer word. */
+        fun wholeWords(p: String, n: String): Boolean = n.isNotEmpty() && found(p, n, wordStart = true, wordEnd = true)
+
+        /** Levenshtein edit distance. */
+        private fun distance(a: String, b: String): Int {
+            var prev = IntArray(b.length + 1) { it }
+            for (i in 1..a.length) {
+                val cur = IntArray(b.length + 1)
+                cur[0] = i
+                for (j in 1..b.length) {
+                    cur[j] = minOf(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + if (a[i - 1] == b[j - 1]) 0 else 1)
+                }
+                prev = cur
+            }
+            return prev[b.length]
         }
 
         private fun found(text: String, p: String, wordStart: Boolean, wordEnd: Boolean = false): Boolean {

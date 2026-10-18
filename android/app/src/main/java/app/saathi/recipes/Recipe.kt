@@ -2,6 +2,7 @@ package app.saathi.recipes
 
 import app.saathi.net.Danger
 import app.saathi.net.Status
+import app.saathi.capture.ScreenText
 import app.saathi.safety.ScreenSafety
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -81,6 +82,20 @@ data class Recipe(
     val steps: List<Step>,
 )
 
+/**
+ * A family of words for one idea, across languages and spellings: "bigger" is big, large,
+ * increase, bada, बड़ा, பெரிது… A script that lists any member accepts them all.
+ */
+@Serializable
+data class Concept(
+    val words: List<String>,
+    /**
+     * Saying one of these changes what the task is ("download", "turn off"). A script that doesn't
+     * do it is never picked for a request that asks for it.
+     */
+    val exclusive: Boolean = false,
+)
+
 @Serializable
 data class Common(
     val version: Int = 0,
@@ -88,6 +103,10 @@ data class Common(
     val unless: List<String> = emptyList(),
     /** "open", "drawer" and "find" lines, with "{app}" for the app's spoken name. */
     val lines: Map<String, Map<String, String>> = emptyMap(),
+    /** Word families by name; see [Concept]. */
+    val concepts: Map<String, Concept> = emptyMap(),
+    /** Pairs of families that mean opposite things ("turn_on", "turn_off"). */
+    val opposites: List<List<String>> = emptyList(),
 )
 
 @Serializable
@@ -98,6 +117,54 @@ const val ANY_APP = "*"
 
 class RecipeBook(val common: Common, val recipes: List<Recipe>) {
     fun byGoal(goal: String): Recipe? = if (goal.isBlank()) null else recipes.firstOrNull { it.goal == goal }
+
+    /** Each recipe's triggers with every word family they touch added in full, by recipe id. */
+    val triggers: Map<String, List<Trigger>> by lazy {
+        recipes.associate { r ->
+            r.id to r.triggers.map { t -> t.copy(all = t.all.map { group -> widen(group) }) }
+        }
+    }
+
+    /** The word families each recipe's triggers cover, by recipe id. */
+    val covers: Map<String, Set<String>> by lazy {
+        recipes.associate { r -> r.id to triggers.getValue(r.id).flatMap { it.all.flatten() }.flatMap { familiesOf(it, inside = true) }.toSet() }
+    }
+
+    /** The families [text] (normalised) mentions. */
+    fun mentions(text: String): Set<String> =
+        common.concepts.filterValues { c -> c.words.any { RecipeEngine.contains(text, it) } }.keys
+
+    /**
+     * The families a trigger phrase belongs to: it is a member, or a member with a short inflected
+     * ending (बड़ / बड़े). With [inside], also a phrase holding a member as whole words ("turn off" in
+     * "turn off dark mode"), which counts for the failsafes but never widens a group: "पता भेज"
+     * (send the address) must not make a location group accept every "send" word.
+     * கால் (call) inside கால்குலேட்டர் (calculator) is never a member.
+     */
+    private fun familiesOf(phrase: String, inside: Boolean = false): Set<String> {
+        val p = ScreenText.norm(phrase)
+        if (p.isEmpty()) return emptySet()
+        return common.concepts.filterValues { c -> c.words.any { w -> member(p, ScreenText.norm(w), inside) } }.keys
+    }
+
+    private fun member(p: String, n: String, inside: Boolean): Boolean {
+        if (n.isEmpty()) return false
+        if (n == p || inside && (RecipeEngine.wholeWords(p, n) || RecipeEngine.wholeWords(n, p))) return true
+        val (short, long) = if (p.length <= n.length) p to n else n to p
+        return short.length >= 3 && long.startsWith(short) && long.length - short.length <= 3
+    }
+
+    /**
+     * Widens a trigger group with every synonym family it touches. Exclusive and opposite families
+     * ("download", "bigger") are left alone: there a word is about the problem as often as the wish
+     * ("things look small" wants them bigger), so they only guard against the wrong script.
+     */
+    private fun widen(group: List<String>): List<String> {
+        val guarded = common.opposites.flatten().toSet() + common.concepts.filterValues { it.exclusive }.keys
+        val families = group.flatMap(::familiesOf).toSet() - guarded
+        if (families.isEmpty()) return group
+        return (group + families.flatMap { common.concepts.getValue(it).words }).distinct()
+    }
 
     companion object {
         val LANGUAGES = listOf("hi-IN", "en-IN", "ta-IN", "te-IN", "kn-IN", "ml-IN")

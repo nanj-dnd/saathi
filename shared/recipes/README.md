@@ -23,6 +23,32 @@ without shipping a new APK.
    (`in_app` triggers), and otherwise to Claude. Saathi never guesses between two recipes.
 5. On later turns nothing is said; the recipe is found again by its English `goal`.
 
+## Word families and failsafes
+
+`_common.json` holds `concepts`: families of words for one idea in every language and common
+Hinglish spellings ("order": order, buy, purchase, mangana, मंगा, ख़रीद, வாங்க…). A trigger group that
+lists one member of a synonym family accepts the whole family, so a recipe never has to list every
+way of saying "buy". A group widens only when one of its phrases *is* a family word (or that word with
+a short inflected ending), never because a longer phrase happens to contain one.
+
+Two failsafes stop the right words reaching the wrong script:
+
+- **Exclusive families** (`"exclusive": true`: download, uninstall, update, cancel, block, unblock)
+  change what the task is. A request that says one of them never picks a recipe whose triggers don't.
+  "Download Blinkit" can't start Blinkit's ordering recipe.
+- **Opposites** (`opposites`: on/off, bigger/smaller, download/uninstall, block/unblock): a request for
+  one side never picks a recipe that covers only the other. "Turn on dark mode" can't run the
+  turn-it-off recipe.
+
+Safety warnings that speak in any app are exempt: they always speak.
+
+Speech recognisers split and misspell names, so for Latin-script phrases, whole words joined without
+spaces count ("blink it" is "blinkit"), and a word of six or more letters may be one letter off (two
+from nine letters). Indian scripts are matched exactly, as recognisers spell them consistently.
+
+When two recipes tie, the one that matched in its own words beats one that matched only through a
+family. A tie that remains still goes to Claude.
+
 ## How a step is chosen
 
 Steps are checked **in order and the first match wins**, so list the furthest-along steps first.

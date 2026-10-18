@@ -172,6 +172,38 @@ class RecipeEngineTest {
         assertEquals(Status.DONE, finished.status)
     }
 
+    @Test fun `similar words, misspellings and split names still find the right script`() {
+        val expected = mapOf(
+            // Names a recogniser splits or misspells.
+            "blink it se doodh mangana hai" to "blinkit-order",
+            "blinkitt se doodh order karna hai" to "blinkit-order",
+            "whatsap pe video call karna hai" to "whatsapp-video-call",
+            // A synonym from the shared family, though the script never lists it.
+            "purchase milk on blinkit" to "blinkit-order",
+            "beti ko phone karna hai" to "phone-call",
+            "ब्लिंकिट से दूध ख़रीदना है" to "blinkit-order",
+        )
+        val wrong = expected.mapNotNull { (said, id) ->
+            val got = engine.match(said, "com.google.android.apps.nexuslauncher")?.id ?: "model"
+            if (got != id) "\"$said\" -> $got, want $id ${engine.candidates(said, "com.google.android.apps.nexuslauncher")}" else null
+        }
+        assertTrue(wrong.joinToString("\n"), wrong.isEmpty())
+    }
+
+    @Test fun `asking for something a script doesn't do, or its opposite, never picks it`() {
+        val launcher = "com.google.android.apps.nexuslauncher"
+        // A different action on the same app.
+        assertTrue(engine.match("download blinkit", launcher)?.id != "blinkit-order")
+        assertTrue(engine.match("blinkit order cancel karna hai", launcher)?.id != "blinkit-order")
+        assertEquals("playstore-update", engine.match("WhatsApp update karna hai", launcher)?.id)
+        assertEquals("tip-uninstall", engine.match("uninstall blinkit", launcher)?.id)
+        // The opposite wish.
+        assertTrue(engine.match("turn on dark mode", launcher)?.id != "settings-dark-off")
+        assertTrue(engine.match("make the letters smaller", launcher)?.id != "settings-text-size")
+        // A slip of one letter in a short word is not forgiven: "prime" is not "prize".
+        assertEquals("primevideo-watch", engine.match("watch a film on Prime Video", launcher)?.id)
+    }
+
     @Test fun `turning dark mode on never runs the turn-it-off recipe`() {
         assertTrue(engine.guide(req(settingsHome, utterance = "how do I turn on dark mode", language = "en-IN"))?.goal != "turn off dark mode")
         assertEquals("turn off dark mode", engine.guide(req(settingsHome, utterance = "remove dark mode", language = "en-IN"))?.goal)
