@@ -14,7 +14,7 @@
     <string name="access_restricted">If the switch is greyed out, open App info, tap ⋮ at the top and choose \"Allow restricted settings\".</string>
     <string name="btn_app_info">App info</string>
     <string name="step_ready">5. Ready</string>
-    <string name="ready_body">In any app, press the orange \"Help\" button and say what you want to do. For example: \"I want to order milk on Blinkit\".</string>
+    <string name="ready_body">In any app, press the blue \"Help\" button and say what you want to do. For example: \"I want to order milk on Blinkit\".</string>
     <string name="bubble_help">Help</string>
     <string name="bubble_listening">Listening</string>
     <string name="bubble_looking">Looking</string>
@@ -47,4 +47,7 @@
     <string name="offline_download">Download speech for use without internet</string>
     <string name="offline_started">Downloading. Keep the phone on Wi-Fi.</string>
     <string name="access_summary">Saathi needs to see the screen to point at buttons. It never presses anything.</string>
+    <string name="btn_continue">Continue</string>
+    <string name="btn_back">Back</string>
+    <string name="mic_body">Saathi listens only after you press the Help button.</string>
 </resources>

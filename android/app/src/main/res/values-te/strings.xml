@@ -13,7 +13,7 @@
     <string name="access_restricted">బటన్ మసకగా ఉంటే, యాప్ సమాచారం తెరిచి, పైన ⋮ నొక్కి \"పరిమిత సెట్టింగ్‌లను అనుమతించు\" ఎంచుకోండి.</string>
     <string name="btn_app_info">యాప్ సమాచారం</string>
     <string name="step_ready">5. సిద్ధం</string>
-    <string name="ready_body">ఏ యాప్‌లోనైనా ఆరెంజ్ \"సహాయం\" బటన్ నొక్కి, మీకు ఏమి చేయాలో చెప్పండి. ఉదాహరణ: \"బ్లింకిట్‌లో పాలు ఆర్డర్ చేయాలి\".</string>
+    <string name="ready_body">ఏ యాప్‌లోనైనా నీలం రంగు \"సహాయం\" బటన్ నొక్కి, మీకు ఏమి చేయాలో చెప్పండి. ఉదాహరణ: \"బ్లింకిట్‌లో పాలు ఆర్డర్ చేయాలి\".</string>
     <string name="bubble_help">సహాయం</string>
     <string name="bubble_listening">వింటున్నాను</string>
     <string name="bubble_looking">చూస్తున్నాను</string>
@@ -46,4 +46,7 @@
     <string name="offline_download">ఇంటర్నెట్ లేకుండా వినడానికి వాయిస్ గుర్తింపు డౌన్‌లోడ్ చేయండి</string>
     <string name="offline_started">డౌన్‌లోడ్ అవుతోంది. ఫోన్‌ను Wi-Fi లో ఉంచండి.</string>
     <string name="access_summary">బటన్లు చూపించడానికి సాథీ స్క్రీన్ చూడాలి. అది తనంతట తాను ఏదీ నొక్కదు.</string>
+    <string name="btn_continue">కొనసాగించండి</string>
+    <string name="btn_back">వెనుకకు</string>
+    <string name="mic_body">మీరు సహాయం బటన్ నొక్కిన తర్వాతే సాథీ వింటుంది.</string>
 </resources>

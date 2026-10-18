@@ -13,7 +13,7 @@
     <string name="access_restricted">ബട്ടൺ മങ്ങിയതാണെങ്കിൽ, ആപ്പ് വിവരം തുറന്ന്, മുകളിൽ ⋮ അമർത്തി \"നിയന്ത്രിത ക്രമീകരണങ്ങൾ അനുവദിക്കുക\" തിരഞ്ഞെടുക്കുക.</string>
     <string name="btn_app_info">ആപ്പ് വിവരം</string>
     <string name="step_ready">5. തയ്യാർ</string>
-    <string name="ready_body">ഏത് ആപ്പിലും ഓറഞ്ച് \"സഹായം\" ബട്ടൺ അമർത്തി, എന്താണ് ചെയ്യേണ്ടതെന്ന് പറയുക. ഉദാഹരണം: \"ബ്ലിങ്കിറ്റിൽ പാൽ ഓർഡർ ചെയ്യണം\".</string>
+    <string name="ready_body">ഏത് ആപ്പിലും നീല \"സഹായം\" ബട്ടൺ അമർത്തി, എന്താണ് ചെയ്യേണ്ടതെന്ന് പറയുക. ഉദാഹരണം: \"ബ്ലിങ്കിറ്റിൽ പാൽ ഓർഡർ ചെയ്യണം\".</string>
     <string name="bubble_help">സഹായം</string>
     <string name="bubble_listening">കേൾക്കുന്നു</string>
     <string name="bubble_looking">നോക്കുന്നു</string>
@@ -46,4 +46,7 @@
     <string name="offline_download">ഇന്റർനെറ്റ് ഇല്ലാതെ കേൾക്കാൻ ശബ്ദ തിരിച്ചറിയൽ ഡൗൺലോഡ് ചെയ്യുക</string>
     <string name="offline_started">ഡൗൺലോഡ് ചെയ്യുന്നു. ഫോൺ Wi-Fi-യിൽ വെക്കുക.</string>
     <string name="access_summary">ബട്ടണുകൾ കാണിക്കാൻ സാഥി സ്ക്രീൻ കാണണം. അത് സ്വയം ഒന്നും അമർത്തില്ല.</string>
+    <string name="btn_continue">തുടരുക</string>
+    <string name="btn_back">പിന്നോട്ട്</string>
+    <string name="mic_body">നിങ്ങൾ സഹായം ബട്ടൺ അമർത്തിയതിനു ശേഷം മാത്രമേ സാഥി കേൾക്കൂ.</string>
 </resources>

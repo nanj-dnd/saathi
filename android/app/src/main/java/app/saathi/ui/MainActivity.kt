@@ -11,61 +11,68 @@ import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
@@ -74,12 +81,11 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
-import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -88,62 +94,61 @@ import androidx.lifecycle.LifecycleEventObserver
 import app.saathi.Languages
 import app.saathi.Prefs
 import app.saathi.R
+import app.saathi.design.Buddy
 import app.saathi.design.Glyph
 import app.saathi.design.Glyphs
-import app.saathi.design.Metro
-import app.saathi.design.SaathiType
 import app.saathi.service.BuddyAccessibilityService
 import app.saathi.voice.Speaker
 import app.saathi.voice.VoiceSetup
 
 /**
- * Setup, laid out as a metro line: five stops from language to ready, done stops ticked, the
- * current one large with its sign. Written so either the senior or a family member can follow it,
- * in the senior's chosen language.
+ * Setup, one step per screen: language, microphone, turning Saathi on, the voice, ready. Each
+ * screen has one obvious button at the bottom. Written so either the senior or a family member can
+ * follow it, in the senior's chosen language.
  */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val metro = Metro.of(this)
-        val ground = if (metro === Metro.DARK) GROUND_DARK else GROUND_LIGHT
+        val dark = Buddy.of(this).dark
+        val ground = if (dark) GROUND_DARK else GROUND_LIGHT
         enableEdgeToEdge(
-            statusBarStyle = if (metro === Metro.DARK) SystemBarStyle.dark(ground) else SystemBarStyle.light(ground, metro.ink),
-            navigationBarStyle = if (metro === Metro.DARK) SystemBarStyle.dark(ground) else SystemBarStyle.light(ground, metro.ink),
+            statusBarStyle = if (dark) SystemBarStyle.dark(ground) else SystemBarStyle.light(ground, INK_LIGHT),
+            navigationBarStyle = if (dark) SystemBarStyle.dark(ground) else SystemBarStyle.light(ground, INK_LIGHT),
         )
         val prefs = Prefs(this)
-        setContent { SaathiTheme { Setup(prefs) } }
+        setContent { SaathiTheme { Setup(prefs, onFinish = ::finish) } }
     }
 }
 
 private const val GROUND_LIGHT = 0xFFFFFFFF.toInt()
-private const val GROUND_DARK = 0xFF111215.toInt()
+private const val GROUND_DARK = 0xFF0F1114.toInt()
+private const val INK_LIGHT = 0xFF101215.toInt()
 
-/** Compose-side colours, read from the same [Metro] tokens the overlay uses. */
-private class Tones(val m: Metro, dark: Boolean) {
-    val ground = Color(if (dark) GROUND_DARK else GROUND_LIGHT)
-    val panel = Color(m.panel)
-    val ink = Color(m.ink)
-    val soft = Color(m.inkSoft)
-    val accent = Color(m.accent)
-    val accentFill = Color(m.accentFill)
-    val onAccent = Color(m.onAccent)
-    val done = Color(m.done)
-    val caution = Color(m.caution)
-    val track = if (dark) Color(0xFF3A3E45) else Color(0xFFC9CDD3)
-    /** Unselected chips and the sign's hairline on the white ground. */
-    val chip = if (dark) Color(0xFF2A2D33) else Color(0xFFECEEF1)
-    val hairline = if (dark) Color(0xFF2A2D33) else Color(0xFFDDE1E6)
+/** Compose-side colours, sharing the overlay's [Buddy] blue and badge colours. */
+private class Tones(val b: Buddy) {
+    val ground = Color(if (b.dark) GROUND_DARK else GROUND_LIGHT)
+    val ink = Color(if (b.dark) 0xFFF3F4F6.toInt() else INK_LIGHT)
+    val soft = Color(if (b.dark) 0xFFA4AAB3.toInt() else 0xFF5B616B.toInt())
+    /** Tiles, the segmented track and quiet buttons. */
+    val tile = Color(if (b.dark) 0xFF1C1F24.toInt() else 0xFFF2F3F5.toInt())
+    /** The raised segment inside the track. */
+    val raised = Color(if (b.dark) 0xFF33373F.toInt() else 0xFFFFFFFF.toInt())
+    val track = Color(if (b.dark) 0xFF2A2E35.toInt() else 0xFFE3E6EA.toInt())
+    val accent = Color(b.accent)
+    val accentLine = Color(b.accentLine)
+    val onAccent = Color(b.onAccent)
+    val done = Color(b.done)
+    val caution = Color(b.caution)
 }
 
 private val LocalTones = staticCompositionLocalOf<Tones> { error("no tones") }
-private val LocalFace = staticCompositionLocalOf<FontFamily> { FontFamily.Default }
 
 @Composable
 private fun SaathiTheme(content: @Composable () -> Unit) {
     val dark = isSystemInDarkTheme()
-    val tones = remember(dark) { Tones(if (dark) Metro.DARK else Metro.LIGHT, dark) }
-    val scheme = if (dark) darkColorScheme(primary = tones.accentFill, onPrimary = tones.onAccent, background = tones.ground, surface = tones.panel, onSurface = tones.ink)
-    else lightColorScheme(primary = tones.accentFill, onPrimary = tones.onAccent, background = tones.ground, surface = tones.panel, onSurface = tones.ink)
+    val tones = remember(dark) { Tones(if (dark) Buddy.DARK else Buddy.LIGHT) }
+    val scheme = if (dark) darkColorScheme(primary = tones.accent, onPrimary = tones.onAccent, background = tones.ground, surface = tones.ground, onSurface = tones.ink)
+    else lightColorScheme(primary = tones.accent, onPrimary = tones.onAccent, background = tones.ground, surface = tones.ground, onSurface = tones.ink)
     CompositionLocalProvider(LocalTones provides tones) {
         MaterialTheme(colorScheme = scheme) {
             Surface(Modifier.fillMaxSize(), color = tones.ground) { content() }
@@ -151,15 +156,17 @@ private fun SaathiTheme(content: @Composable () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
+private const val STEPS = 5
+
 @Composable
-private fun Setup(prefs: Prefs) {
+private fun Setup(prefs: Prefs, onFinish: () -> Unit) {
     val base = LocalContext.current
     val t = LocalTones.current
     var language by remember { mutableStateOf(prefs.language) }
     val res = remember(language) { Languages.context(base, language) }
-    val face = remember(language) { SaathiType.family(base, language) }
     fun s(id: Int) = res.getString(id)
+    /** Step titles are stored numbered ("2. Allow the microphone"); the progress bar carries the number now. */
+    fun title(id: Int) = s(id).substringAfter(". ", s(id))
 
     var micGranted by remember { mutableStateOf(hasMic(base)) }
     var serviceOn by remember { mutableStateOf(BuddyAccessibilityService.isEnabled(base)) }
@@ -183,352 +190,361 @@ private fun Setup(prefs: Prefs) {
     var voiceStatus by remember(language) { mutableStateOf<Speaker.VoiceStatus?>(null) }
     var offlineStarted by remember(language) { mutableStateOf(false) }
 
-    // The last stop (Ready) is never "complete" on its own: it becomes current once the rest are done.
-    val complete = listOf(true, micGranted, serviceOn, voiceStatus == Speaker.VoiceStatus.OK, false)
-    val current = complete.indexOfFirst { !it }
-    // A finished stop can be reopened (to change the voice speed, say); null means "follow the line".
-    var opened by remember { mutableStateOf<Int?>(null) }
-    val focus = opened ?: current
+    // A first run starts at the language; once everything is granted, setup reopens on Ready.
+    var page by rememberSaveable { mutableIntStateOf(if (!micGranted) 0 else if (!serviceOn) 2 else STEPS - 1) }
+    // Granting the mic or turning Saathi on moves straight to the next step.
+    LaunchedEffect(micGranted) { if (micGranted && page == 1) page = 2 }
+    LaunchedEffect(serviceOn) { if (serviceOn && page == 2) page = 3 }
+    BackHandler(enabled = page > 0) { page-- }
 
-    // While "Turn on Saathi" is the current stop, its action is pinned to the bottom of the screen
-    // so it is always in reach without scrolling past the disclosure.
-    val pinAccess = focus == 2 && !serviceOn
-    CompositionLocalProvider(LocalFace provides face) {
-      Box(Modifier.fillMaxSize().safeDrawingPadding()) {
-        Column(
-            Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(start = 24.dp, end = 24.dp, top = 28.dp, bottom = if (pinAccess) 112.dp else 28.dp),
+    Column(Modifier.fillMaxSize().safeDrawingPadding()) {
+        Row(
+            Modifier.fillMaxWidth().height(64.dp).padding(horizontal = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Comp 3: wordmark, tagline and language chips as one centred stack.
-            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                Txt(s(R.string.app_name), 40, FontWeight.ExtraBold, t.ink, Modifier.semantics { heading() })
-                Spacer(Modifier.height(8.dp))
-                Txt(s(R.string.onb_subtitle), 19, FontWeight.Normal, t.soft, lineHeight = 27, center = true)
-            }
-            Spacer(Modifier.height(20.dp))
-            FlowRow(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                Languages.ALL.forEach { (tag, name) ->
-                    LanguageChip(name, tag, selected = tag == language) {
-                        language = tag
-                        prefs.language = tag
-                    }
+            if (page > 0) {
+                Box(
+                    Modifier
+                        .size(48.dp)
+                        .clickable(role = Role.Button, onClickLabel = s(R.string.btn_back)) { page-- }
+                        .semantics { contentDescription = s(R.string.btn_back) },
+                    contentAlignment = Alignment.Center,
+                ) { GlyphIcon(Glyph.BACK, t.ink, 26.dp) }
+            } else {
+                Spacer(Modifier.width(12.dp))
+                Box(Modifier.size(34.dp).background(t.accent, CircleShape), contentAlignment = Alignment.Center) {
+                    GlyphIcon(Glyph.CURSOR, t.onAccent, 20.dp)
                 }
+                Spacer(Modifier.width(10.dp))
+                Txt(s(R.string.app_name), 21, FontWeight.Bold, t.ink)
             }
-            Spacer(Modifier.height(28.dp))
+        }
+        Progress(page, Modifier.padding(horizontal = 24.dp))
 
-            val stops = listOf(
-                R.string.step_language, R.string.step_mic, R.string.step_access, R.string.step_voice, R.string.step_ready,
-            )
-            stops.forEachIndexed { i, title ->
-                Stop(
-                    index = i,
-                    title = s(title).substringAfter(". ", s(title)),
-                    done = complete[i] || (i == 4 && current == 4),
-                    focused = i == focus,
-                    last = i == stops.lastIndex,
-                    doneLabel = s(R.string.done),
-                    onOpen = { opened = if (opened == i) null else i },
-                ) {
-                    when (i) {
-                        0 -> Txt(Languages.ALL[language].orEmpty(), 20, FontWeight.SemiBold, t.ink)
-                        1 -> if (micGranted) DoneLine(s(R.string.done)) else Sign {
-                            PrimaryButton(s(R.string.btn_allow)) {
-                                val perms = buildList {
-                                    add(Manifest.permission.RECORD_AUDIO)
-                                    if (Build.VERSION.SDK_INT >= 33) add(Manifest.permission.POST_NOTIFICATIONS)
-                                }
-                                askPermissions.launch(perms.toTypedArray())
-                            }
+        AnimatedContent(
+            targetState = page,
+            modifier = Modifier.weight(1f),
+            transitionSpec = {
+                val dir = if (targetState > initialState) 1 else -1
+                (slideInHorizontally(tween(320)) { it / 6 * dir } + fadeIn(tween(320))) togetherWith
+                    (slideOutHorizontally(tween(220)) { -it / 6 * dir } + fadeOut(tween(220)))
+            },
+            label = "step",
+        ) { step ->
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(start = 24.dp, end = 24.dp, top = 36.dp, bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                when (step) {
+                    0 -> {
+                        Title(title(R.string.step_language))
+                        Body(s(R.string.onb_subtitle))
+                        Spacer(Modifier.height(8.dp))
+                        LanguageGrid(language) {
+                            language = it
+                            prefs.language = it
                         }
-                        2 -> if (serviceOn) DoneLine(s(R.string.access_on)) else Sign {
-                            // Lead with the two-line summary; the full prominent disclosure follows at
-                            // reading size, above the action (which is pinned to the screen bottom).
-                            Txt(s(R.string.access_summary), 21, FontWeight.SemiBold, t.ink, lineHeight = 29)
-                            Txt(s(R.string.disclosure), 16, FontWeight.Normal, t.soft, lineHeight = 23)
-                            Txt(s(R.string.access_hint), 16, FontWeight.Normal, t.soft, lineHeight = 23)
-                            Txt(s(R.string.access_restricted), 16, FontWeight.Normal, t.soft, lineHeight = 23)
-                            SecondaryButton(s(R.string.btn_app_info)) {
+                    }
+                    1 -> {
+                        Title(title(R.string.step_mic))
+                        Body(s(R.string.mic_body))
+                        // What the senior will see while Saathi listens: the Help pill, turned dark.
+                        Box(
+                            Modifier.fillMaxWidth().height(180.dp).background(t.tile, RoundedCornerShape(24.dp)),
+                            contentAlignment = Alignment.Center,
+                        ) { ListeningPill(s(R.string.bubble_listening)) }
+                        if (micGranted) DoneRow(s(R.string.done))
+                    }
+                    2 -> {
+                        Title(title(R.string.step_access))
+                        if (serviceOn) {
+                            DoneRow(s(R.string.access_on))
+                        } else {
+                            // The prominent disclosure, in full, above the button that agrees to it.
+                            Txt(s(R.string.access_summary), 20, FontWeight.SemiBold, t.ink, lineHeight = 28)
+                            Column(
+                                Modifier.fillMaxWidth().background(t.tile, RoundedCornerShape(20.dp)).padding(20.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp),
+                            ) {
+                                Txt(s(R.string.disclosure), 16, FontWeight.Normal, t.soft, lineHeight = 24)
+                                Txt(s(R.string.access_hint), 16, FontWeight.Normal, t.soft, lineHeight = 24)
+                                Txt(s(R.string.access_restricted), 16, FontWeight.Normal, t.soft, lineHeight = 24)
+                            }
+                            TextAction(s(R.string.btn_app_info)) {
                                 base.startActivity(
                                     Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${base.packageName}"))
                                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
                                 )
                             }
                         }
-                        3 -> Sign {
-                            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                                listOf(Speaker.SLOW_RATE to R.string.speed_slow, Speaker.DEFAULT_RATE to R.string.speed_normal).forEach { (r, label) ->
-                                    Choice(s(label), selected = rate == r, Modifier.weight(1f)) {
-                                        rate = r
-                                        prefs.speechRate = r
-                                    }
-                                }
-                            }
-                            PrimaryButton(s(R.string.voice_test), Glyph.SPEAKER) {
-                                voice.test(language, rate, s(R.string.voice_sample)) { voiceStatus = it }
-                            }
-                            when (voiceStatus) {
-                                Speaker.VoiceStatus.OK -> DoneLine(s(R.string.voice_ok))
-                                Speaker.VoiceStatus.MISSING, Speaker.VoiceStatus.NO_ENGINE -> {
-                                    Notice(s(R.string.voice_missing))
-                                    PrimaryButton(s(R.string.voice_install)) { base.startActivity(voice.installVoiceIntent()) }
-                                }
-                                null -> {}
-                            }
-                            if (voice.canDownloadOfflineSpeech) {
-                                if (offlineStarted) Txt(s(R.string.offline_started), 16, FontWeight.Normal, t.soft, lineHeight = 23)
-                                else SecondaryButton(s(R.string.offline_download)) { offlineStarted = voice.downloadOfflineSpeech(language) }
-                            }
-                        }
-                        4 -> Sign {
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                                HelpDisc(s(R.string.bubble_help), 72.dp)
-                                Txt(s(R.string.ready_body), 19, FontWeight.Normal, t.ink, Modifier.weight(1f), lineHeight = 27)
-                            }
-                        }
                     }
-                }
-            }
-        }
-        if (pinAccess) {
-            Box(
-                Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .background(t.ground)
-                    .padding(horizontal = 24.dp, vertical = 16.dp),
-            ) {
-                PrimaryButton(s(R.string.btn_open_settings)) {
-                    base.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-                }
-            }
-        }
-      }
-    }
-}
-
-private val LINE_X = 22.dp
-private val RAIL = 6.dp
-
-/**
- * One stop on the line. The rail runs through every stop; it is blue up to the current stop and
- * grey after it. Done stops show a filled disc with a drawn tick (shape, not just colour).
- */
-@Composable
-private fun Stop(
-    index: Int,
-    title: String,
-    done: Boolean,
-    focused: Boolean,
-    last: Boolean,
-    doneLabel: String,
-    onOpen: () -> Unit,
-    body: @Composable () -> Unit,
-) {
-    val t = LocalTones.current
-    val railColor = if (done) t.accent else t.track
-    val marker = if (focused) 34.dp else if (done) 30.dp else 22.dp
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min),
-    ) {
-        Box(Modifier.width(LINE_X * 2).fillMaxHeight()) {
-            Canvas(Modifier.fillMaxSize()) {
-                val x = LINE_X.toPx()
-                val markerY = 20.dp.toPx()
-                if (index > 0) drawLine(t.track, Offset(x, 0f), Offset(x, markerY), RAIL.toPx())
-                if (index > 0 && (done || focused)) drawLine(t.accent, Offset(x, 0f), Offset(x, markerY), RAIL.toPx())
-                if (!last) drawLine(railColor, Offset(x, markerY), Offset(x, size.height), RAIL.toPx())
-                val r = marker.toPx() / 2
-                when {
-                    done && !focused -> {
-                        // accentFill, not accent: the white tick needs ≥3:1 on it in dark mode too.
-                        drawCircle(t.accentFill, r, Offset(x, markerY))
-                        drawIntoCanvas {
-                            val g = r * 1.2f
-                            Glyphs.draw(it.nativeCanvas, Glyph.CHECK, RectF(x - g / 2, markerY - g / 2, x + g / 2, markerY + g / 2), t.onAccent.toArgb())
+                    3 -> {
+                        Title(title(R.string.step_voice))
+                        Segmented(
+                            listOf(s(R.string.speed_slow) to Speaker.SLOW_RATE, s(R.string.speed_normal) to Speaker.DEFAULT_RATE),
+                            selected = rate,
+                        ) {
+                            rate = it
+                            prefs.speechRate = it
                         }
-                    }
-                    focused -> {
-                        drawCircle(t.ground, r, Offset(x, markerY))
-                        drawCircle(t.accent, r - 3.5.dp.toPx(), Offset(x, markerY), style = Stroke(7.dp.toPx()))
+                        QuietButton(s(R.string.voice_test), Glyph.SPEAKER) {
+                            voice.test(language, rate, s(R.string.voice_sample)) { voiceStatus = it }
+                        }
+                        when (voiceStatus) {
+                            Speaker.VoiceStatus.OK -> DoneRow(s(R.string.voice_ok))
+                            Speaker.VoiceStatus.MISSING, Speaker.VoiceStatus.NO_ENGINE -> {
+                                Notice(s(R.string.voice_missing))
+                                QuietButton(s(R.string.voice_install), null) { base.startActivity(voice.installVoiceIntent()) }
+                            }
+                            null -> {}
+                        }
+                        if (voice.canDownloadOfflineSpeech) {
+                            if (offlineStarted) Body(s(R.string.offline_started), size = 16)
+                            else TextAction(s(R.string.offline_download)) { offlineStarted = voice.downloadOfflineSpeech(language) }
+                        }
                     }
                     else -> {
-                        drawCircle(t.ground, r, Offset(x, markerY))
-                        drawCircle(t.track, r - 2.dp.toPx(), Offset(x, markerY), style = Stroke(4.dp.toPx()))
+                        Title(title(R.string.step_ready))
+                        // The same Help pill the senior will see over every app, so setup can point it out.
+                        Box(
+                            Modifier.fillMaxWidth().height(180.dp).background(t.tile, RoundedCornerShape(24.dp)),
+                            contentAlignment = Alignment.Center,
+                        ) { HelpPill(s(R.string.bubble_help)) }
+                        Body(s(R.string.ready_body), size = 19)
                     }
                 }
             }
         }
-        Column(
-            Modifier
-                .weight(1f)
-                .padding(start = 8.dp, bottom = if (last) 0.dp else 26.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Row(
-                Modifier
-                    .heightIn(min = 40.dp)
-                    .clickable(role = Role.Button, onClick = onOpen)
-                    .semantics {
-                        heading()
-                        stateDescription = if (done) doneLabel else ""
-                    },
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Txt("${index + 1}", if (focused) 26 else 20, FontWeight.Bold, if (done || focused) t.accent else t.soft)
-                Spacer(Modifier.width(12.dp))
-                // weight(1f) bounds the title to the column so long labels wrap instead of clipping.
-                Txt(title, if (focused) 26 else 20, if (focused) FontWeight.Bold else FontWeight.SemiBold, if (focused || done) t.ink else t.soft, Modifier.weight(1f))
+
+        Box(Modifier.fillMaxWidth().padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 16.dp)) {
+            when (page) {
+                1 -> if (micGranted) PrimaryPill(s(R.string.btn_continue)) { page = 2 }
+                else PrimaryPill(s(R.string.btn_allow)) {
+                    val perms = buildList {
+                        add(Manifest.permission.RECORD_AUDIO)
+                        if (Build.VERSION.SDK_INT >= 33) add(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                    askPermissions.launch(perms.toTypedArray())
+                }
+                2 -> if (serviceOn) PrimaryPill(s(R.string.btn_continue)) { page = 3 }
+                else PrimaryPill(s(R.string.btn_open_settings)) {
+                    base.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                }
+                STEPS - 1 -> PrimaryPill(s(R.string.done), onClick = onFinish)
+                else -> PrimaryPill(s(R.string.btn_continue)) { page++ }
             }
-            if (focused) body()
         }
     }
 }
 
-/** The enamel sign beside the current stop: a panel with a metro-blue band on its leading edge. */
+/** Five short segments: blue up to and including the current step. */
 @Composable
-private fun Sign(content: @Composable () -> Unit) {
+private fun Progress(page: Int, modifier: Modifier = Modifier) {
     val t = LocalTones.current
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-            .background(t.panel, RoundedCornerShape(8.dp))
-            .border(1.dp, t.hairline, RoundedCornerShape(8.dp)),
-    ) {
-        Box(Modifier.width(10.dp).fillMaxHeight().background(t.accent, RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp)))
-        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) { content() }
+    Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        repeat(STEPS) { i ->
+            Box(Modifier.weight(1f).height(6.dp).background(if (i <= page) t.accent else t.track, CircleShape))
+        }
     }
 }
 
 @Composable
-private fun PrimaryButton(label: String, glyph: Glyph? = null, onClick: () -> Unit) {
+private fun Title(text: String) {
+    val t = LocalTones.current
+    Txt(text, 32, FontWeight.Bold, t.ink, Modifier.semantics { heading() }, lineHeight = 38)
+}
+
+@Composable
+private fun Body(text: String, size: Int = 18) {
+    val t = LocalTones.current
+    Txt(text, size, FontWeight.Normal, t.soft, lineHeight = (size * 1.45f).toInt())
+}
+
+/** Six languages as a two-column grid of tiles, each name set in its own script. */
+@Composable
+private fun LanguageGrid(selected: String, onPick: (String) -> Unit) {
+    val all = Languages.ALL.entries.toList()
+    Column(Modifier.selectableGroup(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        all.chunked(2).forEach { row ->
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                row.forEach { (tag, name) ->
+                    LanguageTile(name, selected = tag == selected, Modifier.weight(1f)) { onPick(tag) }
+                }
+                if (row.size == 1) Spacer(Modifier.weight(1f))
+            }
+        }
+    }
+}
+
+@Composable
+private fun LanguageTile(name: String, selected: Boolean, modifier: Modifier, onClick: () -> Unit) {
+    val t = LocalTones.current
+    Row(
+        modifier
+            .heightIn(min = 76.dp)
+            .background(if (selected) t.accent else t.tile, RoundedCornerShape(20.dp))
+            .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
+            .padding(horizontal = 18.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Txt(name, 24, FontWeight.SemiBold, if (selected) t.onAccent else t.ink, Modifier.weight(1f))
+        // The tick marks the choice by shape as well as by the blue fill.
+        if (selected) {
+            Box(Modifier.size(26.dp).background(t.onAccent, CircleShape), contentAlignment = Alignment.Center) {
+                GlyphIcon(Glyph.CHECK, t.accent, 18.dp)
+            }
+        }
+    }
+}
+
+/** A two-way choice as a track with a raised segment; the chosen one also carries a tick. */
+@Composable
+private fun <T> Segmented(options: List<Pair<String, T>>, selected: T, onPick: (T) -> Unit) {
+    val t = LocalTones.current
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .background(t.tile, CircleShape)
+            .padding(4.dp)
+            .selectableGroup(),
+    ) {
+        options.forEach { (label, value) ->
+            val on = value == selected
+            Row(
+                Modifier
+                    .weight(1f)
+                    .heightIn(min = 56.dp)
+                    .then(if (on) Modifier.shadow(2.dp, CircleShape).background(t.raised, CircleShape) else Modifier)
+                    .selectable(selected = on, role = Role.RadioButton) { onPick(value) },
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if (on) {
+                    GlyphIcon(Glyph.CHECK, t.accentLine, 18.dp)
+                    Spacer(Modifier.width(6.dp))
+                }
+                Txt(label, 19, if (on) FontWeight.Bold else FontWeight.Medium, if (on) t.ink else t.soft)
+            }
+        }
+    }
+}
+
+@Composable
+private fun PrimaryPill(label: String, onClick: () -> Unit) {
     val t = LocalTones.current
     Button(
         onClick = onClick,
-        shape = RoundedCornerShape(10.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = t.accentFill, contentColor = t.onAccent),
+        shape = CircleShape,
+        colors = ButtonDefaults.buttonColors(containerColor = t.accent, contentColor = t.onAccent),
+        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 14.dp),
         modifier = Modifier.fillMaxWidth().heightIn(min = 60.dp),
+    ) { Txt(label, 20, FontWeight.SemiBold, t.onAccent, center = true) }
+}
+
+@Composable
+private fun QuietButton(label: String, glyph: Glyph?, onClick: () -> Unit) {
+    val t = LocalTones.current
+    Button(
+        onClick = onClick,
+        shape = CircleShape,
+        colors = ButtonDefaults.buttonColors(containerColor = t.tile, contentColor = t.ink),
+        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
     ) {
         if (glyph != null) {
-            GlyphIcon(glyph, t.onAccent, 24.dp)
+            GlyphIcon(glyph, t.ink, 22.dp)
             Spacer(Modifier.width(10.dp))
         }
-        Txt(label, 21, FontWeight.Bold, t.onAccent)
+        Txt(label, 19, FontWeight.SemiBold, t.ink, center = true)
     }
 }
 
 @Composable
-private fun SecondaryButton(label: String, onClick: () -> Unit) {
+private fun TextAction(label: String, onClick: () -> Unit) {
     val t = LocalTones.current
-    OutlinedButton(
+    // The button clips to its pill, so its padding must hold the ि matra that overhangs a word's start;
+    // the offset puts the words back in line with the column.
+    TextButton(
         onClick = onClick,
-        shape = RoundedCornerShape(10.dp),
-        border = BorderStroke(2.5.dp, t.accent),
-        // Vertical padding so a two-line label (Hindi "…डाउनलोड करें") is never cut by the border.
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-        modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
-    ) { Txt(label, 18, FontWeight.SemiBold, t.accent, center = true) }
-}
-
-/** A two-way choice; the selected one is filled and ticked, so it reads without colour. */
-@Composable
-private fun Choice(label: String, selected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    val t = LocalTones.current
-    OutlinedButton(
-        onClick = onClick,
-        shape = RoundedCornerShape(10.dp),
-        border = BorderStroke(2.5.dp, t.accent),
-        colors = ButtonDefaults.outlinedButtonColors(containerColor = if (selected) t.accentFill else Color.Transparent),
-        // Tight padding: half-width pills hold "Normal" or "சாதாரண" plus the tick on one line.
-        contentPadding = PaddingValues(horizontal = 12.dp),
-        modifier = modifier.heightIn(min = 56.dp).semantics { this.selected = selected },
+        modifier = Modifier.heightIn(min = 48.dp).offset(x = (-12).dp),
+        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
     ) {
-        if (selected) {
-            GlyphIcon(Glyph.CHECK, t.onAccent, 20.dp)
-            Spacer(Modifier.width(6.dp))
-        }
-        Text(
-            label,
-            maxLines = 1,
-            softWrap = false,
-            style = TextStyle(fontFamily = LocalFace.current, fontSize = 19.sp, fontWeight = FontWeight.SemiBold, color = if (selected) t.onAccent else t.accent),
-        )
-    }
-}
-
-/** A language chip set in that language's own script face. */
-@Composable
-private fun LanguageChip(name: String, tag: String, selected: Boolean, onClick: () -> Unit) {
-    val t = LocalTones.current
-    val context = LocalContext.current
-    val face = remember(tag) { SaathiType.family(context, tag) }
-    Box(
-        Modifier
-            .heightIn(min = 52.dp)
-            // Comp 3: unselected chips are plain grey fills; the chosen one is tinted and outlined in blue.
-            .background(if (selected) t.accent.copy(alpha = 0.14f) else t.chip, RoundedCornerShape(26.dp))
-            .border(2.5.dp, if (selected) t.accent else Color.Transparent, RoundedCornerShape(26.dp))
-            .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
-            .padding(horizontal = 20.dp, vertical = 10.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(name, style = TextStyle(fontFamily = face, fontSize = 21.sp, fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold, color = if (selected) t.accent else t.ink))
+        Txt(label, 18, FontWeight.SemiBold, t.accentLine)
     }
 }
 
 @Composable
-private fun DoneLine(label: String) {
+private fun DoneRow(label: String) {
     val t = LocalTones.current
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.size(28.dp).background(t.done, CircleShape), contentAlignment = Alignment.Center) {
-            // The night green is light, so its tick is dark to keep ≥3:1.
-            GlyphIcon(Glyph.CHECK, if (t.m === Metro.DARK) Color(0xFF0B0C0E) else Color.White, 18.dp)
+        Box(Modifier.size(30.dp).background(t.done, CircleShape), contentAlignment = Alignment.Center) {
+            GlyphIcon(Glyph.CHECK, Color.White, 19.dp)
         }
-        Spacer(Modifier.width(10.dp))
-        Txt(label, 19, FontWeight.SemiBold, t.ink)
+        Spacer(Modifier.width(12.dp))
+        Txt(label, 19, FontWeight.SemiBold, t.ink, Modifier.weight(1f, fill = false))
     }
 }
 
-/** Something that needs doing: a caution note marked with a warning glyph, not colour alone. */
+/** Something that needs doing, marked with a warning glyph, not colour alone. */
 @Composable
 private fun Notice(text: String) {
     val t = LocalTones.current
     Row(
         Modifier
             .fillMaxWidth()
-            .border(2.dp, t.caution, RoundedCornerShape(8.dp))
-            .padding(14.dp),
+            .background(t.caution.copy(alpha = 0.16f), RoundedCornerShape(20.dp))
+            .padding(18.dp),
         verticalAlignment = Alignment.Top,
     ) {
-        GlyphIcon(Glyph.WARNING, t.caution, 24.dp)
-        Spacer(Modifier.width(10.dp))
+        // Ink, not amber: an amber glyph on the amber tint falls below 3:1.
+        GlyphIcon(Glyph.WARNING, t.ink, 24.dp)
+        Spacer(Modifier.width(12.dp))
         Txt(text, 17, FontWeight.Normal, t.ink, lineHeight = 25)
     }
 }
 
-/** The same Help disc the senior will see over every app, so setup can point it out. */
+/** The Help pill as it floats over other apps. */
 @Composable
-private fun HelpDisc(label: String, size: Dp) {
+private fun HelpPill(label: String) {
     val t = LocalTones.current
-    Box(
+    Row(
         Modifier
-            .size(size)
-            .background(t.accentFill, CircleShape)
-            .border(2.5.dp, if (t.m === Metro.DARK) Color(0xFF0B0C0E) else Color.White, CircleShape)
-            .semantics { contentDescription = label },
-        contentAlignment = Alignment.Center,
+            .shadow(8.dp, CircleShape)
+            .background(t.accent, CircleShape)
+            .heightIn(min = 56.dp)
+            .padding(start = 18.dp, end = 22.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            GlyphIcon(Glyph.GUIDE, t.onAccent, size * 0.34f)
-            if (size >= 64.dp) Txt(label, 14, FontWeight.Bold, t.onAccent)
+        GlyphIcon(Glyph.CURSOR, t.onAccent, 24.dp)
+        Spacer(Modifier.width(8.dp))
+        Txt(label, 19, FontWeight.Bold, t.onAccent)
+    }
+}
+
+/** The Help pill while the mic is open: near-black, with voice bars beside the word. */
+@Composable
+private fun ListeningPill(label: String) {
+    val card = Color(LocalTones.current.b.card)
+    Row(
+        Modifier
+            .shadow(8.dp, CircleShape)
+            .background(card, CircleShape)
+            .heightIn(min = 56.dp)
+            .padding(start = 18.dp, end = 22.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Canvas(Modifier.size(24.dp)) {
+            val step = size.width / 4
+            listOf(0.5f, 0.9f, 0.65f, 0.8f).forEachIndexed { k, h ->
+                val x = step * (k + 0.5f)
+                drawLine(Color.White, Offset(x, size.height * (1 - h) / 2), Offset(x, size.height * (1 + h) / 2), 3.2.dp.toPx(), cap = StrokeCap.Round)
+            }
         }
+        Spacer(Modifier.width(8.dp))
+        Txt(label, 19, FontWeight.Bold, Color.White)
     }
 }
 
@@ -553,12 +569,14 @@ private fun Txt(
         text,
         modifier = modifier,
         style = TextStyle(
-            textAlign = if (center) androidx.compose.ui.text.style.TextAlign.Center else androidx.compose.ui.text.style.TextAlign.Unspecified,
-            fontFamily = LocalFace.current,
+            textAlign = if (center) TextAlign.Center else TextAlign.Unspecified,
             fontSize = size.sp,
             fontWeight = weight,
             color = color,
-            lineHeight = (lineHeight ?: (size * 1.2f).toInt()).sp,
+            // Room above the first line for Devanagari's ि and ी hooks and the Dravidian vowel signs,
+            // which a tight line height clips.
+            lineHeight = (lineHeight ?: (size * 1.4f).toInt()).sp,
+            lineHeightStyle = LineHeightStyle(LineHeightStyle.Alignment.Center, LineHeightStyle.Trim.None),
         ),
     )
 }

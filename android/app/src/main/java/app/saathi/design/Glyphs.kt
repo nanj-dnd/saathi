@@ -3,16 +3,28 @@ package app.saathi.design
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
 import android.graphics.RectF
 
 /**
- * Saathi's drawn icon set, on a 24-unit grid with one heavy stroke weight, used by the overlay and
- * setup alike. Each sign kind has a distinct shape so state never depends on colour alone.
+ * Saathi's drawn icon set on a 24-unit grid with one rounded stroke, used by the overlay and setup
+ * alike. The cursor is the system's mark: the pointer, the Help button and the launcher icon.
  */
-enum class Glyph { ARROW_DOWN, ARROW_UP, CHECK, LOCK, WARNING, STOP, MIC, REPEAT, CLOSE, SPEAKER, GUIDE }
+enum class Glyph { CURSOR, CHECK, LOCK, WARNING, MIC, REPEAT, CLOSE, SPEAKER, BACK }
 
 object Glyphs {
-    private const val STROKE = 3.2f
+    private const val STROKE = 2.4f
+
+    /** The cursor's tip, in grid units: where it touches the thing it points at. */
+    const val TIP_X = 5f
+    const val TIP_Y = 3f
+
+    /** The classic pointer with its tail, tip at the top left. Fill it with a round-joined stroke to soften the corners. */
+    fun cursorPath() = Path().apply {
+        moveTo(TIP_X, TIP_Y); lineTo(5f, 20f); lineTo(9.3f, 16.2f); lineTo(12f, 21.7f)
+        lineTo(14.4f, 20.6f); lineTo(11.7f, 15f); lineTo(17f, 15f); close()
+    }
 
     /** Draws [glyph] centred in [box] in [color]. */
     fun draw(canvas: Canvas, glyph: Glyph, box: RectF, color: Int) {
@@ -29,68 +41,43 @@ object Glyphs {
         }
         val fill = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL; this.color = color }
         when (glyph) {
-            Glyph.ARROW_DOWN -> arrow(canvas, fill, down = true)
-            Glyph.ARROW_UP -> arrow(canvas, fill, down = false)
-            Glyph.CHECK -> canvas.drawPath(Path().apply { moveTo(4.5f, 12.5f); lineTo(9.5f, 17.5f); lineTo(19.5f, 6.5f) }, stroke.apply { strokeWidth = 3.6f })
+            Glyph.CURSOR -> canvas.drawPath(cursorPath(), Paint(stroke).apply { style = Paint.Style.FILL_AND_STROKE; strokeWidth = 1.6f })
+            Glyph.CHECK -> canvas.drawPath(Path().apply { moveTo(5f, 12.5f); lineTo(9.8f, 17.2f); lineTo(19f, 7f) }, stroke.apply { strokeWidth = 3f })
             Glyph.LOCK -> {
-                canvas.drawRoundRect(RectF(5f, 10.5f, 19f, 21f), 2f, 2f, fill)
-                canvas.drawPath(Path().apply { moveTo(8.5f, 10.5f); lineTo(8.5f, 7.5f); cubicTo(8.5f, 2.8f, 15.5f, 2.8f, 15.5f, 7.5f); lineTo(15.5f, 10.5f) }, stroke)
+                canvas.drawRoundRect(RectF(5.5f, 10.5f, 18.5f, 20.5f), 3f, 3f, fill)
+                canvas.drawPath(Path().apply { moveTo(8.5f, 10.5f); lineTo(8.5f, 7.8f); cubicTo(8.5f, 3.2f, 15.5f, 3.2f, 15.5f, 7.8f); lineTo(15.5f, 10.5f) }, stroke)
             }
             Glyph.WARNING -> {
-                val knock = Paint(fill).apply { xfermode = android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.CLEAR) }
-                // Punch the exclamation mark out so it reads on any band colour.
+                // The mark is knocked out of the triangle so it reads on any badge colour.
+                val knock = Paint(fill).apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR) }
                 canvas.saveLayer(0f, 0f, 24f, 24f, null)
-                canvas.drawPath(Path().apply { moveTo(12f, 2.5f); lineTo(22.5f, 21f); lineTo(1.5f, 21f); close() }, fill)
-                canvas.drawRoundRect(RectF(10.8f, 8.5f, 13.2f, 15f), 1.2f, 1.2f, knock)
-                canvas.drawCircle(12f, 18f, 1.4f, knock)
+                val tri = Path().apply { moveTo(12f, 3.5f); lineTo(21.5f, 20f); lineTo(2.5f, 20f); close() }
+                canvas.drawPath(tri, Paint(stroke).apply { style = Paint.Style.FILL_AND_STROKE; strokeWidth = 2f })
+                canvas.drawRoundRect(RectF(11f, 9f, 13f, 14.5f), 1f, 1f, knock)
+                canvas.drawCircle(12f, 17.2f, 1.2f, knock)
                 canvas.restore()
             }
-            Glyph.STOP -> {
-                canvas.drawCircle(12f, 12f, 8.5f, stroke)
-                canvas.drawCircle(12f, 12f, 4f, fill)
-            }
             Glyph.MIC -> {
-                canvas.drawRoundRect(RectF(8.5f, 2.5f, 15.5f, 14.5f), 3.5f, 3.5f, fill)
-                canvas.drawPath(Path().apply { moveTo(5f, 11f); cubicTo(5f, 19.5f, 19f, 19.5f, 19f, 11f) }, stroke)
-                canvas.drawLine(12f, 17.5f, 12f, 21.5f, stroke)
+                canvas.drawRoundRect(RectF(9f, 3f, 15f, 14f), 3f, 3f, fill)
+                canvas.drawPath(Path().apply { moveTo(5.5f, 11f); cubicTo(5.5f, 19f, 18.5f, 19f, 18.5f, 11f) }, stroke)
+                canvas.drawLine(12f, 17.2f, 12f, 21f, stroke)
             }
             Glyph.REPEAT -> {
-                // A circular arrow: a 300° arc ending at the top, with its head pointing on round.
-                canvas.drawArc(RectF(4.5f, 4.5f, 19.5f, 19.5f), -30f, 300f, false, stroke)
-                canvas.drawPath(Path().apply { moveTo(10.5f, 0.8f); lineTo(16f, 4.5f); lineTo(10.5f, 8.2f); close() }, fill)
+                // A clockwise circular arrow, open at the top right, its solid head at the top pointing on round.
+                canvas.drawArc(RectF(5f, 5f, 19f, 19f), 0f, 270f, false, stroke)
+                canvas.drawPath(Path().apply { moveTo(16.8f, 5f); lineTo(11f, 0.8f); lineTo(11f, 9.2f); close() }, fill)
             }
             Glyph.CLOSE -> {
-                canvas.drawLine(6f, 6f, 18f, 18f, stroke)
-                canvas.drawLine(18f, 6f, 6f, 18f, stroke)
+                canvas.drawLine(6.5f, 6.5f, 17.5f, 17.5f, stroke)
+                canvas.drawLine(17.5f, 6.5f, 6.5f, 17.5f, stroke)
             }
             Glyph.SPEAKER -> {
-                canvas.drawPath(Path().apply { moveTo(3f, 9f); lineTo(7f, 9f); lineTo(12f, 4.5f); lineTo(12f, 19.5f); lineTo(7f, 15f); lineTo(3f, 15f); close() }, fill)
-                canvas.drawArc(RectF(10f, 7.5f, 17f, 16.5f), -50f, 100f, false, stroke)
-                canvas.drawArc(RectF(10f, 3.5f, 21.5f, 20.5f), -50f, 100f, false, stroke)
+                canvas.drawPath(Path().apply { moveTo(3.5f, 9.5f); lineTo(7f, 9.5f); lineTo(11.5f, 5.5f); lineTo(11.5f, 18.5f); lineTo(7f, 14.5f); lineTo(3.5f, 14.5f); close() }, Paint(stroke).apply { style = Paint.Style.FILL_AND_STROKE; strokeWidth = 1.5f })
+                canvas.drawArc(RectF(10f, 8f, 16f, 16f), -55f, 110f, false, stroke)
+                canvas.drawArc(RectF(10f, 4.5f, 20.5f, 19.5f), -55f, 110f, false, stroke)
             }
-            Glyph.GUIDE -> {
-                // Saathi's mark: an arrow arriving at a station dot.
-                canvas.drawLine(2.5f, 12f, 13f, 12f, stroke)
-                canvas.drawPath(Path().apply { moveTo(9f, 7f); lineTo(14f, 12f); lineTo(9f, 17f) }, stroke)
-                canvas.drawCircle(19.5f, 12f, 3f, fill)
-            }
+            Glyph.BACK -> canvas.drawPath(Path().apply { moveTo(15f, 5f); lineTo(8f, 12f); lineTo(15f, 19f) }, stroke.apply { strokeWidth = 2.6f })
         }
         canvas.restore()
-    }
-
-    /** A heavy signage arrow: wide head, thick shaft. */
-    private fun arrow(canvas: Canvas, fill: Paint, down: Boolean) {
-        val p = Path().apply {
-            moveTo(9.5f, 2f); lineTo(14.5f, 2f); lineTo(14.5f, 12.5f); lineTo(20.5f, 12.5f)
-            lineTo(12f, 22f); lineTo(3.5f, 12.5f); lineTo(9.5f, 12.5f); close()
-        }
-        if (!down) {
-            canvas.save()
-            canvas.rotate(180f, 12f, 12f)
-            canvas.drawPath(p, fill)
-            canvas.restore()
-        } else {
-            canvas.drawPath(p, fill)
-        }
     }
 }

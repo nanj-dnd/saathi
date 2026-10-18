@@ -13,7 +13,7 @@
     <string name="access_restricted">ಬಟನ್ ಮಸುಕಾಗಿದ್ದರೆ, ಆ್ಯಪ್ ಮಾಹಿತಿ ತೆರೆದು, ಮೇಲೆ ⋮ ಒತ್ತಿ \"ನಿರ್ಬಂಧಿತ ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ಅನುಮತಿಸಿ\" ಆಯ್ಕೆಮಾಡಿ.</string>
     <string name="btn_app_info">ಆ್ಯಪ್ ಮಾಹಿತಿ</string>
     <string name="step_ready">5. ಸಿದ್ಧ</string>
-    <string name="ready_body">ಯಾವುದೇ ಆ್ಯಪ್‌ನಲ್ಲಿ ಕಿತ್ತಳೆ ಬಣ್ಣದ \"ಸಹಾಯ\" ಬಟನ್ ಒತ್ತಿ, ನಿಮಗೆ ಏನು ಮಾಡಬೇಕು ಎಂದು ಹೇಳಿ. ಉದಾಹರಣೆ: \"ಬ್ಲಿಂಕಿಟ್‌ನಲ್ಲಿ ಹಾಲು ತರಿಸಬೇಕು\".</string>
+    <string name="ready_body">ಯಾವುದೇ ಆ್ಯಪ್‌ನಲ್ಲಿ ನೀಲಿ ಬಣ್ಣದ \"ಸಹಾಯ\" ಬಟನ್ ಒತ್ತಿ, ನಿಮಗೆ ಏನು ಮಾಡಬೇಕು ಎಂದು ಹೇಳಿ. ಉದಾಹರಣೆ: \"ಬ್ಲಿಂಕಿಟ್‌ನಲ್ಲಿ ಹಾಲು ತರಿಸಬೇಕು\".</string>
     <string name="bubble_help">ಸಹಾಯ</string>
     <string name="bubble_listening">ಕೇಳುತ್ತಿದ್ದೇನೆ</string>
     <string name="bubble_looking">ನೋಡುತ್ತಿದ್ದೇನೆ</string>
@@ -46,4 +46,7 @@
     <string name="offline_download">ಇಂಟರ್ನೆಟ್ ಇಲ್ಲದೆ ಕೇಳಲು ಧ್ವನಿ ಗುರುತಿಸುವಿಕೆ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ</string>
     <string name="offline_started">ಡೌನ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ. ಫೋನನ್ನು Wi-Fi ನಲ್ಲಿ ಇಡಿ.</string>
     <string name="access_summary">ಬಟನ್‌ಗಳನ್ನು ತೋರಿಸಲು ಸಾಥಿ ಪರದೆಯನ್ನು ನೋಡಬೇಕು. ಅದು ತಾನಾಗಿ ಏನನ್ನೂ ಒತ್ತುವುದಿಲ್ಲ.</string>
+    <string name="btn_continue">ಮುಂದುವರಿಸಿ</string>
+    <string name="btn_back">ಹಿಂದೆ</string>
+    <string name="mic_body">ನೀವು ಸಹಾಯ ಬಟನ್ ಒತ್ತಿದ ನಂತರವೇ ಸಾಥಿ ಕೇಳುತ್ತದೆ.</string>
 </resources>

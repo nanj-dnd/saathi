@@ -1,0 +1,5 @@
+{
+ "tool": "Figma AI gpt-image-2.5-sunburst (file rQOghecnqdi2c08tdgHb2M)",
+ "prompt": "Clicky-minimal comp 1-pointer; see session prompt: dimmed app, blue tilted cursor with white edge at the target, near-black 28-radius caption card with white type and two pills, blue Help pill; setup as one-step screen with progress segments and language tiles.",
+ "approved": true, "note": "approved 2026-10-18 with change: caption card defaults to the top of the screen, bottom only when the target is up there"
+}

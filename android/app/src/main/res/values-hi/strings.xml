@@ -13,7 +13,7 @@
     <string name="access_restricted">अगर बटन धुंधला है, तो ऐप की जानकारी खोलें, ऊपर ⋮ दबाएँ और \"प्रतिबंधित सेटिंग की अनुमति दें\" चुनें।</string>
     <string name="btn_app_info">ऐप की जानकारी</string>
     <string name="step_ready">5. तैयार</string>
-    <string name="ready_body">किसी भी ऐप में नारंगी \"मदद\" बटन दबाइए और बोलिए कि आपको क्या करना है। जैसे: \"ब्लिंकिट से दूध मंगाना है\"।</string>
+    <string name="ready_body">किसी भी ऐप में नीले \"मदद\" बटन दबाइए और बोलिए कि आपको क्या करना है। जैसे: \"ब्लिंकिट से दूध मंगाना है\"।</string>
     <string name="bubble_help">मदद</string>
     <string name="bubble_listening">सुन रहा हूँ</string>
     <string name="bubble_looking">देख रहा हूँ</string>
@@ -46,4 +46,7 @@
     <string name="offline_download">बिना इंटरनेट के सुनने के लिए आवाज़ पहचान डाउनलोड करें</string>
     <string name="offline_started">डाउनलोड हो रहा है। फ़ोन वाई-फाई पर रखिए।</string>
     <string name="access_summary">बटन दिखाने के लिए साथी को स्क्रीन देखनी होती है। यह खुद कभी कुछ नहीं दबाता।</string>
+    <string name="btn_continue">आगे बढ़ें</string>
+    <string name="btn_back">पीछे</string>
+    <string name="mic_body">साथी तभी सुनता है जब आप मदद बटन दबाते हैं।</string>
 </resources>

@@ -13,7 +13,7 @@
     <string name="access_restricted">பொத்தான் மங்கலாக இருந்தால், ஆப் தகவலைத் திறந்து, மேலே ⋮ அழுத்தி \"கட்டுப்படுத்தப்பட்ட அமைப்புகளை அனுமதி\" என்பதைத் தேர்ந்தெடுக்கவும்.</string>
     <string name="btn_app_info">ஆப் தகவல்</string>
     <string name="step_ready">5. தயார்</string>
-    <string name="ready_body">எந்த ஆப்பிலும் ஆரஞ்சு \"உதவி\" பொத்தானை அழுத்தி, என்ன செய்ய வேண்டும் என்று சொல்லுங்கள். உதாரணம்: \"பிளிங்கிட்டில் பால் வாங்க வேண்டும்\".</string>
+    <string name="ready_body">எந்த ஆப்பிலும் நீல \"உதவி\" பொத்தானை அழுத்தி, என்ன செய்ய வேண்டும் என்று சொல்லுங்கள். உதாரணம்: \"பிளிங்கிட்டில் பால் வாங்க வேண்டும்\".</string>
     <string name="bubble_help">உதவி</string>
     <string name="bubble_listening">கேட்கிறேன்</string>
     <string name="bubble_looking">பார்க்கிறேன்</string>
@@ -46,4 +46,7 @@
     <string name="offline_download">இணையம் இல்லாமல் கேட்க குரல் அடையாளத்தைப் பதிவிறக்குங்கள்</string>
     <string name="offline_started">பதிவிறக்கம் நடக்கிறது. போனை Wi-Fi-யில் வைத்திருங்கள்.</string>
     <string name="access_summary">பொத்தான்களைக் காட்ட சாத்தி திரையைப் பார்க்க வேண்டும். அது தானாக எதையும் அழுத்தாது.</string>
+    <string name="btn_continue">தொடரவும்</string>
+    <string name="btn_back">பின்செல்</string>
+    <string name="mic_body">நீங்கள் உதவி பொத்தானை அழுத்திய பிறகுதான் சாத்தி கேட்கும்.</string>
 </resources>

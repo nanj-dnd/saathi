@@ -1,676 +1,669 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-15T10:13:31+00:00",
+  "generatedAt": "2026-10-18T14:39:41.219140+00:00",
   "title": "Design System: Saathi",
   "extensions": {
     "colorMeta": {
-      "metro-blue": {
+      "saathi-blue": {
         "role": "primary",
-        "displayName": "Metro Blue",
-        "canonical": "#0858A8",
+        "displayName": "Saathi Blue",
+        "canonical": "#1F5FE0",
         "tonalRamp": [
-          "#000B1F",
-          "#02234A",
-          "#073F7A",
-          "#105DAD",
-          "#387ED1",
-          "#5AA1F7",
-          "#9DC7FD",
-          "#E4F0FE"
+          "#00003A",
+          "#001966",
+          "#093896",
+          "#2057C8",
+          "#3879FB",
+          "#64A0FF",
+          "#90C7FF",
+          "#BDEFFF"
         ]
       },
-      "metro-blue-night-line": {
+      "saathi-blue-night-line": {
         "role": "primary",
         "displayName": "Night Line Blue",
-        "canonical": "#6AB2F2",
+        "canonical": "#4D8BFF",
         "tonalRamp": [
-          "#000C1B",
-          "#022642",
-          "#08426D",
-          "#12619C",
-          "#3A82BF",
-          "#5DA5E4",
-          "#93CAFD",
-          "#E2F0FE"
+          "#000135",
+          "#001D5F",
+          "#103B8C",
+          "#275BBD",
+          "#407CEE",
+          "#6AA2FF",
+          "#96C9FF",
+          "#C2EFFF"
         ]
       },
-      "metro-blue-night-fill": {
-        "role": "primary",
-        "displayName": "Night Fill Blue",
-        "canonical": "#1E6CC0",
-        "tonalRamp": [
-          "#000B1E",
-          "#032448",
-          "#013F7B",
-          "#055DAF",
-          "#337ED4",
-          "#56A1F9",
-          "#9BC8FF",
-          "#E4F0FF"
-        ]
-      },
-      "enamel-white": {
+      "on-blue": {
         "role": "neutral",
-        "displayName": "Enamel White",
+        "displayName": "On Blue White",
         "canonical": "#FFFFFF",
         "tonalRamp": [
           "#0B0B0B",
-          "#242424",
-          "#404040",
-          "#5D5D5D",
-          "#7D7D7D",
-          "#9E9E9E",
-          "#C4C4C4",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
           "#EEEEEE"
         ]
       },
-      "graphite-panel": {
+      "caption-near-black": {
         "role": "neutral",
-        "displayName": "Graphite Panel",
-        "canonical": "#1C1E22",
+        "displayName": "Caption Near-Black",
+        "canonical": "#15171C",
         "tonalRamp": [
-          "#090B0F",
-          "#222428",
-          "#3D4044",
-          "#5B5E62",
-          "#7B7D82",
-          "#9C9EA4",
-          "#C1C4CA",
+          "#0A0B0E",
+          "#242529",
+          "#404246",
+          "#5F6167",
+          "#808289",
+          "#A2A5AB",
+          "#C7C9CE",
+          "#ECEEF3"
+        ]
+      },
+      "caption-night": {
+        "role": "neutral",
+        "displayName": "Caption Night",
+        "canonical": "#22252B",
+        "tonalRamp": [
+          "#0A0B0E",
+          "#232529",
+          "#3F4247",
+          "#5E6168",
+          "#7F828A",
+          "#A2A5AC",
+          "#C6C9CF",
           "#ECEEF4"
         ]
       },
-      "graphite-raised": {
+      "caption-edge-night": {
         "role": "neutral",
-        "displayName": "Graphite Raised",
-        "canonical": "#2A2D33",
+        "displayName": "Night Caption Hairline",
+        "canonical": "#FFFFFF1F",
         "tonalRamp": [
-          "#090B10",
-          "#21242A",
-          "#3D4046",
-          "#5A5E64",
-          "#7A7D84",
-          "#9B9EA6",
-          "#C0C4CC",
-          "#EAEFF7"
+          "#0B0B0B",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
+          "#EEEEEE"
+        ],
+        "note": "CSS #RRGGBBAA; source is Android ARGB in Buddy.kt"
+      },
+      "caption-ink": {
+        "role": "neutral",
+        "displayName": "Caption Ink",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
+          "#EEEEEE"
         ]
       },
-      "night-ground": {
+      "caption-ink-soft": {
         "role": "neutral",
-        "displayName": "Night Ground",
-        "canonical": "#111215",
+        "displayName": "Caption Ink Soft (70% white)",
+        "canonical": "#FFFFFFB3",
         "tonalRamp": [
-          "#0A0B0E",
-          "#232427",
-          "#3E4043",
-          "#5C5D61",
-          "#7C7D81",
-          "#9D9EA2",
-          "#C2C4C8",
-          "#EDEEF3"
+          "#0B0B0B",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
+          "#EEEEEE"
+        ],
+        "note": "CSS #RRGGBBAA; source is Android ARGB in Buddy.kt"
+      },
+      "pill-white": {
+        "role": "neutral",
+        "displayName": "Pill White",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
+          "#EEEEEE"
         ]
       },
-      "ring-edge-night": {
+      "pill-quiet": {
         "role": "neutral",
-        "displayName": "Ring Edge Night",
-        "canonical": "#0B0C0E",
+        "displayName": "Pill Quiet (16% white)",
+        "canonical": "#FFFFFF29",
         "tonalRamp": [
-          "#0A0B0D",
-          "#232426",
-          "#3E4042",
-          "#5C5E60",
-          "#7C7D80",
-          "#9D9EA1",
-          "#C2C4C7",
-          "#EDEEF2"
-        ]
+          "#0B0B0B",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
+          "#EEEEEE"
+        ],
+        "note": "CSS #RRGGBBAA; source is Android ARGB in Buddy.kt"
       },
-      "signage-ink": {
+      "cursor-edge": {
         "role": "neutral",
-        "displayName": "Signage Ink",
-        "canonical": "#111214",
+        "displayName": "Cursor Edge",
+        "canonical": "#FFFFFF",
         "tonalRamp": [
-          "#0A0B0D",
-          "#232426",
-          "#3E4042",
-          "#5C5E60",
-          "#7C7D80",
-          "#9D9EA1",
-          "#C3C4C7",
-          "#EDEEF1"
-        ]
-      },
-      "signage-ink-soft": {
-        "role": "neutral",
-        "displayName": "Signage Ink Soft",
-        "canonical": "#3B3F45",
-        "tonalRamp": [
-          "#080B10",
-          "#21242A",
-          "#3C4046",
-          "#5A5E64",
-          "#797E84",
-          "#9A9FA6",
-          "#C0C4CC",
-          "#EAEFF6"
-        ]
-      },
-      "night-ink": {
-        "role": "neutral",
-        "displayName": "Night Ink",
-        "canonical": "#F4F5F7",
-        "tonalRamp": [
-          "#0B0B0C",
-          "#232425",
-          "#3F4041",
-          "#5D5E5F",
-          "#7C7D7F",
-          "#9D9EA0",
-          "#C3C4C6",
-          "#EDEEF0"
-        ]
-      },
-      "night-ink-soft": {
-        "role": "neutral",
-        "displayName": "Night Ink Soft",
-        "canonical": "#C3C7CE",
-        "tonalRamp": [
-          "#090B10",
-          "#212429",
-          "#3D4046",
-          "#5A5E64",
-          "#7A7D84",
-          "#9B9FA5",
-          "#C0C4CB",
-          "#EBEFF6"
+          "#0B0B0B",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
+          "#EEEEEE"
         ]
       },
       "veil-day": {
         "role": "neutral",
-        "displayName": "Veil (day)",
-        "canonical": "#0000005C",
+        "displayName": "Day Veil (22% black)",
+        "canonical": "#00000038",
         "tonalRamp": [
           "#0B0B0B",
-          "#242424",
-          "#404040",
-          "#5D5D5D",
-          "#7D7D7D",
-          "#9E9E9E",
-          "#C4C4C4",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
           "#EEEEEE"
         ],
-        "note": "Alpha black over the app; ramp shows the opaque hue only."
+        "note": "CSS #RRGGBBAA; source is Android ARGB in Buddy.kt"
       },
       "veil-night": {
         "role": "neutral",
-        "displayName": "Veil (night)",
-        "canonical": "#00000080",
+        "displayName": "Night Veil (32% black)",
+        "canonical": "#00000052",
         "tonalRamp": [
           "#0B0B0B",
-          "#242424",
-          "#404040",
-          "#5D5D5D",
-          "#7D7D7D",
-          "#9E9E9E",
-          "#C4C4C4",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
           "#EEEEEE"
         ],
-        "note": "Alpha black over the app; ramp shows the opaque hue only."
+        "note": "CSS #RRGGBBAA; source is Android ARGB in Buddy.kt"
       },
-      "close-grey": {
+      "ground-day": {
         "role": "neutral",
-        "displayName": "Close Grey",
-        "canonical": "#E9EBEE",
+        "displayName": "Setup Ground",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
+          "#EEEEEE"
+        ]
+      },
+      "ground-night": {
+        "role": "neutral",
+        "displayName": "Setup Ground Night",
+        "canonical": "#0F1114",
         "tonalRamp": [
           "#0A0B0D",
-          "#232426",
-          "#3E4042",
-          "#5C5E60",
-          "#7C7D80",
-          "#9D9EA1",
-          "#C2C4C7",
+          "#242527",
+          "#404245",
+          "#5F6165",
+          "#808287",
+          "#A3A5A9",
+          "#C7C9CD",
           "#EDEFF2"
         ]
       },
-      "chip-grey": {
+      "ink-day": {
         "role": "neutral",
-        "displayName": "Chip Grey",
-        "canonical": "#ECEEF1",
+        "displayName": "Setup Ink",
+        "canonical": "#101215",
         "tonalRamp": [
           "#0A0B0D",
-          "#232426",
-          "#3E4042",
-          "#5C5E60",
-          "#7C7D80",
-          "#9D9EA1",
-          "#C2C4C7",
-          "#EDEFF2"
+          "#242527",
+          "#404245",
+          "#5F6165",
+          "#808286",
+          "#A3A5A9",
+          "#C7C9CD",
+          "#EDEFF1"
         ]
       },
-      "hairline": {
+      "ink-night": {
         "role": "neutral",
-        "displayName": "Hairline",
-        "canonical": "#DDE1E6",
+        "displayName": "Setup Ink Night",
+        "canonical": "#F3F4F6",
         "tonalRamp": [
-          "#090B0F",
-          "#212428",
-          "#3D4044",
-          "#5A5E62",
-          "#7A7E82",
-          "#9B9FA3",
-          "#C1C4C9",
-          "#EBEFF4"
+          "#0B0B0C",
+          "#252526",
+          "#414243",
+          "#606163",
+          "#818284",
+          "#A4A5A7",
+          "#C8C9CA",
+          "#EEEEF0"
         ]
       },
-      "track-grey": {
+      "ink-soft-day": {
         "role": "neutral",
-        "displayName": "Track Grey",
-        "canonical": "#C9CDD3",
+        "displayName": "Soft Ink",
+        "canonical": "#5B616B",
         "tonalRamp": [
           "#090B0F",
-          "#212429",
-          "#3D4045",
-          "#5A5E63",
-          "#7A7D83",
-          "#9B9FA4",
-          "#C0C4CA",
+          "#22252B",
+          "#3E424A",
+          "#5C626A",
+          "#7C838D",
+          "#A0A5AF",
+          "#C4C9D2",
+          "#EAEFF6"
+        ]
+      },
+      "ink-soft-night": {
+        "role": "neutral",
+        "displayName": "Soft Ink Night",
+        "canonical": "#A4AAB3",
+        "tonalRamp": [
+          "#090B0F",
+          "#22252A",
+          "#3E4248",
+          "#5D6269",
+          "#7D838B",
+          "#A0A5AD",
+          "#C5C9D1",
           "#EBEFF5"
+        ]
+      },
+      "tile-day": {
+        "role": "neutral",
+        "displayName": "Tile Grey",
+        "canonical": "#F2F3F5",
+        "tonalRamp": [
+          "#0B0B0C",
+          "#252526",
+          "#414243",
+          "#606163",
+          "#818284",
+          "#A4A5A7",
+          "#C8C9CA",
+          "#EEEEF0"
+        ]
+      },
+      "tile-night": {
+        "role": "neutral",
+        "displayName": "Tile Night",
+        "canonical": "#1C1F24",
+        "tonalRamp": [
+          "#0A0B0E",
+          "#232529",
+          "#3F4246",
+          "#5E6167",
+          "#7F8289",
+          "#A2A5AB",
+          "#C6C9CE",
+          "#ECEFF3"
+        ]
+      },
+      "raised-day": {
+        "role": "neutral",
+        "displayName": "Raised Segment",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#A5A5A5",
+          "#C9C9C9",
+          "#EEEEEE"
+        ]
+      },
+      "raised-night": {
+        "role": "neutral",
+        "displayName": "Raised Segment Night",
+        "canonical": "#33373F",
+        "tonalRamp": [
+          "#090B0F",
+          "#23252A",
+          "#3F4248",
+          "#5D6169",
+          "#7E828C",
+          "#A1A5AE",
+          "#C5C9D1",
+          "#EBEFF5"
+        ]
+      },
+      "track-day": {
+        "role": "neutral",
+        "displayName": "Progress Track",
+        "canonical": "#E3E6EA",
+        "tonalRamp": [
+          "#0A0B0D",
+          "#242527",
+          "#404245",
+          "#5F6164",
+          "#808286",
+          "#A3A5A8",
+          "#C7C9CC",
+          "#EDEFF1"
         ]
       },
       "track-night": {
         "role": "neutral",
-        "displayName": "Track Night",
-        "canonical": "#3A3E45",
+        "displayName": "Progress Track Night",
+        "canonical": "#2A2E35",
         "tonalRamp": [
-          "#080B11",
-          "#20242B",
-          "#3C4047",
-          "#595E65",
-          "#797D85",
-          "#9A9FA7",
-          "#BFC4CD",
-          "#EAEFF8"
+          "#090B0E",
+          "#23252A",
+          "#3F4248",
+          "#5D6168",
+          "#7E838B",
+          "#A1A5AD",
+          "#C5C9D0",
+          "#EBEFF5"
         ]
       },
       "done-green": {
-        "role": "tertiary",
+        "role": "status",
         "displayName": "Done Green",
-        "canonical": "#1B7F3B",
+        "canonical": "#1E9E5A",
         "tonalRamp": [
-          "#001003",
-          "#032D0F",
-          "#0A4D20",
-          "#157033",
-          "#35934E",
-          "#5AB56E",
-          "#81DD93",
-          "#C9FFD1"
-        ]
-      },
-      "done-green-night": {
-        "role": "tertiary",
-        "displayName": "Done Green Night",
-        "canonical": "#4CC071",
-        "tonalRamp": [
-          "#001003",
-          "#022D12",
-          "#094D24",
-          "#137038",
-          "#0E964A",
-          "#44B96A",
-          "#6EE08F",
-          "#C8FED4"
+          "#001300",
+          "#00310B",
+          "#005223",
+          "#00763C",
+          "#1A9B57",
+          "#5BBC7F",
+          "#8DDFA7",
+          "#BCFFD1"
         ]
       },
       "caution-amber": {
-        "role": "tertiary",
+        "role": "status",
         "displayName": "Caution Amber",
-        "canonical": "#9A5B00",
+        "canonical": "#F5A524",
         "tonalRamp": [
-          "#150800",
-          "#361D01",
-          "#5B3606",
-          "#845010",
-          "#AD6C20",
-          "#D18E47",
-          "#F9B46D",
-          "#FEEBD9"
-        ]
-      },
-      "caution-amber-night": {
-        "role": "tertiary",
-        "displayName": "Caution Amber Night",
-        "canonical": "#F0A63A",
-        "tonalRamp": [
-          "#130800",
-          "#341F01",
-          "#583806",
-          "#7F530F",
-          "#AA6F09",
-          "#D58D11",
-          "#FEB34A",
-          "#FEEBD5"
+          "#1F0100",
+          "#421700",
+          "#683200",
+          "#904F00",
+          "#BA6F00",
+          "#DA952D",
+          "#FABC6B",
+          "#FFE4A1"
         ]
       },
       "danger-red": {
-        "role": "tertiary",
+        "role": "status",
         "displayName": "Danger Red",
-        "canonical": "#C62828",
+        "canonical": "#E5484D",
         "tonalRamp": [
-          "#1F0001",
-          "#490406",
-          "#7D0009",
-          "#B10414",
-          "#D83C38",
-          "#FA6A60",
-          "#FEABA2",
-          "#FEE9E6"
-        ]
-      },
-      "danger-red-night": {
-        "role": "tertiary",
-        "displayName": "Danger Red Night",
-        "canonical": "#FF6B6B",
-        "tonalRamp": [
-          "#1F0002",
-          "#4A020A",
-          "#790B18",
-          "#AD1628",
-          "#D34347",
-          "#FB6768",
-          "#FBACA8",
-          "#FFE9E7"
+          "#2A0000",
+          "#530002",
+          "#7F0317",
+          "#AE252E",
+          "#DE4248",
+          "#FE7371",
+          "#FFA09B",
+          "#FFCDC7"
         ]
       }
     },
     "typographyMeta": {
       "display": {
         "displayName": "Display",
-        "purpose": "Setup wordmark only."
+        "purpose": "Setup step titles, one per screen."
       },
-      "sign-head": {
-        "displayName": "Sign Head",
-        "purpose": "First sentence of an overlay instruction; scales with system font up to 1.3x; fallback line spacing off."
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "The caption's first sentence; scales with system font size up to 1.3x."
       },
-      "sign-sub": {
-        "displayName": "Sign Sub",
-        "purpose": "Remaining sentences of an instruction, soft ink; scales up to 1.3x."
+      "title": {
+        "displayName": "Title",
+        "purpose": "Language names in their own script on the language tiles."
       },
-      "stop-current": {
-        "displayName": "Stop Current",
-        "purpose": "Current setup stop number and title."
-      },
-      "stop": {
-        "displayName": "Stop",
-        "purpose": "Other setup stop titles."
+      "body-caption": {
+        "displayName": "Body Caption",
+        "purpose": "The rest of the caption beneath the headline, at 70% white."
       },
       "body": {
         "displayName": "Body",
-        "purpose": "Setup tagline and Ready text."
+        "purpose": "Setup explanations in soft ink."
       },
       "body-small": {
         "displayName": "Body Small",
-        "purpose": "Disclosure, hints, status lines."
+        "purpose": "The accessibility disclosure block in setup."
       },
-      "button": {
-        "displayName": "Button",
-        "purpose": "Repeat, Close and primary actions; shrinks to fit beside its glyph, never below 13."
+      "label-button": {
+        "displayName": "Label Button",
+        "purpose": "The pinned primary pill."
       },
-      "button-secondary": {
-        "displayName": "Button Secondary",
-        "purpose": "Setup outline actions."
+      "label": {
+        "displayName": "Label",
+        "purpose": "Repeat, Close, quiet buttons, segment labels, confirmation rows; shrinks to fit, never below 13sp."
       },
-      "disc-word": {
-        "displayName": "Disc Word",
-        "purpose": "Help/Listening/Looking under the disc glyph, width axis 88; never below 14."
+      "label-help": {
+        "displayName": "Label Help",
+        "purpose": "The Help pill's word; shrinks to fit a 240dp pill, never below 15sp."
       }
     },
-    "fonts": [
-      {
-        "family": "Anek",
-        "source": "android/app/src/main/assets/fonts",
-        "files": [
-          "AnekLatin.ttf",
-          "AnekDevanagari.ttf",
-          "AnekTamil.ttf",
-          "AnekTelugu.ttf",
-          "AnekKannada.ttf",
-          "AnekMalayalam.ttf"
-        ],
-        "axes": {
-          "wght": "100-800",
-          "wdth": "75-125"
-        },
-        "purpose": "One variable file per script, chosen by the senior's language; each also carries Latin."
-      }
-    ],
     "shadows": [
       {
-        "name": "sign-inset",
-        "value": "Android elevation 4dp",
-        "purpose": "Top inset sign card over the app."
+        "name": "cursor-lift",
+        "value": "0 2px 6px rgba(0,0,0,0.35)",
+        "purpose": "Under the cursor's white edge."
       },
       {
-        "name": "sign-docked",
-        "value": "Android elevation 8dp",
-        "purpose": "Bottom docked platform board (square corners)."
+        "name": "help-pill-lift",
+        "value": "0 3px 8px rgba(0,0,0,0.25)",
+        "purpose": "Under the Help pill, overlay and setup alike."
       },
       {
-        "name": "disc-lift",
-        "value": "0 2px 6px rgba(0,0,0,0.33)",
-        "purpose": "Help disc only, together with its 3dp bright rim."
+        "name": "caption-float",
+        "value": "Android elevation 10dp (approx. 0 6px 20px rgba(0,0,0,0.28))",
+        "purpose": "The caption card floating over the app."
+      },
+      {
+        "name": "spotlight-halo",
+        "value": "0 0 18px rgba(31,95,224,0.78), inset 0 0 0 1px rgba(31,95,224,0.59)",
+        "purpose": "The spotlight's edge around the target; night uses #4D8BFF."
+      },
+      {
+        "name": "raised-segment",
+        "value": "Android elevation 2dp (approx. 0 1px 3px rgba(0,0,0,0.18))",
+        "purpose": "The selected half of the segmented control."
       }
     ],
     "motion": [
       {
-        "name": "ring-glide",
-        "value": "520ms, DecelerateInterpolator(2)",
-        "purpose": "The ring travels from its last stop or the Help disc to the next target. The signature motion."
+        "name": "settle",
+        "value": "cubic-bezier(0.3, 0, 0.1, 1)",
+        "purpose": "Material emphasized curve for the cursor flight."
       },
       {
-        "name": "station-dot-breathe",
-        "value": "1600ms loop, up to 18% swell",
-        "purpose": "Station dot pulses once the ring has arrived; nothing else moves."
+        "name": "cursor-flight",
+        "value": "720ms settle, quadratic arc bowing up 22% of its length, 14-dot fading trail",
+        "purpose": "The one signature motion: Help pill (or last stop) to the target."
       },
       {
-        "name": "disc-listening",
-        "value": "1400ms loop, two rings outward",
-        "purpose": "Help disc while the mic is open."
+        "name": "cursor-nod",
+        "value": "1400ms loop, 4dp toward the target",
+        "purpose": "The landed cursor's only movement."
       },
       {
-        "name": "disc-looking",
-        "value": "1400ms loop, 100-degree arc rotating",
-        "purpose": "Help disc while the screen is being read."
+        "name": "listening-pulse",
+        "value": "1400ms loop, two soft halos, voice bars out of step",
+        "purpose": "Help pill while the mic is open."
+      },
+      {
+        "name": "step-change",
+        "value": "slide 1/6 width + fade, 320ms in / 220ms out",
+        "purpose": "Moving between setup steps."
       },
       {
         "name": "reduce-motion",
-        "value": "ValueAnimator.areAnimatorsEnabled() == false",
-        "purpose": "Remove animations: every motion above becomes an instant cut or is not started."
+        "value": "instant cuts",
+        "purpose": "With the system's Remove animations setting, flight, nod and pulses do not animate."
       }
     ],
-    "breakpoints": [],
-    "accessibility": [
-      {
-        "name": "font-scale-cap",
-        "value": "1.0-1.3x",
-        "purpose": "Overlay type follows system font scale up to 1.3x."
-      },
-      {
-        "name": "ring-min",
-        "value": "64dp",
-        "purpose": "Minimum ring side for small targets."
-      },
-      {
-        "name": "touch-min",
-        "value": "60dp sign buttons, 56dp setup buttons, 52dp chips",
-        "purpose": "Large targets for older hands."
-      },
-      {
-        "name": "glyph-grid",
-        "value": "24-unit grid, 3.2 stroke, round caps/joins",
-        "purpose": "Drawn icon set (Glyphs.kt) shared by overlay and setup."
-      }
-    ]
+    "breakpoints": []
   },
   "components": [
     {
-      "name": "Repeat Button",
+      "name": "Help Pill",
       "kind": "button",
-      "refersTo": "button-repeat",
-      "description": "Filled metro-blue sign button; replays the spoken step.",
-      "html": "<button class=\"ds-btn-repeat\"><svg viewBox=\"0 0 24 24\" width=\"24\" height=\"24\" aria-hidden=\"true\"><path d=\"M18.5 15.75A7.5 7.5 0 1 1 13.3 4.6\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.2\" stroke-linecap=\"round\"/><path d=\"M10.5 0.8L16 4.5 10.5 8.2z\" fill=\"currentColor\"/></svg>Repeat</button>",
-      "css": ".ds-btn-repeat{font-family:'Anek Latin','Anek Devanagari',sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:60px;min-width:200px;padding:0 14px;border-radius:10px;font-size:21px;font-weight:700;cursor:pointer;transition:filter .15s;background:#0858A8;color:#FFFFFF;border:none;} .ds-btn-repeat:hover{filter:brightness(1.1);} .ds-btn-repeat:focus-visible{outline:3px solid #111214;outline-offset:3px;} .ds-btn-repeat:active{filter:brightness(.9);}"
+      "refersTo": "help-pill",
+      "description": "The blue pill carrying the cursor glyph and its word; side-anchored and snapped to a screen edge.",
+      "html": "<button class=\"ds-help\"><svg viewBox=\"0 0 24 24\" width=\"24\" height=\"24\"><path d=\"M5,3 L5,20 L9.3,16.2 L12,21.7 L14.4,20.6 L11.7,15 L17,15 Z\" fill=\"#fff\" stroke=\"#fff\" stroke-width=\"1.6\" stroke-linejoin=\"round\"/></svg><span>Help</span></button>",
+      "css": ".ds-help { display: inline-flex; align-items: center; gap: 8px; height: 56px; padding: 0 22px 0 18px; border-radius: 9999px; background: #1F5FE0; color: #fff; border: 1.5px solid rgba(255,255,255,0.9); box-shadow: 0 3px 8px rgba(0,0,0,0.25); font: 700 19px/1.4 Roboto, 'Noto Sans Devanagari', sans-serif; cursor: pointer; transition: transform 0.2s cubic-bezier(0.3,0,0.1,1); } .ds-help:hover { transform: translateY(-1px); } .ds-help:active { transform: scale(0.97); } .ds-help:focus-visible { outline: 3px solid #4D8BFF; outline-offset: 3px; }"
     },
     {
-      "name": "Close Button (on veil)",
+      "name": "Help Pill, Listening",
       "kind": "button",
-      "refersTo": "button-close-on-veil",
-      "description": "Outline sign button with an opaque neutral fill, used beneath the inset sign on the veil.",
-      "html": "<button class=\"ds-btn-close\"><svg viewBox=\"0 0 24 24\" width=\"24\" height=\"24\" aria-hidden=\"true\"><path d=\"M6 6l12 12M18 6L6 18\" stroke=\"currentColor\" stroke-width=\"3.2\" stroke-linecap=\"round\"/></svg>Close</button>",
-      "css": ".ds-btn-close{font-family:'Anek Latin','Anek Devanagari',sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:60px;min-width:200px;padding:0 14px;border-radius:10px;font-size:21px;font-weight:700;cursor:pointer;transition:filter .15s;background:#E9EBEE;color:#0858A8;border:2.5px solid #0858A8;} .ds-btn-close:hover{background:#DDE1E6;} .ds-btn-close:focus-visible{outline:3px solid #111214;outline-offset:3px;} .ds-btn-close:active{background:#C9CDD3;}"
+      "refersTo": "help-pill-busy",
+      "description": "The Help pill while the mic is open: near-black with white voice bars and a soft blue halo.",
+      "html": "<button class=\"ds-help-busy\"><span class=\"ds-bars\"><i></i><i></i><i></i><i></i></span><span>Listening</span></button>",
+      "css": ".ds-help-busy { display: inline-flex; align-items: center; gap: 8px; height: 56px; padding: 0 22px 0 18px; border-radius: 9999px; background: #15171C; color: #fff; border: 1.5px solid rgba(255,255,255,0.9); box-shadow: 0 3px 8px rgba(0,0,0,0.25), 0 0 0 6px rgba(31,95,224,0.25); font: 700 19px/1.4 Roboto, sans-serif; } .ds-bars { display: inline-flex; align-items: center; gap: 2.8px; width: 24px; height: 24px; } .ds-bars i { display: block; width: 3.2px; border-radius: 2px; background: #fff; height: 12px; animation: ds-bar 1.4s ease-in-out infinite; } .ds-bars i:nth-child(2) { animation-delay: -0.38s; } .ds-bars i:nth-child(3) { animation-delay: -0.76s; } .ds-bars i:nth-child(4) { animation-delay: -1.1s; } @keyframes ds-bar { 0%,100% { height: 8px; } 50% { height: 24px; } } .ds-help-busy:focus-visible { outline: 3px solid #4D8BFF; outline-offset: 3px; }"
     },
     {
-      "name": "Secondary Button",
-      "kind": "button",
-      "refersTo": "button-secondary",
-      "description": "Setup outline action; label may wrap to two lines.",
-      "html": "<button class=\"ds-btn-secondary\">Open app info</button>",
-      "css": ".ds-btn-secondary{font-family:'Anek Latin','Anek Devanagari',sans-serif;min-height:56px;min-width:260px;padding:12px 16px;border-radius:10px;background:transparent;color:#0858A8;border:2.5px solid #0858A8;font-size:18px;font-weight:600;cursor:pointer;} .ds-btn-secondary:hover{background:rgba(8,88,168,.08);} .ds-btn-secondary:focus-visible{outline:3px solid #111214;outline-offset:3px;}"
-    },
-    {
-      "name": "Instruction Sign",
+      "name": "Caption Card",
       "kind": "card",
-      "refersTo": "sign-panel",
-      "description": "Enamel panel with a leading band, a heavy arrow and the first sentence large.",
-      "html": "<div class=\"ds-sign\"><span class=\"ds-sign-band\"></span><span class=\"ds-sign-glyph\"><svg viewBox=\"0 0 24 24\" width=\"56\" height=\"56\" aria-hidden=\"true\"><path d=\"M9.5 2h5v10.5h6L12 22 3.5 12.5h6z\" fill=\"currentColor\"/></svg></span><div class=\"ds-sign-text\"><p class=\"ds-sign-head\">Press 'Network &amp; internet'.</p><p class=\"ds-sign-sub\">Wi-Fi is inside it.</p></div></div>",
-      "css": ".ds-sign{font-family:'Anek Latin','Anek Devanagari',sans-serif;display:flex;align-items:stretch;width:360px;background:#FFFFFF;border-radius:8px;overflow:hidden;box-shadow:0 2px 4px rgba(0,0,0,.2);} .ds-sign-band{width:12px;background:#0858A8;flex:none;} .ds-sign-glyph{display:flex;align-items:center;color:#111214;margin:0 6px 0 8px;} .ds-sign-text{padding:18px 18px 18px 0;} .ds-sign-head{margin:0;color:#111214;font-size:27px;font-weight:700;line-height:1.3;} .ds-sign-sub{margin:6px 0 0;color:#3B3F45;font-size:20px;font-weight:500;line-height:1.35;}"
+      "refersTo": "caption-card",
+      "description": "Near-black floating caption: large bold first sentence, 70%-white remainder, Repeat and Close pills inside.",
+      "html": "<div class=\"ds-caption\"><p class=\"ds-cap-head\">Press 'Display &amp; touch'.</p><p class=\"ds-cap-sub\">The text size is in here.</p><div class=\"ds-cap-row\"><button class=\"ds-pill-repeat\">Repeat</button><button class=\"ds-pill-close\">Close</button></div></div>",
+      "css": ".ds-caption { background: #15171C; border-radius: 28px; padding: 20px 20px 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.28); font-family: Roboto, 'Noto Sans Devanagari', sans-serif; max-width: 380px; } .ds-cap-head { margin: 0; color: #fff; font-weight: 700; font-size: 24px; line-height: 1.3; } .ds-cap-sub { margin: 6px 0 0; color: rgba(255,255,255,0.7); font-weight: 400; font-size: 18px; line-height: 1.38; } .ds-cap-row { display: flex; gap: 14px; margin-top: 18px; } .ds-pill-repeat, .ds-pill-close { flex: 1; min-height: 56px; padding: 0 16px; border: none; border-radius: 9999px; font: 600 19px/1.4 Roboto, sans-serif; cursor: pointer; } .ds-pill-repeat { background: #fff; color: #15171C; } .ds-pill-close { background: rgba(255,255,255,0.16); color: #fff; } .ds-pill-repeat:focus-visible, .ds-pill-close:focus-visible { outline: 3px solid #4D8BFF; outline-offset: 2px; }"
     },
     {
-      "name": "Help Disc",
+      "name": "Status Badges",
       "kind": "custom",
-      "refersTo": "help-disc",
-      "description": "Metro-blue station disc with a bright rim, guide mark and state word.",
-      "html": "<button class=\"ds-disc\" aria-label=\"Help\"><svg viewBox=\"0 0 24 24\" width=\"26\" height=\"26\" aria-hidden=\"true\"><path d=\"M2.5 12H13M9 7l5 5-5 5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><circle cx=\"19.5\" cy=\"12\" r=\"3\" fill=\"currentColor\"/></svg><span>Help</span></button>",
-      "css": ".ds-disc{font-family:'Anek Latin','Anek Devanagari',sans-serif;width:80px;height:80px;border-radius:50%;background:#0858A8;color:#FFFFFF;border:3px solid #FFFFFF;box-shadow:0 2px 6px rgba(0,0,0,.33);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:16px;font-weight:700;font-stretch:88%;cursor:pointer;} .ds-disc:focus-visible{outline:3px solid #111214;outline-offset:3px;} .ds-disc:active{filter:brightness(.9);}"
+      "refersTo": "badge-done",
+      "description": "36dp round badges leading a caption: green tick, amber lock, red warning; shape carries the state.",
+      "html": "<div class=\"ds-badges\"><span class=\"ds-badge ds-done\"><svg viewBox=\"0 0 24 24\"><path d=\"M5 12.5 L9.8 17.2 L19 7\" fill=\"none\" stroke=\"#fff\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></span><span class=\"ds-badge ds-caution\"><svg viewBox=\"0 0 24 24\"><rect x=\"5.5\" y=\"10.5\" width=\"13\" height=\"10\" rx=\"3\" fill=\"#15171C\"/><path d=\"M8.5 10.5 V7.8 C8.5 3.2 15.5 3.2 15.5 7.8 V10.5\" fill=\"none\" stroke=\"#15171C\" stroke-width=\"2.4\" stroke-linecap=\"round\"/></svg></span><span class=\"ds-badge ds-danger\"><svg viewBox=\"0 0 24 24\"><path d=\"M12 3.5 L21.5 20 L2.5 20 Z\" fill=\"#fff\" stroke=\"#fff\" stroke-width=\"2\" stroke-linejoin=\"round\"/><rect x=\"11\" y=\"9\" width=\"2\" height=\"5.5\" rx=\"1\" fill=\"#E5484D\"/><circle cx=\"12\" cy=\"17.2\" r=\"1.2\" fill=\"#E5484D\"/></svg></span></div>",
+      "css": ".ds-badges { display: flex; gap: 14px; padding: 16px; background: #15171C; border-radius: 28px; width: max-content; } .ds-badge { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; } .ds-badge svg { width: 60%; height: 60%; } .ds-done { background: #1E9E5A; } .ds-caution { background: #F5A524; } .ds-danger { background: #E5484D; }"
     },
     {
-      "name": "Ring Pointer",
-      "kind": "custom",
-      "refersTo": "",
-      "description": "Blue ring with a bright edge and a station dot on its leading end, cut out of a flat veil.",
-      "html": "<div class=\"ds-veil\"><div class=\"ds-ring\"><span class=\"ds-dot\"></span>Display &amp; touch</div></div>",
-      "css": ".ds-veil{font-family:'Anek Latin','Anek Devanagari',sans-serif;position:relative;padding:40px 24px;background:#ECEEF1;background-image:linear-gradient(rgba(0,0,0,.36),rgba(0,0,0,.36));} .ds-ring{position:relative;height:64px;display:flex;align-items:center;padding-left:28px;border-radius:16px;background:#ECEEF1;border:6px solid #0858A8;box-shadow:0 0 0 2.5px #FFFFFF,inset 0 0 0 2.5px #FFFFFF;font-size:20px;color:#111214;} .ds-dot{position:absolute;left:-15px;top:50%;width:18px;height:18px;margin-top:-9px;border-radius:50%;background:#0858A8;box-shadow:0 0 0 2.5px #FFFFFF;}"
-    },
-    {
-      "name": "Language Chip",
-      "kind": "chip",
-      "refersTo": "language-chip",
-      "description": "Pill set in its own script; selected is tinted and outlined blue.",
-      "html": "<div class=\"ds-chips\"><button class=\"ds-chip ds-chip-on\" aria-pressed=\"true\">हिन्दी</button><button class=\"ds-chip\">English</button><button class=\"ds-chip\">தமிழ்</button></div>",
-      "css": ".ds-chips{display:flex;gap:10px;} .ds-chip{font-family:'Anek Latin','Anek Devanagari',sans-serif;min-height:52px;padding:10px 20px;border-radius:26px;background:#ECEEF1;color:#111214;border:2.5px solid transparent;font-size:21px;font-weight:600;cursor:pointer;} .ds-chip:hover{background:#DDE1E6;} .ds-chip:focus-visible{outline:3px solid #111214;outline-offset:2px;} .ds-chip-on{background:rgba(8,88,168,.14);border-color:#0858A8;color:#0858A8;font-weight:700;}"
-    },
-    {
-      "name": "Speed Choice",
+      "name": "Primary Pill",
       "kind": "button",
-      "refersTo": "choice-selected",
-      "description": "Two-way outlined choice; the selected one fills blue and gains a tick.",
-      "html": "<div class=\"ds-choices\"><button class=\"ds-choice\">Slow</button><button class=\"ds-choice ds-choice-on\" aria-pressed=\"true\"><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" aria-hidden=\"true\"><path d=\"M4.5 12.5l5 5 10-11\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Normal</button></div>",
-      "css": ".ds-choices{display:flex;gap:10px;width:320px;} .ds-choice{font-family:'Anek Latin','Anek Devanagari',sans-serif;flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:56px;padding:0 12px;border-radius:10px;background:transparent;color:#0858A8;border:2.5px solid #0858A8;font-size:19px;font-weight:600;cursor:pointer;} .ds-choice:focus-visible{outline:3px solid #111214;outline-offset:3px;} .ds-choice-on{background:#0858A8;color:#FFFFFF;}"
+      "refersTo": "primary-pill",
+      "description": "The one pinned blue pill at the bottom of every setup step.",
+      "html": "<button class=\"ds-primary\">Continue</button>",
+      "css": ".ds-primary { width: 100%; min-height: 60px; padding: 14px 24px; border: none; border-radius: 9999px; background: #1F5FE0; color: #fff; font: 600 20px/1.4 Roboto, 'Noto Sans Devanagari', sans-serif; cursor: pointer; transition: background 0.2s, transform 0.2s; } .ds-primary:hover { background: #1A52C4; } .ds-primary:active { transform: scale(0.98); } .ds-primary:focus-visible { outline: 3px solid #4D8BFF; outline-offset: 3px; }"
     },
     {
-      "name": "Setup Line Stop",
+      "name": "Quiet Button",
+      "kind": "button",
+      "refersTo": "quiet-button",
+      "description": "Secondary setup action: tile-grey pill with an optional drawn glyph.",
+      "html": "<button class=\"ds-quiet\"><svg viewBox=\"0 0 24 24\" width=\"22\" height=\"22\"><path d=\"M3.5 9.5 H7 L11.5 5.5 V18.5 L7 14.5 H3.5 Z\" fill=\"#101215\" stroke=\"#101215\" stroke-width=\"1.5\" stroke-linejoin=\"round\"/><path d=\"M15 9.5 A3 4 0 0 1 15 14.5 M16.8 6.5 A5.2 7.5 0 0 1 16.8 17.5\" fill=\"none\" stroke=\"#101215\" stroke-width=\"2.4\" stroke-linecap=\"round\"/></svg><span>Play a test</span></button>",
+      "css": ".ds-quiet { display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 56px; padding: 12px 20px; border: none; border-radius: 9999px; background: #F2F3F5; color: #101215; font: 600 19px/1.4 Roboto, sans-serif; cursor: pointer; transition: background 0.2s; } .ds-quiet:hover { background: #E3E6EA; } .ds-quiet:focus-visible { outline: 3px solid #1F5FE0; outline-offset: 3px; }"
+    },
+    {
+      "name": "Language Tiles",
+      "kind": "chip",
+      "refersTo": "language-tile-selected",
+      "description": "Two-column grid of languages in their own scripts; selected tile turns blue and carries a tick.",
+      "html": "<div class=\"ds-langs\"><button class=\"ds-lang ds-lang-on\" aria-pressed=\"true\"><span>हिन्दी</span><i class=\"ds-tick\"><svg viewBox=\"0 0 24 24\"><path d=\"M5 12.5 L9.8 17.2 L19 7\" fill=\"none\" stroke=\"#1F5FE0\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></i></button><button class=\"ds-lang\"><span>English</span></button><button class=\"ds-lang\"><span>தமிழ்</span></button><button class=\"ds-lang\"><span>తెలుగు</span></button></div>",
+      "css": ".ds-langs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 380px; } .ds-lang { display: flex; align-items: center; justify-content: space-between; min-height: 76px; padding: 12px 18px; border: none; border-radius: 20px; background: #F2F3F5; color: #101215; font: 600 24px/1.4 Roboto, 'Noto Sans Devanagari', 'Noto Sans Tamil', 'Noto Sans Telugu', sans-serif; text-align: left; cursor: pointer; transition: background 0.2s; } .ds-lang:hover { background: #E3E6EA; } .ds-lang-on, .ds-lang-on:hover { background: #1F5FE0; color: #fff; } .ds-tick { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: #fff; } .ds-tick svg { width: 18px; height: 18px; } .ds-lang:focus-visible { outline: 3px solid #1F5FE0; outline-offset: 3px; }"
+    },
+    {
+      "name": "Segmented Control",
+      "kind": "input",
+      "refersTo": "segmented-selected",
+      "description": "Two-way choice: tile-grey track with a raised white pill and a tick on the chosen side.",
+      "html": "<div class=\"ds-seg\" role=\"radiogroup\"><button class=\"ds-seg-opt\" role=\"radio\" aria-checked=\"false\">Slow</button><button class=\"ds-seg-opt ds-seg-on\" role=\"radio\" aria-checked=\"true\"><svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\"><path d=\"M5 12.5 L9.8 17.2 L19 7\" fill=\"none\" stroke=\"#1F5FE0\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Normal</button></div>",
+      "css": ".ds-seg { display: flex; padding: 4px; border-radius: 9999px; background: #F2F3F5; max-width: 380px; } .ds-seg-opt { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 56px; border: none; border-radius: 9999px; background: transparent; color: #5B616B; font: 500 19px/1.4 Roboto, sans-serif; cursor: pointer; } .ds-seg-on { background: #fff; color: #101215; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.18); } .ds-seg-opt:focus-visible { outline: 3px solid #1F5FE0; outline-offset: 2px; }"
+    },
+    {
+      "name": "Progress Segments",
       "kind": "nav",
-      "refersTo": "",
-      "description": "A stop on the setup rail: done stops ticked, the current stop a large open ring.",
-      "html": "<ol class=\"ds-line\"><li class=\"ds-stop ds-done\"><span class=\"ds-mark\"><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" aria-hidden=\"true\"><path d=\"M4.5 12.5l5 5 10-11\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></span><b>1</b> Choose language</li><li class=\"ds-stop ds-current\"><span class=\"ds-mark\"></span><b>2</b> Allow the mic</li><li class=\"ds-stop\"><span class=\"ds-mark\"></span><b>3</b> Turn on Saathi</li></ol>",
-      "css": ".ds-line{font-family:'Anek Latin','Anek Devanagari',sans-serif;list-style:none;margin:0;padding:0 0 0 0;border-left:6px solid #C9CDD3;margin-left:22px;} .ds-stop{position:relative;display:flex;align-items:center;gap:12px;min-height:40px;margin-bottom:26px;padding-left:24px;font-size:20px;font-weight:600;color:#3B3F45;} .ds-stop b{color:#3B3F45;} .ds-mark{position:absolute;left:-17px;width:22px;height:22px;border-radius:50%;background:#FFFFFF;box-shadow:inset 0 0 0 4px #C9CDD3;display:flex;align-items:center;justify-content:center;color:#FFFFFF;} .ds-done{color:#111214;} .ds-done b{color:#0858A8;} .ds-done .ds-mark{left:-21px;width:30px;height:30px;background:#0858A8;box-shadow:none;} .ds-current{font-size:26px;font-weight:700;color:#111214;} .ds-current b{color:#0858A8;} .ds-current .ds-mark{left:-23px;width:34px;height:34px;box-shadow:inset 0 0 0 7px #0858A8;}"
+      "refersTo": "progress-segment-reached",
+      "description": "Five pill segments, blue up to and including the current step.",
+      "html": "<div class=\"ds-progress\"><i class=\"on\"></i><i class=\"on\"></i><i></i><i></i><i></i></div>",
+      "css": ".ds-progress { display: flex; gap: 6px; max-width: 380px; } .ds-progress i { flex: 1; height: 6px; border-radius: 9999px; background: #E3E6EA; } .ds-progress i.on { background: #1F5FE0; }"
     }
   ],
   "narrative": {
-    "northStar": "The Metro Sign",
-    "overview": "**Creative North Star: \"The Metro Sign\"**\n\nSaathi guides the way a Delhi Metro sign does: one heavy arrow, one ringed stop, the instruction set on a white enamel panel with a thick metro-blue band on its leading edge. Everything else on screen is dimmed under a flat neutral veil, so the only lit things are the sign, the ring around the target, and the round blue Help disc. The setup screen is the same world read as a line map: five stops on a rail, done stops ticked, the current stop large with its sign beside it.\n\nThe system is built for older eyes and six scripts. Type is big and bold (Anek, a signage sans from Ek Type, in the script of the senior's language), touch targets never drop below 52 to 60 units, and every state is carried by a drawn glyph's shape as well as its colour. The world refuses the category default of a rounded bottom sheet with a soft glowing highlight: the sign is either an inset enamel card or a square-cornered platform board, and the target is ringed with a hard blue line, not lit.\n\nAll dimensions below are Android dp (sp for setup text), written as px in the tokens at 1px = 1dp. Both themes are first-class: the night scheme swaps to a graphite panel, white type, and a lighter blue line with a deeper blue fill.",
+    "northStar": "The Cursor Buddy",
+    "overview": "Saathi is a pointer and a voice, not a signboard. Over any app, one plump blue cursor flies on an upward arc from the Help pill and lands with its tip inside the exact button; the app is only lightly dimmed and the target sits in a soft rounded spotlight with a faint blue halo. A near-black caption card floats above it all and says the step in white system sans: the first sentence large and bold, the rest smaller at 70% white. Everything the senior might press is a full pill.\n\nThe system is clean, modern and calm. Blue is spent only where to press (the cursor, the spotlight halo) and on what can be pressed (the Help pill, the primary pill, a selected tile). The caption is pure contrast, white on near-black, with no grey panels and no borders by day. Setup is the same world on a white ground: one step per screen, five progress segments, a big title, soft grey tiles and one pinned blue pill at the bottom.\n\nThe build explicitly refuses the instructional-UI vocabulary of the superseded world: bordered signboards, edge bands and boxy outline buttons.",
     "keyCharacteristics": [
-      "White enamel panels, near-black bold signage type, metro blue the only accent.",
-      "A thick coloured band on the leading edge of every sign; band colour and glyph shape together say what kind of sign it is.",
-      "A thick blue ring with a bright edge and a solid station dot marks the one place to press.",
-      "Flat veil, flat panels, square docking; depth only where a layer must hold over an unknown app.",
-      "One drawn icon set on a 24-unit grid, used by overlay and setup alike.",
-      "Motion is one glide of the ring from stop to stop, and it all stops when the system says Remove animations."
+      "One blue cursor (42dp, white edge, soft shadow) is the system's mark: pointer, Help pill glyph, setup wordmark and launcher icon.",
+      "Light veil (22% black by day, 32% at night) with a rounded spotlight; the app stays readable.",
+      "Near-black floating caption card, two type sizes ranked by weight and opacity.",
+      "Every action is a full pill; containers are softly rounded rectangles (18 to 28dp).",
+      "State reads by badge shape (tick, lock, warning) and word, never colour alone.",
+      "The phone's own sans (Roboto plus Android's Noto Indic faces), with explicit line heights for Indic scripts."
     ],
     "rules": [
       {
-        "name": "The One Blue Rule",
-        "body": "Metro blue is the only accent. Green, amber and red appear only as a sign's band and glyph or a status mark, never as decoration or a second brand colour.",
+        "name": "The Press-Here Rule",
+        "body": "Blue marks only where to press or what can be pressed. Body copy, headings, cards and decoration are never blue.",
         "section": "colors"
       },
       {
-        "name": "The Shape-Plus-Colour Rule",
-        "body": "No state is told by colour alone. Press here is an arrow, done is a tick, do-it-yourself is a lock, warning is a triangle, a note with no target is a station stop. A selected choice carries a tick; a reached stop carries a tick; a selected chip carries a heavier weight and an outline.",
+        "name": "The Pure Contrast Rule",
+        "body": "The caption is white on near-black. No grey panels, tinted cards or coloured caption backgrounds; rank is carried by size, weight and the 70% white of the second line.",
         "section": "colors"
       },
       {
-        "name": "The Line and Fill Rule",
-        "body": "At night, blue that is a line (band, ring, stroke, text on an outline) uses the lighter line blue; blue that carries white on it uses the deeper fill blue.",
+        "name": "The Shape-Not-Hue Rule",
+        "body": "Every state carries a glyph or word as well as a colour: tick, lock, warning triangle, voice bars, spinning arc, the tick inside a selected tile or segment.",
         "section": "colors"
       },
       {
-        "name": "The First Sentence Rule",
-        "body": "A sign splits at its first sentence end (. ! ? or ।): that sentence is large and bold, the rest smaller beneath. One instruction reads at a glance.",
+        "name": "The Two Sizes Rule",
+        "body": "A caption uses exactly two sizes: the first sentence large and bold, everything after it small and regular. The split happens at the first `.`, `!`, `?` or `।`.",
         "section": "typography"
       },
       {
         "name": "The Indic Line Rule",
-        "body": "Set the typeface before the size and line height, give every overlay text an explicit line height (1.3 head, 1.35 sub), and turn fallback line spacing and font padding off. Devanagari and the Dravidian scripts' tall metrics otherwise push a two-line instruction apart into what reads as two lines.",
+        "body": "Line heights are always explicit (about 1.3 to 1.45x) with trimming off, so Devanagari matras and Dravidian vowel signs are never clipped and a two-line instruction never falls apart into two lines. Pill words shrink to fit (to 13sp) rather than truncate.",
         "section": "typography"
       },
       {
-        "name": "The 1.3 Cap Rule",
-        "body": "Overlay type follows the system font scale up to 1.3× and no further, so a sign never covers the screen; the cap is read on every render.",
-        "section": "typography"
-      },
-      {
-        "name": "The Own-Script Chip Rule",
-        "body": "Each language chip is set in its own script's face, whatever the current language.",
-        "section": "typography"
-      },
-      {
-        "name": "The Away-From-Target Rule",
-        "body": "The sign, the disc and the buttons never cover the thing the senior is meant to press.",
-        "section": "layout"
-      },
-      {
-        "name": "The Flat Veil Rule",
-        "body": "The veil is one flat neutral with a hard cutout. No gradient, no blur, no glow around the target.",
+        "name": "The Light Veil Rule",
+        "body": "The app underneath is dimmed, never blacked out (22% by day, 32% at night), so the senior still recognises their own screen.",
         "section": "elevation"
-      },
-      {
-        "name": "The Bright Edge Rule",
-        "body": "Anything blue that floats over an app (ring, station dot, Help disc) carries a bright edge: white by day, near-black at night.",
-        "section": "elevation"
-      },
-      {
-        "name": "The Station Dot Rule",
-        "body": "The station dot is the system's signature: a solid blue dot with a bright edge on the leading end of the ring, at the end of the guide mark, and in the launcher.",
-        "section": "shapes"
       }
     ],
     "dos": [
-      "**Do** pair every state with its glyph shape: arrow for press here, tick for done, lock for do-it-yourself, warning triangle for warnings, station stop for a note.",
-      "**Do** put the sign at the top as an inset 8-radius card with Repeat and Close on the veil beneath, or at the bottom docked full width at 0 radius with the buttons inside.",
-      "**Do** give Close an opaque neutral fill whenever it sits on the veil.",
-      "**Do** make buttons 10-radius rounded rectangles at least 60 tall, with the glyph centred on the word's ink.",
-      "**Do** size the Help disc once per language to its longest state word and keep its centre fixed.",
-      "**Do** give the ring a bright edge (white by day, near-black at night) and a station dot on its leading end, and never draw it smaller than 64.",
-      "**Do** set explicit line heights with fallback line spacing off for all overlay text.",
-      "**Do** cap overlay font scale at 1.3× and honour Remove animations everywhere.",
-      "**Do** draw every icon from the 24-unit glyph set."
+      "Do keep blue for where to press and what can be pressed: cursor, spotlight halo, Help pill, primary pill, selected tile.",
+      "Do float the caption at the top below the status bar, and move it to the bottom only when it would cover the target.",
+      "Do keep the Help pill against a screen edge and move it to the other side when it comes within 24dp of the target.",
+      "Do split every caption into a large bold first sentence and a smaller 70%-white remainder.",
+      "Do make every pressable control a full pill at least 56dp tall.",
+      "Do pair every state colour with a drawn glyph or word (tick, lock, warning, voice bars, arc).",
+      "Do draw icons from the shared 24-unit glyph set with its one rounded stroke; never mix in an icon font.",
+      "Do set explicit line heights for Indic scripts and shrink pill words to fit instead of truncating.",
+      "Do honour \"Remove animations\": the cursor flight, nod and pulses become instant cuts."
     ],
     "donts": [
-      "**Don't** use a rounded bottom sheet or a soft glowing highlight around the target; the veil is a flat neutral with a hard cutout and the ring is a hard line.",
-      "**Don't** add a second accent colour; green, amber and red live only in bands, status marks and their glyphs.",
-      "**Don't** let any state depend on colour alone.",
-      "**Don't** shrink sign buttons' words below 13 or the disc word below 14; grow the container first.",
-      "**Don't** cover the target with the sign, the disc or the buttons.",
-      "**Don't** use emoji, font icons or text characters as icons; draw them."
+      "Don't build bordered signboards, edge bands or boxy outline buttons; the caption is a borderless floating card.",
+      "Don't put grey panels, tints or colour inside the caption card; it stays white on near-black.",
+      "Don't dim the app heavily; the veil stays at 22% by day and 32% at night.",
+      "Don't let the cursor body or the Help pill sit over the next row or the target; the tip rests inside the target.",
+      "Don't use colour alone for any state, selection or warning.",
+      "Don't put more than one primary pill on a setup step."
     ]
   }
 }

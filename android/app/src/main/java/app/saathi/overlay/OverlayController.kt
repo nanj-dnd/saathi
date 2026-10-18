@@ -35,7 +35,7 @@ class OverlayController(
 
     private val pointer = PointerView(service).apply { visibility = View.GONE }
     private val caption = CaptionView(service, { onRepeat() }, { onClose() }).apply { visibility = View.GONE }
-    private val bubble = BubbleView(service, onBubbleTap, ::dragBubble, ::saveBubble)
+    private val bubble = BubbleView(service, onBubbleTap, ::dragBubble, ::snapBubble)
 
     private val pointerParams = params(LP.MATCH_PARENT, LP.MATCH_PARENT, touchable = false)
     private val captionParams = params(LP.MATCH_PARENT, LP.WRAP_CONTENT, touchable = true)
@@ -83,30 +83,23 @@ class OverlayController(
 
     override fun state(state: GuideState) {
         this.state = state
-        // Back to idle: the bubble returns to where the senior put it, if a step had moved it.
-        if (state == GuideState.IDLE && attached) {
-            placeBubbleWhereSaved()
-            wm.updateViewLayout(bubble, bubbleParams)
-        }
         val res = strings()
-        // One size for every state, so the disc holds still; recentred if the language changed it.
-        val grew = bubble.sizeFor(
-            listOf(res.getString(R.string.bubble_help), res.getString(R.string.bubble_listening), res.getString(R.string.bubble_looking)),
-            prefs.language,
-        )
-        if (grew != 0 && attached) {
-            bubbleParams.x -= grew / 2
-            bubbleParams.y -= grew / 2
-            wm.updateViewLayout(bubble, bubbleParams)
-            // Remember the recentred spot, so returning to idle doesn't shift it back.
-            if (prefs.bubbleX >= 0) saveBubble()
-        }
         val label = when (state) {
             GuideState.LISTENING -> res.getString(R.string.bubble_listening)
             GuideState.THINKING -> res.getString(R.string.bubble_looking)
             else -> res.getString(R.string.bubble_help)
         }
-        bubble.render(state, label, prefs.language)
+        bubble.render(state, label)
+        if (attached) {
+            if (state == GuideState.IDLE) {
+                // Back to idle: the pill returns to where the senior put it, if a step had moved it.
+                placeBubbleWhereSaved()
+            } else if (bubbleParams.x > 0) {
+                // The pill grows and shrinks with its word; one on the right keeps its right edge on the screen edge.
+                bubbleParams.x = (screen.width() - bubble.wantedWidth).coerceAtLeast(0)
+            }
+            wm.updateViewLayout(bubble, bubbleParams)
+        }
         // Keep our own drawing out of the screenshot the model is about to see.
         if (state == GuideState.THINKING || state == GuideState.LISTENING) {
             pointer.clear()
@@ -117,23 +110,16 @@ class OverlayController(
     override fun point(target: Box?, caption: String, danger: String, done: Boolean) {
         if (!attached) return
         val res = strings()
-        val atTop = placeCaption(target)
-        val docked = !atTop
-        // The glyph's shape carries the state, so nothing depends on telling colours apart.
+        // The badge's shape carries the state, so nothing depends on telling colours apart.
         val kind = when {
             danger == Danger.SCAM -> SignKind.WARNING
             danger == Danger.SENSITIVE -> SignKind.YOURSELF
             done -> SignKind.DONE
             target == null -> SignKind.NOTE
-            atTop -> SignKind.DOWN
-            else -> SignKind.UP
+            else -> SignKind.STEP
         }
-        this.caption.render(
-            caption, kind, prefs.language, res.getString(R.string.btn_repeat), res.getString(R.string.btn_close),
-            docked = docked,
-            veiled = target != null && danger != Danger.SCAM,
-            bottomInset = if (docked && keyboardTop() == null) navBarInset() else 0,
-        )
+        this.caption.render(caption, kind, res.getString(R.string.btn_repeat), res.getString(R.string.btn_close))
+        placeCaption(if (danger == Danger.SCAM) null else target)
         this.caption.visibility = View.VISIBLE
 
         if (target != null && danger != Danger.SCAM) {
@@ -147,34 +133,36 @@ class OverlayController(
     }
 
     /**
-     * The caption goes on the half of the screen away from the target. Our overlay draws above the
-     * keyboard, so when one is open the caption must stay above it or it would hide the keys.
+     * The caption floats at the top of the screen, below the status bar, unless that would cover
+     * the target; then it floats at the bottom, above the navigation bar or an open keyboard (our
+     * overlay draws above the keyboard, so it must never sit on the keys).
      */
-    /** Returns true when the sign went to the top of the screen. */
-    private fun placeCaption(target: Box?): Boolean {
-        val h = screen.height()
+    private fun placeCaption(target: Box?) {
+        val s = screen
         val keyboardTop = keyboardTop()
-        val usable = keyboardTop ?: h
-        val targetLow = target != null && target.centerY > usable / 2
-        val gap = service.dp(if (targetLow) 36f else 24f).toInt()
-        val top = targetLow || (keyboardTop != null && target == null)
-        val margin = service.dp(12f).toInt()
-        if (top) {
-            // Comp 1: an inset card below the status bar.
+        caption.measure(
+            View.MeasureSpec.makeMeasureSpec(s.width(), View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+        )
+        val topY = statusBarInset() - service.dp(2f).toInt()
+        // The spotlight reaches a little past the target, so leave it room too.
+        val coversTarget = target != null && target.top < topY + caption.measuredHeight + service.dp(8f)
+        captionParams.x = 0
+        captionParams.width = s.width()
+        if (!coversTarget) {
             captionParams.gravity = Gravity.TOP or Gravity.START
-            captionParams.y = gap
-            captionParams.x = margin
-            captionParams.width = screen.width() - margin * 2
+            captionParams.y = topY
         } else {
-            // Comp 2: docked full-width to the bottom edge, or to the top of an open keyboard.
             captionParams.gravity = Gravity.BOTTOM or Gravity.START
-            captionParams.y = h - usable
-            captionParams.x = 0
-            captionParams.width = screen.width()
+            captionParams.y = (if (keyboardTop != null) s.height() - keyboardTop else navBarInset()) - service.dp(2f).toInt()
         }
         wm.updateViewLayout(caption, captionParams)
-        return top
     }
+
+    private fun statusBarInset(): Int =
+        wm.currentWindowMetrics.windowInsets.getInsets(
+            android.view.WindowInsets.Type.statusBars() or android.view.WindowInsets.Type.displayCutout(),
+        ).top
 
     private fun navBarInset(): Int =
         wm.currentWindowMetrics.windowInsets.getInsets(android.view.WindowInsets.Type.navigationBars()).bottom
@@ -192,8 +180,8 @@ class OverlayController(
             b.top < target.bottom + margin && b.bottom > target.top - margin
         if (!overlaps) return
         val s = screen
-        val w = bubble.width.takeIf { it > 0 } ?: service.dp(112f).toInt()
-        val h = bubble.height.takeIf { it > 0 } ?: service.dp(112f).toInt()
+        val w = bubble.wantedWidth
+        val h = bubbleHeight()
         // Opposite horizontal side first; if the target spans the width, go above or below it.
         bubbleParams.x = if (target.centerX > s.width() / 2) 0 else s.width() - w
         if (target.width > s.width() - w * 2) {
@@ -204,18 +192,21 @@ class OverlayController(
     }
 
     private fun sizeCaption() {
-        val margin = service.dp(12f).toInt()
-        captionParams.width = screen.width() - margin * 2
-        captionParams.x = margin
+        captionParams.width = screen.width()
+        captionParams.x = 0
     }
 
+    private fun bubbleHeight() = bubble.height.takeIf { it > 0 } ?: service.dp(84f).toInt()
+
+    /** The pill sits against the side the senior last left it on (the right, at first), at their height. */
     private fun placeBubbleWhereSaved() {
         val s = screen
-        val w = bubble.width.takeIf { it > 0 } ?: service.dp(112f).toInt()
-        val h = bubble.height.takeIf { it > 0 } ?: service.dp(112f).toInt()
-        bubbleParams.x = (prefs.bubbleX.takeIf { it >= 0 } ?: (s.width() - w)).coerceIn(0, (s.width() - w).coerceAtLeast(0))
+        val w = bubble.wantedWidth
+        val h = bubbleHeight()
+        bubbleParams.x = if (prefs.bubbleX == 0) 0 else (s.width() - w).coerceAtLeast(0)
         bubbleParams.y = (prefs.bubbleY.takeIf { it >= 0 } ?: (s.height() * 0.62f).toInt()).coerceIn(0, (s.height() - h).coerceAtLeast(0))
     }
+
 
     override fun clear() {
         pointer.clear()
@@ -232,6 +223,14 @@ class OverlayController(
         bubbleParams.x = (bubbleParams.x + dx).coerceIn(0, s.width() - bubble.width)
         bubbleParams.y = (bubbleParams.y + dy).coerceIn(0, s.height() - bubble.height)
         wm.updateViewLayout(bubble, bubbleParams)
+    }
+
+    /** After a drag the pill settles against the nearer side of the screen, out of the way. */
+    private fun snapBubble() {
+        val s = screen
+        bubbleParams.x = if (bubbleParams.x + bubble.width / 2 < s.width() / 2) 0 else s.width() - bubble.width
+        wm.updateViewLayout(bubble, bubbleParams)
+        saveBubble()
     }
 
     private fun saveBubble() {
