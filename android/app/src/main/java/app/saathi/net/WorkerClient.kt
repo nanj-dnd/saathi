@@ -2,6 +2,7 @@ package app.saathi.net
 
 import app.saathi.Prefs
 import app.saathi.session.Brain
+import app.saathi.voice.VoiceUnavailable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -50,6 +51,28 @@ class WorkerClient(
                 !it.isSuccessful -> throw IOException("worker ${it.code}")
             }
             json.decodeFromString<TurnResponse>(it.body!!.string())
+        }
+    }
+
+    /**
+     * One line in the natural voice, as MP3 bytes; null if the Worker couldn't make it (busy, limit,
+     * upstream error). Throws [VoiceUnavailable] when no voice is configured at all.
+     */
+    suspend fun speak(text: String, language: String, pace: Float): ByteArray? = withContext(Dispatchers.IO) {
+        val body = json.encodeToString(SpeakRequest(text, language, pace))
+        var token = prefs.token ?: register()
+        var res = post("/speak", body, token)
+        if (res.code == 401) {
+            res.close()
+            token = register()
+            res = post("/speak", body, token)
+        }
+        res.use {
+            when {
+                it.code == 501 -> throw VoiceUnavailable()
+                !it.isSuccessful -> null
+                else -> it.body?.bytes()
+            }
         }
     }
 
@@ -103,3 +126,6 @@ private suspend fun Call.await(): Response = suspendCancellableCoroutine { cont 
     })
     cont.invokeOnCancellation { cancel() }
 }
+
+@kotlinx.serialization.Serializable
+private data class SpeakRequest(val text: String, val language: String, val pace: Float)

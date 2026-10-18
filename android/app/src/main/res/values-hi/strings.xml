@@ -49,4 +49,5 @@
     <string name="btn_continue">आगे बढ़ें</string>
     <string name="btn_back">पीछे</string>
     <string name="mic_body">साथी तभी सुनता है जब आप मदद बटन दबाते हैं।</string>
+    <string name="say_scrolling">नीचे देखता हूँ।</string>
 </resources>

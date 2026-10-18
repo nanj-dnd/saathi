@@ -12,6 +12,7 @@ import android.media.AudioManager
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityManager
+import android.view.accessibility.AccessibilityNodeInfo
 import android.accessibilityservice.AccessibilityServiceInfo
 import app.saathi.BuildConfig
 import app.saathi.Languages
@@ -27,8 +28,10 @@ import app.saathi.playbooks.PlaybookStore
 import app.saathi.recipes.RecipeSource
 import app.saathi.safety.ScamGuard
 import app.saathi.session.GuideSession
+import app.saathi.session.Hands
 import app.saathi.session.Lines
 import app.saathi.session.ScreenEvent
+import app.saathi.voice.CloudVoice
 import app.saathi.voice.SpeechListener
 import app.saathi.voice.Speaker
 import kotlinx.coroutines.CancellationException
@@ -41,7 +44,8 @@ import java.io.File
 
 /**
  * Everything Saathi does runs inside this service: it reads the screen, hosts the overlay, and
- * watches for the senior's taps so it can give the next step. It never performs actions.
+ * watches for the senior's taps so it can give the next step. It never taps for the senior: the
+ * only things it does itself are scrolling a list and opening an app (see [hands]).
  */
 class BuddyAccessibilityService : AccessibilityService() {
     private val scope = MainScope()
@@ -55,7 +59,6 @@ class BuddyAccessibilityService : AccessibilityService() {
 
     override fun onServiceConnected() {
         prefs = Prefs(this)
-        speaker = Speaker(this, language = { prefs.language }, rate = { prefs.speechRate })
         val playbooks = PlaybookStore(assets)
         val recipes = RecipeSource(assets, File(filesDir, "recipes.json"))
         val worker = WorkerClient(
@@ -63,6 +66,7 @@ class BuddyAccessibilityService : AccessibilityService() {
             prefs = prefs,
             fixtureDir = if (BuildConfig.DEBUG) File(getExternalFilesDir(null), "fixtures") else null,
         )
+        speaker = Speaker(this, language = { prefs.language }, rate = { prefs.speechRate }, cloud = CloudVoice(this, worker::speak))
         // Scripted recipes, then answers this phone already got, then the Worker.
         val brain = LocalFirstBrain(
             recipes = { recipes.book },
@@ -70,6 +74,7 @@ class BuddyAccessibilityService : AccessibilityService() {
             remote = worker,
             sensitiveLine = { tag -> Languages.context(this, tag).getString(R.string.say_sensitive) },
             log = { if (BuildConfig.DEBUG) Log.d(TAG, it) },
+            canOpen = { packageManager.getLaunchIntentForPackage(it) != null },
         )
         scope.launch {
             withContext(Dispatchers.IO) { recipes.load() }
@@ -112,10 +117,12 @@ class BuddyAccessibilityService : AccessibilityService() {
                     override val wait = res.getString(R.string.say_wait)
                     override val busy = res.getString(R.string.say_busy)
                     override val limit = res.getString(R.string.say_limit)
+                    override val scrolling = res.getString(R.string.say_scrolling)
                 }
             },
             hasMic = { checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED },
             inCall = ::inCall,
+            hands = hands,
         )
         // A screen that turns off mid-task means the senior put the phone down: stop talking.
         registerReceiver(screenOff, IntentFilter(Intent.ACTION_SCREEN_OFF))
@@ -125,6 +132,53 @@ class BuddyAccessibilityService : AccessibilityService() {
             // adb shell "am broadcast -a app.saathi.DEBUG_OPENED --es pkg com.anydesk.anydeskandroid"
             registerReceiver(debugAsk, IntentFilter().apply { addAction(DEBUG_ASK); addAction(DEBUG_OPENED) }, RECEIVER_EXPORTED)
         }
+    }
+
+    /** Scrolling and opening apps are the only things Saathi does itself; it never taps. */
+    private val hands = object : Hands {
+        override suspend fun scrollDown(): Boolean {
+            val list = mainList() ?: return false
+            return try {
+                list.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_DOWN.id) ||
+                    list.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD)
+            } finally {
+                @Suppress("DEPRECATION") list.recycle()
+            }
+        }
+
+        override fun openApp(pkg: String): Boolean {
+            val launch = packageManager.getLaunchIntentForPackage(pkg) ?: return false
+            return runCatching { startActivity(launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }.isSuccess
+        }
+    }
+
+    /**
+     * The screen's main vertical list: the largest visible scrollable that scrolls down, so a
+     * banner carousel (wide and short) is never scrolled by mistake.
+     */
+    private fun mainList(): AccessibilityNodeInfo? {
+        val root = rootInActiveWindow ?: return null
+        val queue = ArrayDeque<AccessibilityNodeInfo>().apply { add(root) }
+        var best: AccessibilityNodeInfo? = null
+        var bestArea = 0
+        val r = android.graphics.Rect()
+        var seen = 0
+        while (queue.isNotEmpty() && seen < 600) {
+            val n = queue.removeFirst()
+            seen++
+            for (i in 0 until n.childCount) n.getChild(i)?.let(queue::add)
+            if (!n.isScrollable || !n.isVisibleToUser) continue
+            n.getBoundsInScreen(r)
+            val down = n.actionList.any {
+                it.id == AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_DOWN.id || it.id == AccessibilityNodeInfo.ACTION_SCROLL_FORWARD
+            }
+            val area = r.width() * r.height()
+            if (down && r.height() > r.width() / 2 && area > bestArea) {
+                best = n
+                bestArea = area
+            }
+        }
+        return best
     }
 
     private fun inCall(): Boolean {

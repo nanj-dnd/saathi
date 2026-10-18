@@ -34,6 +34,8 @@ class LocalFirstBrain(
     private val sensitiveLine: (language: String) -> String,
     private val clock: () -> Long = System::currentTimeMillis,
     private val log: (String) -> Unit = {},
+    /** True if this phone can open a package directly; recipes then open apps themselves. */
+    private val canOpen: (String) -> Boolean = { false },
 ) : Brain {
 
     override suspend fun turn(request: TurnRequest): TurnResponse {
@@ -57,7 +59,7 @@ class LocalFirstBrain(
         }
 
         val risky = ScreenSafety.scamCue(request.tree) || ScreenSafety.scamCue(request.utterance.orEmpty())
-        if (!risky) RecipeEngine(recipes()).guide(request)?.let { return local(it, Source.RECIPE) }
+        if (!risky) RecipeEngine(recipes(), canOpen).guide(request)?.let { return local(it, Source.RECIPE) }
 
         val key = if (!risky && cacheable(request)) ScreenKey.turnKey(request) else null
         if (key != null) cache.get(key)?.takeIf { fits(it, request) }?.let { return local(it, Source.CACHE) }

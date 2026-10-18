@@ -2,6 +2,7 @@ package app.saathi.recipes
 
 import app.saathi.capture.ScreenText
 import app.saathi.capture.TreeNode
+import app.saathi.net.Action
 import app.saathi.net.Danger
 import app.saathi.net.Guide
 import app.saathi.net.PastStep
@@ -14,7 +15,11 @@ import app.saathi.safety.ScreenSafety
  * model answers instead: no recipe fits what was said, two fit equally, the screen matches no
  * step, or a step has been repeated too often (the senior is stuck or the app looks different).
  */
-class RecipeEngine(private val book: RecipeBook) {
+class RecipeEngine(
+    private val book: RecipeBook,
+    /** True if this phone can open [pkg] directly (it has a launcher entry). */
+    private val canOpen: (pkg: String) -> Boolean = { false },
+) {
 
     fun guide(req: TurnRequest): Guide? {
         if (book.recipes.isEmpty()) return null
@@ -97,13 +102,26 @@ class RecipeEngine(private val book: RecipeBook) {
             var say = template.replace("{label}", label)
             if (step.readScreen) say = say.replace("{screen}", readable(screen) ?: continue)
             if (repeats(req.history, say) >= step.maxRepeats) continue
-            return guide(recipe, step.id, say, node, label, step.status, step.danger)
+            val g = guide(recipe, step.id, say, node, label, step.status, step.danger)
+            // "Slide the screen up" steps: Saathi scrolls for the senior, and the line is the fallback.
+            return if (step.id == SCROLL_STEP && node == null) g.copy(action = Action.SCROLL_DOWN) else g
         }
         return null
     }
 
     /** Not in the app yet: point at its icon on the home screen, or say how to get there. */
     private fun outside(recipe: Recipe, req: TurnRequest, screen: ScreenText): Guide? {
+        // At the start of a task, or from the home screen, Saathi opens the app itself. Mid-task in
+        // another app (a share sheet, say) it never pulls the senior away; it says where to go.
+        val pkg = recipe.apps.firstOrNull { it != ANY_APP && canOpen(it) }
+        if (pkg != null && (req.history.isEmpty() || isLauncher(req.app))) {
+            val line = (book.common.lines["opening"] ?: OPENING)[req.language] ?: OPENING.getValue("en-IN")
+            val say = line.replace("{app}", recipe.appLabel)
+            if (repeats(req.history, say) < OUTSIDE_REPEATS) {
+                return guide(recipe, "opening", say, null, "", Status.NEXT_STEP, Danger.NONE)
+                    .copy(action = Action.OPEN_APP, actionArg = pkg)
+            }
+        }
         val icon = if (isLauncher(req.app)) screen.find(recipe.appNames + recipe.appLabel) else null
         val which = when {
             icon != null -> "open"
@@ -129,6 +147,18 @@ class RecipeEngine(private val book: RecipeBook) {
 
     internal companion object {
         const val OUTSIDE_REPEATS = 3
+        /** The step id recipes give their "slide the screen up" step. */
+        const val SCROLL_STEP = "scroll"
+
+        /** Said while Saathi opens the app; a recipe bundle's "opening" common line overrides it. */
+        val OPENING = mapOf(
+            "hi-IN" to "'{app}' खोल रहा हूँ।",
+            "en-IN" to "Opening '{app}' for you.",
+            "ta-IN" to "'{app}' ஐத் திறக்கிறேன்.",
+            "te-IN" to "'{app}' తెరుస్తున్నాను.",
+            "kn-IN" to "'{app}' ತೆರೆಯುತ್ತಿದ್ದೇನೆ.",
+            "ml-IN" to "'{app}' തുറക്കുന്നു.",
+        )
 
         private const val READ_LIMIT = 700
 

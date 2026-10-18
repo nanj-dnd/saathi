@@ -1,5 +1,6 @@
 package app.saathi
 
+import app.saathi.net.Action
 import app.saathi.net.Danger
 import app.saathi.net.Guide
 import app.saathi.net.PastStep
@@ -98,6 +99,35 @@ class RecipeEngineTest {
         assertEquals("स्क्रीन पर उंगली रखकर ऊपर की ओर सरकाइए।", g.say)
         assertEquals("none", g.targetKind)
         assertEquals("make the text bigger", g.goal)
+    }
+
+    @Test fun `Saathi scrolls a slide-up step itself, keeping the line for doing it by hand`() {
+        val g = engine.guide(req(settingsHome, utterance = "पढ़ने के लिए अक्षर बड़े करने हैं"))!!
+        assertEquals(Action.SCROLL_DOWN, g.action)
+        assertEquals("स्क्रीन पर उंगली रखकर ऊपर की ओर सरकाइए।", g.say)
+    }
+
+    @Test fun `Saathi opens the app at the start of a task, never mid-task from another app`() {
+        val opener = RecipeEngine(book, canOpen = { it == "com.android.settings" })
+        val home = opener.guide(req(launcher, app = "com.miui.home", utterance = "अक्षर बड़े करने हैं"))!!
+        assertEquals(Action.OPEN_APP, home.action)
+        assertEquals("com.android.settings", home.actionArg)
+        assertEquals("'Settings' खोल रहा हूँ।", home.say)
+
+        val fromAnotherApp = opener.guide(req(launcher, app = "com.google.android.youtube", utterance = "अक्षर बड़े करने हैं"))!!
+        assertEquals(Action.OPEN_APP, fromAnotherApp.action)
+
+        // Halfway through, in some other app: it says where to go rather than pulling the senior away.
+        val midTask = opener.guide(
+            req(launcher, app = "com.google.android.youtube", goal = "make the text bigger", history = listOf(past(home))),
+        )!!
+        assertEquals("", midTask.action)
+        assertEquals("पहले Home बटन दबाइए, फिर 'Settings' ऐप खोलिए।", midTask.say)
+
+        // An app this phone can't open is pointed at, as before.
+        val notInstalled = opener.guide(req(launcher, app = "com.google.android.apps.nexuslauncher", utterance = "WhatsApp पर वीडियो कॉल करना है"))!!
+        assertEquals("", notInstalled.action)
+        assertEquals("n3", notInstalled.nodeId)
     }
 
     @Test fun `the whole text size task runs on the phone`() {

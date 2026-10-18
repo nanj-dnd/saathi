@@ -1,6 +1,6 @@
 ---
 name: Saathi
-description: A cursor buddy for Indian seniors; one blue pointer flies to the exact button while a quiet dark caption says the step.
+description: A pointing-hand buddy for Indian seniors; one blue hand flies to the exact button while a quiet dark caption says the step.
 colors:
   saathi-blue: "#1F5FE0"
   saathi-blue-night-line: "#4D8BFF"
@@ -12,7 +12,7 @@ colors:
   caption-ink-soft: "#FFFFFFB3"
   pill-white: "#FFFFFF"
   pill-quiet: "#FFFFFF29"
-  cursor-edge: "#FFFFFF"
+  hand-edge: "#FFFFFF"
   veil-day: "#00000038"
   veil-night: "#00000052"
   ground-day: "#FFFFFF"
@@ -203,16 +203,16 @@ components:
 
 ## Overview
 
-**Creative North Star: "The Cursor Buddy"**
+**Creative North Star: "The Pointing Hand"**
 
-Saathi is a pointer and a voice, not a signboard. Over any app, one plump blue cursor flies on an upward arc from the Help pill and lands with its tip inside the exact button; the app is only lightly dimmed and the target sits in a soft rounded spotlight with a faint blue halo. A near-black caption card floats above it all and says the step in white system sans: the first sentence large and bold, the rest smaller at 70% white. Everything the senior might press is a full pill.
+Saathi is a pointer and a voice, not a signboard. Over any app, one blue pointing hand flies on an upward arc from the Help pill and lands with its fingertip inside the exact button, then taps it with a ripple; the app is only lightly dimmed and the target sits in a soft rounded spotlight with a faint blue halo. A near-black caption card floats above it all and says the step in white system sans: the first sentence large and bold, the rest smaller at 70% white. Everything the senior might press is a full pill.
 
-The system is clean, modern and calm. Blue is spent only where to press (the cursor, the spotlight halo) and on what can be pressed (the Help pill, the primary pill, a selected tile). The caption is pure contrast, white on near-black, with no grey panels and no borders by day. Setup is the same world on a white ground: one step per screen, five progress segments, a big title, soft grey tiles and one pinned blue pill at the bottom.
+The system is clean, modern and calm. Blue is spent only where to press (the hand, the spotlight halo and its tap ripple) and on what can be pressed (the Help pill, the primary pill, a selected tile). The caption is pure contrast, white on near-black, with no grey panels and no borders by day. Setup is the same world on a white ground: one step per screen, five progress segments, a big title, soft grey tiles and one pinned blue pill at the bottom.
 
 The build explicitly refuses the instructional-UI vocabulary of the superseded world: bordered signboards, edge bands and boxy outline buttons.
 
 **Key Characteristics:**
-- One blue cursor (42dp, white edge, soft shadow) is the system's mark: pointer, Help pill glyph, setup wordmark and launcher icon.
+- One blue pointing hand (48dp, white edge, soft shadow) is the system's mark: pointer, Help pill glyph, setup wordmark and launcher icon.
 - Light veil (22% black by day, 32% at night) with a rounded spotlight; the app stays readable.
 - Near-black floating caption card, two type sizes ranked by weight and opacity.
 - Every action is a full pill; containers are softly rounded rectangles (18 to 28dp).
@@ -224,7 +224,7 @@ The build explicitly refuses the instructional-UI vocabulary of the superseded w
 One saturated blue on a near-black and white base, with three badge colours that only ever appear as round fills behind a glyph.
 
 ### Primary
-- **Saathi Blue** (#1F5FE0): the cursor body, the Help pill, the primary pill, the selected language tile, reached progress segments, the setup wordmark disc and the launcher background. The same fill in light and dark.
+- **Saathi Blue** (#1F5FE0): the hand, the Help pill, the primary pill, the selected language tile, reached progress segments, the setup wordmark disc and the launcher background. The same fill in light and dark.
 - **Night Line Blue** (#4D8BFF): blue as a line or text on a dark ground at night (spotlight halo and hairline, listening pulse, segmented tick, text actions). By day the line colour is Saathi Blue itself.
 
 ### Neutral
@@ -232,7 +232,7 @@ One saturated blue on a near-black and white base, with three badge colours that
 - **Caption Night** (#22252B): the caption card at night, lifted off dark apps by a 1dp hairline (#FFFFFF at 12%).
 - **Caption Ink** (#FFFFFF) and **Caption Ink Soft** (white at 70%): the caption's first sentence and the rest.
 - **Pill White** (#FFFFFF) and **Pill Quiet** (white at 16%): Repeat and Close inside the card.
-- **Cursor Edge** (#FFFFFF): the white rim around the cursor and the Help pill that keeps them visible on any app colour.
+- **Hand Edge** (#FFFFFF): the white rim around the hand and the Help pill that keeps them visible on any app colour.
 - **Veil** (black at 22% by day, 32% at night): the dim over everything except the spotlight.
 - **Setup ground, ink and tiles**: white ground (#FFFFFF / night #0F1114), ink (#101215 / #F3F4F6), soft ink for body copy (#5B616B / #A4AAB3), tiles and quiet buttons (#F2F3F5 / #1C1F24), the raised segment (#FFFFFF / #33373F), the unreached progress track (#E3E6EA / #2A2E35).
 
@@ -273,7 +273,7 @@ One saturated blue on a near-black and white base, with three badge colours that
 
 ## Layout
 
-Overlay: three windows over the app. The caption spans the screen width with a 14dp margin around the card, sits just below the status bar by default, and moves to the bottom (above the navigation bar or an open keyboard) only when it would cover the target. The Help pill is side-anchored: it starts on the right at 62% of screen height, snaps to the nearer edge after a drag, keeps its outer edge on the screen edge as its word changes width, and slides to the opposite side (or above/below a full-width target) whenever it comes within 24dp of the target. The spotlight pads the target by 6dp, grows small targets to at least 56dp, and stays 12dp in from screen edges. On a wide row the cursor lands at 78% of the row's width, past the label and short of a trailing switch; near the right or bottom edge it mirrors.
+Overlay: three windows over the app. The caption spans the screen width with a 14dp margin around the card, sits just below the status bar by default, and moves to the bottom (above the navigation bar or an open keyboard) only when it would cover the target. The Help pill is side-anchored: it starts on the right at 62% of screen height, snaps to the nearer edge after a drag, keeps its outer edge on the screen edge as its word changes width, and slides to the opposite side (or above/below a full-width target) whenever it comes within 24dp of the target. The spotlight pads the target by 6dp, grows small targets to at least 56dp, and stays 12dp in from screen edges. On a wide row the hand lands at 78% of the row's width, past the label and short of a trailing switch; near the right or bottom edge it mirrors.
 
 Setup: one step per screen in a single column with 24dp side margins. A 64dp top bar (wordmark on the first step, a 48dp back target after), five progress segments (6dp tall, 6dp gaps), then content starting 36dp below with 16dp between blocks. The primary pill is pinned at the bottom (8dp above, 16dp below). The language grid is two columns with 12dp gaps. Steps change with a short horizontal slide of a sixth of the width plus fade (320ms in, 220ms out).
 
@@ -284,7 +284,7 @@ Touch targets are at least 56dp for every overlay control and setup button (60dp
 Soft, ambient shadows on the few things that float over someone else's app, plus a dim-and-spotlight that pushes the app back. Setup is flat apart from the raised segment and the illustrative pills.
 
 ### Shadow Vocabulary
-- **Cursor lift** (blur 6dp, y 2dp, black at 35%): under the cursor's white edge.
+- **Hand lift** (blur 6dp, y 2dp, black at 35%): under the hand's white edge.
 - **Help pill lift** (blur 8dp, y 3dp, black at 25%): under the Help pill, overlay and setup alike.
 - **Caption float** (Android elevation 10dp): the caption card.
 - **Spotlight halo** (18dp outer blur in the line blue at about 78%, plus a 1dp hairline at about 59%): the target's edge.
@@ -295,20 +295,20 @@ Soft, ambient shadows on the few things that float over someone else's app, plus
 
 ## Shapes
 
-Round and soft. Every pressable control is a full pill (Help, Repeat, Close, primary, quiet, segments, progress). Containers are generously rounded rectangles: the caption card at 28dp, illustrative frames at 24dp, tiles and notices at 20dp, the spotlight at 18dp. Badges and the wordmark disc are circles. Icons are drawn on a 24-unit grid with one 2.4-unit rounded stroke (round caps and joins); the cursor is a filled classic pointer with a tail, its corners softened by a round-joined stroke. White edges exist only where something must separate from an unknown background: the cursor rim, the Help pill's 1.5dp rim, the night caption hairline.
+Round and soft. Every pressable control is a full pill (Help, Repeat, Close, primary, quiet, segments, progress). Containers are generously rounded rectangles: the caption card at 28dp, illustrative frames at 24dp, tiles and notices at 20dp, the spotlight at 18dp. Badges and the wordmark disc are circles. Icons are drawn on a 24-unit grid with one 2.4-unit rounded stroke (round caps and joins); the hand is a filled silhouette of rounded shapes (index finger up, three folded fingers, palm, thumb). White edges exist only where something must separate from an unknown background: the hand's rim, the Help pill's 1.5dp rim, the night caption hairline.
 
 ## Components
 
 ### Help Pill (signature)
-The senior's way in: a blue pill carrying the cursor glyph and the word "Help".
+The senior's way in: a blue pill carrying the hand glyph and the word "Help".
 - **Shape:** full pill, 56dp tall, 18dp start / 22dp end padding, 24dp glyph with 8dp gap, 240dp maximum width.
 - **Idle:** Saathi Blue fill, white glyph and word, 1.5dp white rim (black at 40% at night), soft lift shadow.
 - **Listening:** near-black fill, four white voice bars rising and falling out of step, two soft line-blue halos breathing outward; a haptic tap when the mic opens.
 - **Looking:** near-black fill, a line-blue arc spinning on a faint white ring.
 - **Behaviour:** draggable, snaps to the nearer edge, reported to TalkBack as a button.
 
-### Cursor and Spotlight (signature)
-The one signature motion. The cursor (42dp, blue body, white edge, soft shadow) flies on a quadratic arc that bows upward by 22% of its length, 720ms on Material's emphasized curve (0.3, 0, 0.1, 1), trailing 14 fading line-blue dots; it lands with its tip inside the target and then nods 4dp toward it every 1.4s. The spotlight morphs from the previous target to the next during the flight; a first step fades the veil in over the first half. With "Remove animations" on, everything cuts instantly.
+### Pointing Hand and Spotlight (signature)
+The one signature motion. The hand (48dp, blue, white edge, soft shadow) flies on a quadratic arc that bows upward by 22% of its length, 720ms on Material's emphasized curve (0.3, 0, 0.1, 1), trailing 14 fading line-blue dots; it lands with its fingertip inside the target and then taps it every 1.5s: the finger dips 3dp and shrinks 6% while a line-blue ring spreads 24dp from the fingertip and fades. When Saathi scrolls or opens an app itself, the caption says so in one short line and no hand is shown. The spotlight morphs from the previous target to the next during the flight; a first step fades the veil in over the first half. With "Remove animations" on, everything cuts instantly.
 
 ### Caption Card
 - **Corner Style:** 28dp radius.
@@ -341,7 +341,7 @@ The one signature motion. The cursor (42dp, blue body, white edge, soft shadow) 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** keep blue for where to press and what can be pressed: cursor, spotlight halo, Help pill, primary pill, selected tile.
+- **Do** keep blue for where to press and what can be pressed: hand, spotlight halo, Help pill, primary pill, selected tile.
 - **Do** float the caption at the top below the status bar, and move it to the bottom only when it would cover the target.
 - **Do** keep the Help pill against a screen edge and move it to the other side when it comes within 24dp of the target.
 - **Do** split every caption into a large bold first sentence and a smaller 70%-white remainder.
@@ -349,12 +349,12 @@ The one signature motion. The cursor (42dp, blue body, white edge, soft shadow) 
 - **Do** pair every state colour with a drawn glyph or word (tick, lock, warning, voice bars, arc).
 - **Do** draw icons from the shared 24-unit glyph set with its one rounded stroke; never mix in an icon font.
 - **Do** set explicit line heights for Indic scripts and shrink pill words to fit instead of truncating.
-- **Do** honour "Remove animations": the cursor flight, nod and pulses become instant cuts.
+- **Do** honour "Remove animations": the hand's flight, tap and pulses become instant cuts.
 
 ### Don't:
 - **Don't** build bordered signboards, edge bands or boxy outline buttons; the caption is a borderless floating card.
 - **Don't** put grey panels, tints or colour inside the caption card; it stays white on near-black.
 - **Don't** dim the app heavily; the veil stays at 22% by day and 32% at night.
-- **Don't** let the cursor body or the Help pill sit over the next row or the target; the tip rests inside the target.
+- **Don't** let the hand or the Help pill sit over the next row or the target; the tip rests inside the target.
 - **Don't** use colour alone for any state, selection or warning.
 - **Don't** put more than one primary pill on a setup step.

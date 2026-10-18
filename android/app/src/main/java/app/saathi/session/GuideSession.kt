@@ -2,6 +2,7 @@ package app.saathi.session
 
 import app.saathi.brain.ScreenKey
 import app.saathi.capture.Box
+import app.saathi.net.Action
 import app.saathi.net.Danger
 import app.saathi.net.Guide
 import app.saathi.net.PastStep
@@ -69,6 +70,19 @@ interface Pointer {
 
 interface Brain { suspend fun turn(request: TurnRequest): TurnResponse }
 
+/** The harmless moves Saathi may make itself (see [Action]). Each returns false if it couldn't. */
+interface Hands {
+    /** Scrolls the main list on screen down by a page. */
+    suspend fun scrollDown(): Boolean
+    /** Opens [pkg] as its home-screen icon would. */
+    fun openApp(pkg: String): Boolean
+}
+
+object NoHands : Hands {
+    override suspend fun scrollDown() = false
+    override fun openApp(pkg: String) = false
+}
+
 /** Localised lines the session speaks without asking the server. */
 interface Lines {
     val noSpeech: String
@@ -85,6 +99,8 @@ interface Lines {
     val wait: String get() = ""
     val busy: String get() = network
     val limit: String get() = network
+    /** Said while Saathi scrolls to find the next button itself. */
+    val scrolling: String get() = ""
 }
 
 enum class GuideState { IDLE, LISTENING, THINKING, SPEAKING, WATCHING }
@@ -95,9 +111,9 @@ enum class GuideState { IDLE, LISTENING, THINKING, SPEAKING, WATCHING }
  * font slider), so they are always answered; the others are skipped if nothing visibly changed.
  */
 enum class ScreenEvent(val settleMs: Long, val progress: Boolean) {
-    CLICK(1200, true),
-    NAVIGATED(1200, false),
-    SCROLLED(1500, false),
+    CLICK(500, true),
+    NAVIGATED(500, false),
+    SCROLLED(600, false),
     TYPED(3000, false),
 }
 
@@ -118,12 +134,20 @@ class GuideSession(
     private val hasMic: () -> Boolean,
     /** True during a phone or video call: the mic is taken and narrating over a call helps no one. */
     private val inCall: () -> Boolean = { false },
+    private val hands: Hands = NoHands,
 ) {
     companion object {
         const val MAX_AUTO_TURNS = 15
-        /** How long a screen gets to finish loading after the senior acts, in looks 500ms apart. */
-        const val SETTLE_TRIES = 4
-        const val SETTLE_STEP_MS = 500L
+        /** How long a screen gets to finish loading after the senior acts, in looks 250ms apart. */
+        const val SETTLE_TRIES = 6
+        const val SETTLE_STEP_MS = 250L
+        /** After Saathi scrolls or opens an app silently, the screen gets this long to move. */
+        const val ACT_SETTLE_MS = 600L
+        /**
+         * Screen changes this soon after Saathi's own scroll or app launch are its own doing (an app
+         * can take a second to finish opening), not the senior's. A real tap still counts.
+         */
+        const val OWN_CHANGE_MS = 2_000L
         const val WATCH_TIMEOUT_MS = 120_000L
         const val HISTORY = 8
         const val POINT_RADIUS_PX = 90
@@ -147,6 +171,10 @@ class GuideSession(
     private var lastLook: Snapshot? = null
     private var lastGuide: Guide? = null
     private var silences = 0
+    /** True while Saathi is scrolling or opening an app itself, so its own screen changes don't count as the senior's. */
+    private var acting = false
+    /** Active for [OWN_CHANGE_MS] after Saathi acted. */
+    private var ownChange: Job? = null
 
     fun onBubbleTap() {
         if (_state.value == GuideState.LISTENING) {
@@ -160,6 +188,7 @@ class GuideSession(
         val s = _state.value
         // Only re-look while we are waiting on the senior, or if they acted before we finished talking.
         if (s != GuideState.WATCHING && s != GuideState.SPEAKING) return
+        if (acting || (event != ScreenEvent.CLICK && ownChange?.isActive == true)) return
         if (inCall()) {
             // A call started (often the one the senior was just helped to make): get out of the way.
             stop()
@@ -278,7 +307,8 @@ class GuideSession(
         }
     }
 
-    private suspend fun runTurn(utterance: String?, seen: Snapshot? = null) {
+    /** [speaking] is a line still being said (Saathi announcing its own scroll); the next step waits for it. */
+    private suspend fun runTurn(utterance: String?, seen: Snapshot? = null, speaking: Job? = null) {
         setState(GuideState.THINKING)
         val snap = seen ?: eyes.look()
         val request = TurnRequest(
@@ -303,6 +333,7 @@ class GuideSession(
             return
         }
 
+        speaking?.join()
         val guide = response.guide
         if (guide.goal.isNotBlank()) goal = guide.goal
         history.addLast(PastStep(guide.say, guide.label, guide.status, snap.app))
@@ -310,6 +341,8 @@ class GuideSession(
         lastSay = guide.say
         lastLook = snap
         lastGuide = guide
+
+        if (guide.action.isNotEmpty() && act(guide)) return
 
         pointer.point(targetBox(guide, snap), guide.say, guide.danger, done = guide.status == Status.DONE)
         setState(GuideState.SPEAKING)
@@ -324,6 +357,47 @@ class GuideSession(
             }
             else -> enterWatching() // next_step, user_must_do
         }
+    }
+
+    /**
+     * Does [guide]'s action for the senior, says so briefly, and moves on to the next step. Returns
+     * false if it couldn't (nothing to scroll, app not installed): the step is then spoken as usual.
+     */
+    private suspend fun act(guide: Guide): Boolean = coroutineScope {
+        acting = true
+        val speaking: Job?
+        val seen: Snapshot
+        try {
+            val done = when (guide.action) {
+                Action.SCROLL_DOWN -> hands.scrollDown()
+                Action.OPEN_APP -> hands.openApp(guide.actionArg)
+                else -> false
+            }
+            if (!done) return@coroutineScope false
+            val line = if (guide.action == Action.OPEN_APP) guide.say else lines().scrolling
+            // A run of scrolls is announced once, not every page.
+            val repeated = history.size >= 2 && history[history.size - 2].say == guide.say
+            pointer.point(null, line, Danger.NONE)
+            setState(GuideState.SPEAKING)
+            // The line is said while Saathi looks at the moved screen, so the next step is ready
+            // the moment it ends instead of a look and a think later.
+            speaking = if (line.isNotBlank() && !repeated) launch { mouth.say(line) } else null
+            ownChange?.cancel()
+            ownChange = scope.launch { delay(OWN_CHANGE_MS) }
+            delay(ACT_SETTLE_MS)
+            seen = lookSettled()
+        } finally {
+            // runTurn turns THINKING straight away, which ignores screen events on its own.
+            acting = false
+        }
+        if (autoTurns >= MAX_AUTO_TURNS) {
+            speaking?.join()
+            reset()
+            return@coroutineScope true
+        }
+        autoTurns++
+        runTurn(utterance = null, seen = seen, speaking = speaking)
+        true
     }
 
     private fun enterWatching() {

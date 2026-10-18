@@ -2,11 +2,16 @@ package app.saathi.voice
 
 import android.content.Context
 import android.content.Intent
+import android.media.AudioAttributes
 import android.os.Build
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.speech.tts.TextToSpeech
 import android.util.Log
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 /**
@@ -14,7 +19,13 @@ import java.util.Locale
  * the senior's language? A missing voice is the most common reason Saathi would stay silent on a
  * cheap phone, so setup plays a sample and offers the download.
  */
-class VoiceSetup(private val context: Context) {
+class VoiceSetup(
+    private val context: Context,
+    /** The natural voice, played for the test when it can be had; the phone's voice otherwise. */
+    private val cloud: CloudVoice? = null,
+) {
+    private val scope = MainScope()
+    private var playing: Job? = null
     private var tts: TextToSpeech? = null
     private var ready = false
     private var pending: (() -> Unit)? = null
@@ -27,17 +38,38 @@ class VoiceSetup(private val context: Context) {
         }
     }
 
-    /** Speaks [line] in [tag] at [rate] and reports whether the voice exists. Main thread. */
+    /**
+     * Plays [line] in [tag] at [rate], in the natural voice when it can be had, and reports whether
+     * the phone's own voice exists (it speaks whenever the natural one can't). Main thread.
+     */
     fun test(tag: String, rate: Float, line: String, onResult: (Speaker.VoiceStatus) -> Unit) {
+        playing?.cancel()
+        playing = scope.launch {
+            val clip = cloud?.clip(line, tag, Speaker.naturalPace(rate))
+            val attributes = AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ASSISTANT)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                .build()
+            if (clip != null && cloud.play(clip, attributes)) {
+                onResult(Speaker.VoiceStatus.OK)
+            } else {
+                speakOnPhone(tag, rate, line, onResult)
+            }
+        }
+    }
+
+    private fun speakOnPhone(tag: String, rate: Float, line: String, onResult: (Speaker.VoiceStatus) -> Unit) {
         val run = run@{
             val engine = tts
             if (!ready || engine == null) {
                 onResult(Speaker.VoiceStatus.NO_ENGINE)
                 return@run
             }
-            when (engine.setLanguage(Locale.forLanguageTag(tag))) {
+            val locale = Locale.forLanguageTag(tag)
+            when (engine.setLanguage(locale)) {
                 TextToSpeech.LANG_MISSING_DATA, TextToSpeech.LANG_NOT_SUPPORTED -> onResult(Speaker.VoiceStatus.MISSING)
                 else -> {
+                    VoicePicker.apply(context, engine, locale)
                     engine.setSpeechRate(rate)
                     engine.speak(line, TextToSpeech.QUEUE_FLUSH, null, "saathi-setup")
                     onResult(Speaker.VoiceStatus.OK)
@@ -71,6 +103,8 @@ class VoiceSetup(private val context: Context) {
     }
 
     fun shutdown() {
+        scope.cancel()
+        cloud?.stop()
         tts?.stop()
         tts?.shutdown()
         tts = null

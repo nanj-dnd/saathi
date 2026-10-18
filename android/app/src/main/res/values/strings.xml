@@ -50,4 +50,5 @@
     <string name="btn_continue">Continue</string>
     <string name="btn_back">Back</string>
     <string name="mic_body">Saathi listens only after you press the Help button.</string>
+    <string name="say_scrolling">Let me look further down.</string>
 </resources>

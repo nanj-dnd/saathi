@@ -14,7 +14,7 @@ android
 A phone helper in the spirit of Clicky (Farza's macOS buddy). A floating Help button sits over every app. The senior taps it and says what they want; Saathi reads the screen, says the single next step aloud in their language and points at the exact button, then looks again after each tap until the task is done. Success is a senior completing a real task on their own phone without calling anyone.
 
 ## Positioning
-It points and talks, never taps. The senior's own hands complete every step, so they learn the app and stay in control, and payment, PIN and OTP steps are always theirs alone. Common tasks run on the phone from scripted recipes; only unknown screens go to the model.
+It points and talks, and never taps. The senior's own hands make every tap, so they learn the app and stay in control, and payment, PIN and OTP steps are always theirs alone. The only things Saathi does itself are harmless moves that can't buy, send, delete or change anything: scrolling a list to bring the next button into view, and opening the app a task needs (at the start of a task, never pulling the senior out mid-task). Common tasks run on the phone from scripted recipes; only unknown screens go to the model.
 
 ## Operating Context
 - Native Android (11+) accessibility service: reads the foreground app's element tree, takes a screenshot, and draws accessibility overlays (bubble, spotlight pointer, caption card) above every app.
@@ -23,7 +23,7 @@ It points and talks, never taps. The senior's own hands complete every step, so 
 
 ## Capabilities and Constraints
 - Six languages: hi-IN, en-IN, ta-IN, te-IN, kn-IN, ml-IN. Every visible string and spoken line exists in all six.
-- Point-and-talk only: no gesture dispatch, never taps for the user.
+- Never taps for the user and dispatches no gestures. It may scroll a list (the accessibility scroll action) and open an app (its launcher intent); the user asked for this on 2026-10-19 to cut the time a task takes.
 - Overlays must never block the app underneath except where the senior is meant to touch (bubble, caption buttons).
 - Scam safety is a core function: remote-control apps, OTP/PIN requests and "receive money" QR codes get spoken warnings.
 - Undecided: final product name (see Brand Commitments).

@@ -42,7 +42,7 @@ private fun animationsOn() = ValueAnimator.areAnimatorsEnabled()
 private val SETTLE = PathInterpolator(0.3f, 0f, 0.1f, 1f)
 
 /**
- * The Help button: a blue pill carrying the cursor and its word, which the senior taps to talk and
+ * The Help button: a blue pill carrying the pointing hand and its word, which the senior taps to talk and
  * drags out of the way. Listening and Looking turn it near-black with a moving icon (voice bars, a
  * spinning arc), so the state reads by shape and word, not colour alone.
  */
@@ -164,7 +164,7 @@ internal class BubbleView(
                 arc.color = buddy.accentLine
                 canvas.drawArc(box, phase * 360f - 90f, 110f, false, arc)
             }
-            else -> Glyphs.draw(canvas, Glyph.CURSOR, RectF(ix, cy - icon / 2, ix + icon, cy + icon / 2), buddy.onAccent)
+            else -> Glyphs.draw(canvas, Glyph.HAND, RectF(ix, cy - icon / 2, ix + icon, cy + icon / 2), buddy.onAccent)
         }
         label.color = if (busy) buddy.cardInk else buddy.onAccent
         label.textSize = textPx
@@ -217,7 +217,7 @@ internal class BubbleView(
 
 /**
  * Full-screen, touch-through layer. A light dim over everything except the target, which sits in
- * a soft blue-edged spotlight, and the cursor: it flies on an arc from the Help button (or from its
+ * a soft blue-edged spotlight, and the pointing hand: it flies on an arc from the Help button (or from its
  * last stop) and lands with its tip on the target. That flight is Saathi's one signature motion.
  */
 internal class PointerView(context: Context) : View(context) {
@@ -233,18 +233,15 @@ internal class PointerView(context: Context) : View(context) {
     private val minSide = context.dp(56f)
     private val pad = context.dp(6f)
     private val corner = context.dp(18f)
-    private val cursorSize = context.dp(42f)
+    private val handSize = context.dp(48f)
     private val path = Path().apply { fillType = Path.FillType.EVEN_ODD }
-    private val cursor = Glyphs.cursorPath()
-    private val cursorEdge = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    private val hand = Glyphs.handPath()
+    private val handEdge = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL_AND_STROKE
         strokeJoin = Paint.Join.ROUND
     }
-    private val cursorFill = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.FILL_AND_STROKE
-        strokeJoin = Paint.Join.ROUND
-        strokeWidth = 1.6f
-    }
+    private val handFill = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val ripple = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = context.dp(2.5f) }
 
     private var fromSpot: RectF? = null
     private var spot: RectF? = null
@@ -252,7 +249,7 @@ internal class PointerView(context: Context) : View(context) {
     private val start = PointF()
     private val control = PointF()
     private val end = PointF()
-    /** Which way the cursor's body extends from its tip (mirrored near the right or bottom edge). */
+    /** Which way the hand extends from its fingertip (mirrored near the right or bottom edge). */
     private var flipX = 1f
     private var flipY = 1f
     private var travel = 1f
@@ -260,15 +257,15 @@ internal class PointerView(context: Context) : View(context) {
     private var beat = 0f
     private val loc = IntArray(2)
 
-    // Once landed, the cursor nods gently toward the target; nothing else moves.
+    // Once landed, the finger taps the target over and over, with a ripple where it touches.
     private val beatAnim = ValueAnimator.ofFloat(0f, 1f).apply {
-        duration = 1400
+        duration = 1500
         repeatCount = ValueAnimator.INFINITE
         addUpdateListener { beat = it.animatedValue as Float; invalidate() }
     }
     private var travelAnim: ValueAnimator? = null
 
-    /** [target] is in screen pixels; [origin] is where the cursor starts if nothing is showing. */
+    /** [target] is in screen pixels; [origin] is where the hand starts if nothing is showing. */
     fun pointAt(target: Box, origin: Box) {
         buddy = Buddy.of(context)
         getLocationOnScreen(loc)
@@ -283,11 +280,11 @@ internal class PointerView(context: Context) : View(context) {
         next.top = next.top.coerceAtLeast(inset)
         next.bottom = next.bottom.coerceAtMost(height - inset)
 
-        // The tip lands inside the target, so the cursor rests on it the way a hand would; the
+        // The tip lands inside the target, so the hand rests on it, fingertip on the button; the
         // overlay passes touches through, and a body hanging over the next row would invite a tap
         // there. Near the bottom or right of the screen it mirrors so it never leaves the screen.
-        val room = cursorSize * 1.05f
-        // On a wide row the label sits at its start, so the cursor lands well past it (even at large
+        val room = handSize * 0.9f
+        // On a wide row the label sits at its start, so the hand lands well past it (even at large
         // font sizes), short of the switch or chevron at the row's end.
         val tipX = if (next.width() > width * 0.6f) next.left + next.width() * 0.78f else next.centerX()
         flipX = if (tipX + room > width) -1f else 1f
@@ -314,7 +311,7 @@ internal class PointerView(context: Context) : View(context) {
                 interpolator = SETTLE
                 addUpdateListener {
                     travel = it.animatedValue as Float
-                    // The trail shows during the flight and fades out once the cursor has landed.
+                    // The trail shows during the flight and fades out once the hand has landed.
                     trailAlpha = if (travel < 0.85f) 1f else (1f - travel) / 0.15f
                     invalidate()
                 }
@@ -358,7 +355,7 @@ internal class PointerView(context: Context) : View(context) {
         } else {
             currentSpot.set(b)
         }
-        // A first step fades the dim and the spotlight in while the cursor is on its way.
+        // A first step fades the dim and the spotlight in while the hand is on its way.
         val fade = if (a == null) (travel / 0.5f).coerceAtMost(1f) else 1f
 
         veil.color = buddy.veil
@@ -375,7 +372,7 @@ internal class PointerView(context: Context) : View(context) {
         canvas.drawRoundRect(currentSpot, corner, corner, outline)
 
         if (trailAlpha > 0f) {
-            // Dots along the path already flown, brighter nearer the cursor.
+            // Dots along the path already flown, brighter nearer the hand.
             trail.color = buddy.accentLine
             val n = 14
             for (k in 1 until n) {
@@ -387,23 +384,31 @@ internal class PointerView(context: Context) : View(context) {
         }
 
         along(travel, at)
-        val nod = if (travel >= 1f && animationsOn()) context.dp(4f) * sin(beat * 2 * PI).toFloat().let { (it + 1) / 2 } else 0f
-        drawCursor(canvas, at.x + nod * flipX * 0.7f, at.y + nod * flipY * 0.7f)
+        val landed = travel >= 1f && animationsOn()
+        // The tap: the finger dips toward the target early in each beat, and a ring spreads from it.
+        val press = if (landed && beat < 0.3f) sin(beat / 0.3f * PI).toFloat() else 0f
+        if (landed) {
+            val t = beat
+            ripple.color = buddy.accentLine
+            ripple.alpha = ((1 - t) * 200).toInt()
+            canvas.drawCircle(at.x, at.y, context.dp(5f) + t * context.dp(24f), ripple)
+        }
+        drawHand(canvas, at.x, at.y, press)
     }
 
-    /** The cursor with its tip at (x, y): a white edge and soft shadow, then the blue body. */
-    private fun drawCursor(canvas: Canvas, x: Float, y: Float) {
-        val s = cursorSize / 24f
+    /** The hand with its fingertip at (x, y): a white edge and soft shadow, then the blue hand. */
+    private fun drawHand(canvas: Canvas, x: Float, y: Float, press: Float) {
+        val s = handSize / 24f * (1 - 0.06f * press)
         canvas.save()
-        canvas.translate(x, y)
+        canvas.translate(x, y + flipY * context.dp(3f) * press)
         canvas.scale(flipX * s, flipY * s)
         canvas.translate(-Glyphs.TIP_X, -Glyphs.TIP_Y)
-        cursorEdge.color = buddy.edge
-        cursorEdge.strokeWidth = 1.6f + 2 * context.dp(2.5f) / s
-        cursorEdge.setShadowLayer(context.dp(6f) / s, 0f, context.dp(2f) / s, 0x59000000)
-        canvas.drawPath(cursor, cursorEdge)
-        cursorFill.color = buddy.accent
-        canvas.drawPath(cursor, cursorFill)
+        handEdge.color = buddy.edge
+        handEdge.strokeWidth = 2 * context.dp(2.5f) / s
+        handEdge.setShadowLayer(context.dp(6f) / s, 0f, context.dp(2f) / s, 0x59000000)
+        canvas.drawPath(hand, handEdge)
+        handFill.color = buddy.accent
+        canvas.drawPath(hand, handFill)
         canvas.restore()
     }
 }

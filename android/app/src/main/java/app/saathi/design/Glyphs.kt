@@ -1,6 +1,7 @@
 package app.saathi.design
 
 import android.graphics.Canvas
+import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PorterDuff
@@ -9,21 +10,32 @@ import android.graphics.RectF
 
 /**
  * Saathi's drawn icon set on a 24-unit grid with one rounded stroke, used by the overlay and setup
- * alike. The cursor is the system's mark: the pointer, the Help button and the launcher icon.
+ * alike. The pointing hand is the system's mark: the pointer, the Help button and the launcher icon.
  */
-enum class Glyph { CURSOR, CHECK, LOCK, WARNING, MIC, REPEAT, CLOSE, SPEAKER, BACK }
+enum class Glyph { HAND, CHECK, LOCK, WARNING, MIC, REPEAT, CLOSE, SPEAKER, BACK }
 
 object Glyphs {
     private const val STROKE = 2.4f
 
-    /** The cursor's tip, in grid units: where it touches the thing it points at. */
-    const val TIP_X = 5f
-    const val TIP_Y = 3f
+    /** The fingertip, in grid units: where the hand touches the thing it points at. */
+    const val TIP_X = 9f
+    const val TIP_Y = 2f
 
-    /** The classic pointer with its tail, tip at the top left. Fill it with a round-joined stroke to soften the corners. */
-    fun cursorPath() = Path().apply {
-        moveTo(TIP_X, TIP_Y); lineTo(5f, 20f); lineTo(9.3f, 16.2f); lineTo(12f, 21.7f)
-        lineTo(14.4f, 20.6f); lineTo(11.7f, 15f); lineTo(17f, 15f); close()
+    /**
+     * A hand pointing up with its index finger, as if about to tap: finger, three folded fingers,
+     * palm and thumb, each a rounded shape. Filled together they read as one silhouette.
+     */
+    fun handPath() = Path().apply {
+        addRoundRect(RectF(7.2f, 2f, 10.8f, 14.5f), 1.8f, 1.8f, Path.Direction.CW)
+        addRoundRect(RectF(10.3f, 8.4f, 13.7f, 15f), 1.7f, 1.7f, Path.Direction.CW)
+        addRoundRect(RectF(13.3f, 9.4f, 16.7f, 15.5f), 1.7f, 1.7f, Path.Direction.CW)
+        addRoundRect(RectF(16.3f, 10.6f, 19.5f, 16f), 1.6f, 1.6f, Path.Direction.CW)
+        addRoundRect(RectF(7.2f, 12f, 19.5f, 22f), 4f, 4f, Path.Direction.CW)
+        // The thumb reaches out and up from beside the index finger.
+        addPath(Path().apply {
+            addRoundRect(RectF(3f, 12.4f, 9.4f, 15.8f), 1.7f, 1.7f, Path.Direction.CW)
+            transform(Matrix().apply { setRotate(38f, 8.8f, 14.6f) })
+        })
     }
 
     /** Draws [glyph] centred in [box] in [color]. */
@@ -41,7 +53,7 @@ object Glyphs {
         }
         val fill = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL; this.color = color }
         when (glyph) {
-            Glyph.CURSOR -> canvas.drawPath(cursorPath(), Paint(stroke).apply { style = Paint.Style.FILL_AND_STROKE; strokeWidth = 1.6f })
+            Glyph.HAND -> canvas.drawPath(handPath(), fill)
             Glyph.CHECK -> canvas.drawPath(Path().apply { moveTo(5f, 12.5f); lineTo(9.8f, 17.2f); lineTo(19f, 7f) }, stroke.apply { strokeWidth = 3f })
             Glyph.LOCK -> {
                 canvas.drawRoundRect(RectF(5.5f, 10.5f, 18.5f, 20.5f), 3f, 3f, fill)

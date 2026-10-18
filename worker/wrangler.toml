@@ -15,6 +15,11 @@ GUIDE_EFFORT = "low"
 DAILY_TURN_LIMIT = "300"
 # Ceiling on model calls per day across every phone (src/spend.ts). ~3,000 Haiku calls ≈ $2/day.
 GLOBAL_DAILY_LIMIT = "3000"
+# Natural voice (src/speech.ts, Sarvam bulbul:v3). Lines are cached for 90 days in GUIDE_CACHE, so
+# these limits count only new lines. 4,000 lines × ~80 characters ≈ 320k characters/day at most.
+SPEECH_SPEAKER = "shubh"
+SPEECH_DAILY_LIMIT = "4000"
+DEVICE_SPEECH_LIMIT = "400"
 
 # Per-device daily counters. Create with: npx wrangler kv namespace create USAGE
 [[kv_namespaces]]
@@ -28,7 +33,7 @@ binding = "GUIDE_CACHE"
 id = "8ab0b8fd80a24796b91986bc0bcbb3ac"
 
 # Secrets (npx wrangler secret put <NAME>, or .dev.vars locally):
-#   ANTHROPIC_API_KEY  TOKEN_SECRET
+#   ANTHROPIC_API_KEY  TOKEN_SECRET  SARVAM_API_KEY (optional: the natural voice)
 
 # Exact global counter for GLOBAL_DAILY_LIMIT (src/spend.ts).
 [[durable_objects.bindings]]

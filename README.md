@@ -2,7 +2,7 @@
 
 A Clicky-style phone helper for Indian seniors. A big orange **मदद / Help** button floats over every app. The senior taps it and says what they want ("Blinkit से दूध मंगाना है"). Saathi looks at the screen, says the single next step out loud in their language, and puts a spotlight and a pointing hand on the button to press. After the senior taps, Saathi looks again and gives the next step, until the task is done.
 
-Saathi only points and talks; it never taps anything. OTP, PIN and payment screens are always left to the senior. Opening a remote-control app (AnyDesk, TeamViewer…) gets a spoken scam warning.
+Saathi points and talks; it never taps anything. The only things it does itself are scrolling a list to find the next button and opening the app a task needs. OTP, PIN and payment screens are always left to the senior. Opening a remote-control app (AnyDesk, TeamViewer…) gets a spoken scam warning.
 
 Most steps never reach Claude. The phone answers common tasks itself with scripted [recipes](shared/recipes) (177 today: WhatsApp calls, photos and safety settings, SMS and email, Settings switches, UPI balance and bills, Blinkit and other shopping and returns, YouTube and other video apps, Maps, DigiLocker, spoken tips, scam warnings, reading the screen aloud), and it remembers answers it already got for the same screen. Those steps are free, instant and work offline.
 

@@ -49,4 +49,5 @@
     <string name="btn_continue">தொடரவும்</string>
     <string name="btn_back">பின்செல்</string>
     <string name="mic_body">நீங்கள் உதவி பொத்தானை அழுத்திய பிறகுதான் சாத்தி கேட்கும்.</string>
+    <string name="say_scrolling">கீழே பார்க்கிறேன்.</string>
 </resources>

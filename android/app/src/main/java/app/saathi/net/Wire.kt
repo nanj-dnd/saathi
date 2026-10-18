@@ -41,7 +41,23 @@ data class Guide(
     val status: String = Status.NEXT_STEP,
     val danger: String = Danger.NONE,
     val expect: String = "",
+    /** Something Saathi does itself instead of asking the senior: see [Action]. */
+    val action: String = "",
+    /** The action's detail: the package to open. */
+    @SerialName("action_arg") val actionArg: String = "",
 )
+
+/**
+ * The only things Saathi does on the senior's behalf: harmless moves that can't buy, send, delete
+ * or change anything. Every tap stays the senior's own. If an action can't be done, [Guide.say]
+ * is the instruction for doing it by hand.
+ */
+object Action {
+    /** Scroll the main list down a page, to bring the next button into view. */
+    const val SCROLL_DOWN = "scroll_down"
+    /** Open the app the task needs, as its home-screen icon would. */
+    const val OPEN_APP = "open_app"
+}
 
 object Status {
     const val NEXT_STEP = "next_step"

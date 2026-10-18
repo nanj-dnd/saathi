@@ -1,6 +1,7 @@
 package app.saathi
 
 import app.saathi.capture.Box
+import app.saathi.net.Action
 import app.saathi.net.Danger
 import app.saathi.net.Guide
 import app.saathi.net.Status
@@ -12,6 +13,7 @@ import app.saathi.session.Ears
 import app.saathi.session.Eyes
 import app.saathi.session.GuideSession
 import app.saathi.session.GuideState
+import app.saathi.session.Hands
 import app.saathi.session.Heard
 import app.saathi.session.Lines
 import app.saathi.session.Mouth
@@ -91,10 +93,19 @@ class GuideSessionTest {
             override val wait = "wait"
             override val busy = "busy"
             override val limit = "limit"
+            override val scrolling = "scrolling"
+        }
+
+        var scrolls = 0
+        var opened = mutableListOf<String>()
+        var handsWork = true
+        val hands = object : Hands {
+            override suspend fun scrollDown(): Boolean { scrolls++; return handsWork }
+            override fun openApp(pkg: String): Boolean { opened += pkg; return handsWork }
         }
 
         fun session(scope: TestScope, mic: Boolean = true) = GuideSession(
-            scope, eyes, ears, mouth, pointer, brain, { "hints" }, { "hi-IN" }, { lines }, { mic }, { calling },
+            scope, eyes, ears, mouth, pointer, brain, { "hints" }, { "hi-IN" }, { lines }, { mic }, { calling }, hands,
         )
     }
 
@@ -132,6 +143,48 @@ class GuideSessionTest {
         assertEquals("order milk", second.goal)
         assertEquals(1, second.history.size)
         assertEquals(listOf("ADD दबाइए", "View cart दबाइए"), f.said)
+    }
+
+    @Test fun `Saathi scrolls by itself, says so, and goes straight to the next step`() = runTest {
+        val f = Fakes().apply {
+            replies += Guide(say = "slide up", goal = "order milk", action = Action.SCROLL_DOWN)
+            replies += step("ADD दबाइए")
+        }
+        val s = f.session(this)
+        s.ask("order milk")
+        advanceTimeBy(5_000)
+        runCurrent()
+        assertEquals(1, f.scrolls)
+        assertEquals(listOf("scrolling", "ADD दबाइए"), f.said)
+        assertEquals(2, f.requests.size)
+        assertEquals(GuideState.WATCHING, s.state.value)
+    }
+
+    @Test fun `Saathi opens the app itself and carries on inside it`() = runTest {
+        val f = Fakes().apply {
+            replies += Guide(say = "opening Blinkit", goal = "order milk", action = Action.OPEN_APP, actionArg = "com.grofers.customerapp")
+            replies += step("ADD दबाइए")
+        }
+        val s = f.session(this)
+        s.ask("order milk")
+        advanceTimeBy(5_000)
+        runCurrent()
+        assertEquals(listOf("com.grofers.customerapp"), f.opened)
+        assertEquals(listOf("opening Blinkit", "ADD दबाइए"), f.said)
+    }
+
+    @Test fun `when Saathi can't do it, the senior hears how to do it by hand`() = runTest {
+        val f = Fakes().apply {
+            handsWork = false
+            replies += Guide(say = "slide up", goal = "order milk", action = Action.SCROLL_DOWN)
+        }
+        val s = f.session(this)
+        s.ask("order milk")
+        advanceTimeBy(5_000)
+        runCurrent()
+        assertEquals(listOf("slide up"), f.said)
+        assertEquals(1, f.requests.size)
+        assertEquals(GuideState.WATCHING, s.state.value)
     }
 
     private val fullScreen = (1..6).joinToString("\n") { "n$it TextView \"Item $it\" [0,${it * 100},500,${it * 100 + 80}]" } +

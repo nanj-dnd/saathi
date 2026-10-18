@@ -98,6 +98,9 @@ import app.saathi.design.Buddy
 import app.saathi.design.Glyph
 import app.saathi.design.Glyphs
 import app.saathi.service.BuddyAccessibilityService
+import app.saathi.BuildConfig
+import app.saathi.net.WorkerClient
+import app.saathi.voice.CloudVoice
 import app.saathi.voice.Speaker
 import app.saathi.voice.VoiceSetup
 
@@ -184,7 +187,10 @@ private fun Setup(prefs: Prefs, onFinish: () -> Unit) {
     val askPermissions = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
         micGranted = hasMic(base)
     }
-    val voice = remember { VoiceSetup(base) }
+    val voice = remember {
+        val worker = WorkerClient(BuildConfig.WORKER_URL, prefs)
+        VoiceSetup(base, CloudVoice(base, worker::speak))
+    }
     DisposableEffect(voice) { onDispose { voice.shutdown() } }
     var rate by remember { mutableStateOf(prefs.speechRate) }
     var voiceStatus by remember(language) { mutableStateOf<Speaker.VoiceStatus?>(null) }
@@ -213,7 +219,7 @@ private fun Setup(prefs: Prefs, onFinish: () -> Unit) {
             } else {
                 Spacer(Modifier.width(12.dp))
                 Box(Modifier.size(34.dp).background(t.accent, CircleShape), contentAlignment = Alignment.Center) {
-                    GlyphIcon(Glyph.CURSOR, t.onAccent, 20.dp)
+                    GlyphIcon(Glyph.HAND, t.onAccent, 20.dp)
                 }
                 Spacer(Modifier.width(10.dp))
                 Txt(s(R.string.app_name), 21, FontWeight.Bold, t.ink)
@@ -518,7 +524,7 @@ private fun HelpPill(label: String) {
             .padding(start = 18.dp, end = 22.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        GlyphIcon(Glyph.CURSOR, t.onAccent, 24.dp)
+        GlyphIcon(Glyph.HAND, t.onAccent, 24.dp)
         Spacer(Modifier.width(8.dp))
         Txt(label, 19, FontWeight.Bold, t.onAccent)
     }

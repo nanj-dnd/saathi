@@ -22,7 +22,12 @@ class Prefs(context: Context) {
 
     /** TextToSpeech rate; seniors who find the default too fast pick "slow" in setup. */
     var speechRate: Float
-        get() = sp.getFloat("speech_rate", 0.85f)
+        get() = when (val r = sp.getFloat("speech_rate", app.saathi.voice.Speaker.DEFAULT_RATE)) {
+            // Rates saved before the speeds were raised map onto the new normal and slow.
+            0.85f -> app.saathi.voice.Speaker.DEFAULT_RATE
+            0.7f -> app.saathi.voice.Speaker.SLOW_RATE
+            else -> r
+        }
         set(v) = sp.edit().putFloat("speech_rate", v).apply()
 
     var bubbleX: Int

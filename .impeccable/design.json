@@ -157,9 +157,9 @@
         ],
         "note": "CSS #RRGGBBAA; source is Android ARGB in Buddy.kt"
       },
-      "cursor-edge": {
+      "hand-edge": {
         "role": "neutral",
-        "displayName": "Cursor Edge",
+        "displayName": "Hand Edge",
         "canonical": "#FFFFFF",
         "tonalRamp": [
           "#0B0B0B",
@@ -470,9 +470,9 @@
     },
     "shadows": [
       {
-        "name": "cursor-lift",
+        "name": "hand-lift",
         "value": "0 2px 6px rgba(0,0,0,0.35)",
-        "purpose": "Under the cursor's white edge."
+        "purpose": "Under the hand's white edge."
       },
       {
         "name": "help-pill-lift",
@@ -499,17 +499,17 @@
       {
         "name": "settle",
         "value": "cubic-bezier(0.3, 0, 0.1, 1)",
-        "purpose": "Material emphasized curve for the cursor flight."
+        "purpose": "Material emphasized curve for the hand flight."
       },
       {
-        "name": "cursor-flight",
+        "name": "hand-flight",
         "value": "720ms settle, quadratic arc bowing up 22% of its length, 14-dot fading trail",
         "purpose": "The one signature motion: Help pill (or last stop) to the target."
       },
       {
-        "name": "cursor-nod",
+        "name": "hand-nod",
         "value": "1400ms loop, 4dp toward the target",
-        "purpose": "The landed cursor's only movement."
+        "purpose": "The landed hand's only movement."
       },
       {
         "name": "listening-pulse",
@@ -534,9 +534,9 @@
       "name": "Help Pill",
       "kind": "button",
       "refersTo": "help-pill",
-      "description": "The blue pill carrying the cursor glyph and its word; side-anchored and snapped to a screen edge.",
+      "description": "The blue pill carrying the hand glyph and its word; side-anchored and snapped to a screen edge.",
       "html": "<button class=\"ds-help\"><svg viewBox=\"0 0 24 24\" width=\"24\" height=\"24\"><path d=\"M5,3 L5,20 L9.3,16.2 L12,21.7 L14.4,20.6 L11.7,15 L17,15 Z\" fill=\"#fff\" stroke=\"#fff\" stroke-width=\"1.6\" stroke-linejoin=\"round\"/></svg><span>Help</span></button>",
-      "css": ".ds-help { display: inline-flex; align-items: center; gap: 8px; height: 56px; padding: 0 22px 0 18px; border-radius: 9999px; background: #1F5FE0; color: #fff; border: 1.5px solid rgba(255,255,255,0.9); box-shadow: 0 3px 8px rgba(0,0,0,0.25); font: 700 19px/1.4 Roboto, 'Noto Sans Devanagari', sans-serif; cursor: pointer; transition: transform 0.2s cubic-bezier(0.3,0,0.1,1); } .ds-help:hover { transform: translateY(-1px); } .ds-help:active { transform: scale(0.97); } .ds-help:focus-visible { outline: 3px solid #4D8BFF; outline-offset: 3px; }"
+      "css": ".ds-help { display: inline-flex; align-items: center; gap: 8px; height: 56px; padding: 0 22px 0 18px; border-radius: 9999px; background: #1F5FE0; color: #fff; border: 1.5px solid rgba(255,255,255,0.9); box-shadow: 0 3px 8px rgba(0,0,0,0.25); font: 700 19px/1.4 Roboto, 'Noto Sans Devanagari', sans-serif; hand: pointer; transition: transform 0.2s cubic-bezier(0.3,0,0.1,1); } .ds-help:hover { transform: translateY(-1px); } .ds-help:active { transform: scale(0.97); } .ds-help:focus-visible { outline: 3px solid #4D8BFF; outline-offset: 3px; }"
     },
     {
       "name": "Help Pill, Listening",
@@ -552,7 +552,7 @@
       "refersTo": "caption-card",
       "description": "Near-black floating caption: large bold first sentence, 70%-white remainder, Repeat and Close pills inside.",
       "html": "<div class=\"ds-caption\"><p class=\"ds-cap-head\">Press 'Display &amp; touch'.</p><p class=\"ds-cap-sub\">The text size is in here.</p><div class=\"ds-cap-row\"><button class=\"ds-pill-repeat\">Repeat</button><button class=\"ds-pill-close\">Close</button></div></div>",
-      "css": ".ds-caption { background: #15171C; border-radius: 28px; padding: 20px 20px 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.28); font-family: Roboto, 'Noto Sans Devanagari', sans-serif; max-width: 380px; } .ds-cap-head { margin: 0; color: #fff; font-weight: 700; font-size: 24px; line-height: 1.3; } .ds-cap-sub { margin: 6px 0 0; color: rgba(255,255,255,0.7); font-weight: 400; font-size: 18px; line-height: 1.38; } .ds-cap-row { display: flex; gap: 14px; margin-top: 18px; } .ds-pill-repeat, .ds-pill-close { flex: 1; min-height: 56px; padding: 0 16px; border: none; border-radius: 9999px; font: 600 19px/1.4 Roboto, sans-serif; cursor: pointer; } .ds-pill-repeat { background: #fff; color: #15171C; } .ds-pill-close { background: rgba(255,255,255,0.16); color: #fff; } .ds-pill-repeat:focus-visible, .ds-pill-close:focus-visible { outline: 3px solid #4D8BFF; outline-offset: 2px; }"
+      "css": ".ds-caption { background: #15171C; border-radius: 28px; padding: 20px 20px 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.28); font-family: Roboto, 'Noto Sans Devanagari', sans-serif; max-width: 380px; } .ds-cap-head { margin: 0; color: #fff; font-weight: 700; font-size: 24px; line-height: 1.3; } .ds-cap-sub { margin: 6px 0 0; color: rgba(255,255,255,0.7); font-weight: 400; font-size: 18px; line-height: 1.38; } .ds-cap-row { display: flex; gap: 14px; margin-top: 18px; } .ds-pill-repeat, .ds-pill-close { flex: 1; min-height: 56px; padding: 0 16px; border: none; border-radius: 9999px; font: 600 19px/1.4 Roboto, sans-serif; hand: pointer; } .ds-pill-repeat { background: #fff; color: #15171C; } .ds-pill-close { background: rgba(255,255,255,0.16); color: #fff; } .ds-pill-repeat:focus-visible, .ds-pill-close:focus-visible { outline: 3px solid #4D8BFF; outline-offset: 2px; }"
     },
     {
       "name": "Status Badges",
@@ -568,7 +568,7 @@
       "refersTo": "primary-pill",
       "description": "The one pinned blue pill at the bottom of every setup step.",
       "html": "<button class=\"ds-primary\">Continue</button>",
-      "css": ".ds-primary { width: 100%; min-height: 60px; padding: 14px 24px; border: none; border-radius: 9999px; background: #1F5FE0; color: #fff; font: 600 20px/1.4 Roboto, 'Noto Sans Devanagari', sans-serif; cursor: pointer; transition: background 0.2s, transform 0.2s; } .ds-primary:hover { background: #1A52C4; } .ds-primary:active { transform: scale(0.98); } .ds-primary:focus-visible { outline: 3px solid #4D8BFF; outline-offset: 3px; }"
+      "css": ".ds-primary { width: 100%; min-height: 60px; padding: 14px 24px; border: none; border-radius: 9999px; background: #1F5FE0; color: #fff; font: 600 20px/1.4 Roboto, 'Noto Sans Devanagari', sans-serif; hand: pointer; transition: background 0.2s, transform 0.2s; } .ds-primary:hover { background: #1A52C4; } .ds-primary:active { transform: scale(0.98); } .ds-primary:focus-visible { outline: 3px solid #4D8BFF; outline-offset: 3px; }"
     },
     {
       "name": "Quiet Button",
@@ -576,7 +576,7 @@
       "refersTo": "quiet-button",
       "description": "Secondary setup action: tile-grey pill with an optional drawn glyph.",
       "html": "<button class=\"ds-quiet\"><svg viewBox=\"0 0 24 24\" width=\"22\" height=\"22\"><path d=\"M3.5 9.5 H7 L11.5 5.5 V18.5 L7 14.5 H3.5 Z\" fill=\"#101215\" stroke=\"#101215\" stroke-width=\"1.5\" stroke-linejoin=\"round\"/><path d=\"M15 9.5 A3 4 0 0 1 15 14.5 M16.8 6.5 A5.2 7.5 0 0 1 16.8 17.5\" fill=\"none\" stroke=\"#101215\" stroke-width=\"2.4\" stroke-linecap=\"round\"/></svg><span>Play a test</span></button>",
-      "css": ".ds-quiet { display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 56px; padding: 12px 20px; border: none; border-radius: 9999px; background: #F2F3F5; color: #101215; font: 600 19px/1.4 Roboto, sans-serif; cursor: pointer; transition: background 0.2s; } .ds-quiet:hover { background: #E3E6EA; } .ds-quiet:focus-visible { outline: 3px solid #1F5FE0; outline-offset: 3px; }"
+      "css": ".ds-quiet { display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 56px; padding: 12px 20px; border: none; border-radius: 9999px; background: #F2F3F5; color: #101215; font: 600 19px/1.4 Roboto, sans-serif; hand: pointer; transition: background 0.2s; } .ds-quiet:hover { background: #E3E6EA; } .ds-quiet:focus-visible { outline: 3px solid #1F5FE0; outline-offset: 3px; }"
     },
     {
       "name": "Language Tiles",
@@ -584,7 +584,7 @@
       "refersTo": "language-tile-selected",
       "description": "Two-column grid of languages in their own scripts; selected tile turns blue and carries a tick.",
       "html": "<div class=\"ds-langs\"><button class=\"ds-lang ds-lang-on\" aria-pressed=\"true\"><span>हिन्दी</span><i class=\"ds-tick\"><svg viewBox=\"0 0 24 24\"><path d=\"M5 12.5 L9.8 17.2 L19 7\" fill=\"none\" stroke=\"#1F5FE0\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></i></button><button class=\"ds-lang\"><span>English</span></button><button class=\"ds-lang\"><span>தமிழ்</span></button><button class=\"ds-lang\"><span>తెలుగు</span></button></div>",
-      "css": ".ds-langs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 380px; } .ds-lang { display: flex; align-items: center; justify-content: space-between; min-height: 76px; padding: 12px 18px; border: none; border-radius: 20px; background: #F2F3F5; color: #101215; font: 600 24px/1.4 Roboto, 'Noto Sans Devanagari', 'Noto Sans Tamil', 'Noto Sans Telugu', sans-serif; text-align: left; cursor: pointer; transition: background 0.2s; } .ds-lang:hover { background: #E3E6EA; } .ds-lang-on, .ds-lang-on:hover { background: #1F5FE0; color: #fff; } .ds-tick { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: #fff; } .ds-tick svg { width: 18px; height: 18px; } .ds-lang:focus-visible { outline: 3px solid #1F5FE0; outline-offset: 3px; }"
+      "css": ".ds-langs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 380px; } .ds-lang { display: flex; align-items: center; justify-content: space-between; min-height: 76px; padding: 12px 18px; border: none; border-radius: 20px; background: #F2F3F5; color: #101215; font: 600 24px/1.4 Roboto, 'Noto Sans Devanagari', 'Noto Sans Tamil', 'Noto Sans Telugu', sans-serif; text-align: left; hand: pointer; transition: background 0.2s; } .ds-lang:hover { background: #E3E6EA; } .ds-lang-on, .ds-lang-on:hover { background: #1F5FE0; color: #fff; } .ds-tick { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: #fff; } .ds-tick svg { width: 18px; height: 18px; } .ds-lang:focus-visible { outline: 3px solid #1F5FE0; outline-offset: 3px; }"
     },
     {
       "name": "Segmented Control",
@@ -592,7 +592,7 @@
       "refersTo": "segmented-selected",
       "description": "Two-way choice: tile-grey track with a raised white pill and a tick on the chosen side.",
       "html": "<div class=\"ds-seg\" role=\"radiogroup\"><button class=\"ds-seg-opt\" role=\"radio\" aria-checked=\"false\">Slow</button><button class=\"ds-seg-opt ds-seg-on\" role=\"radio\" aria-checked=\"true\"><svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\"><path d=\"M5 12.5 L9.8 17.2 L19 7\" fill=\"none\" stroke=\"#1F5FE0\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>Normal</button></div>",
-      "css": ".ds-seg { display: flex; padding: 4px; border-radius: 9999px; background: #F2F3F5; max-width: 380px; } .ds-seg-opt { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 56px; border: none; border-radius: 9999px; background: transparent; color: #5B616B; font: 500 19px/1.4 Roboto, sans-serif; cursor: pointer; } .ds-seg-on { background: #fff; color: #101215; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.18); } .ds-seg-opt:focus-visible { outline: 3px solid #1F5FE0; outline-offset: 2px; }"
+      "css": ".ds-seg { display: flex; padding: 4px; border-radius: 9999px; background: #F2F3F5; max-width: 380px; } .ds-seg-opt { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 56px; border: none; border-radius: 9999px; background: transparent; color: #5B616B; font: 500 19px/1.4 Roboto, sans-serif; hand: pointer; } .ds-seg-on { background: #fff; color: #101215; font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.18); } .ds-seg-opt:focus-visible { outline: 3px solid #1F5FE0; outline-offset: 2px; }"
     },
     {
       "name": "Progress Segments",
@@ -604,10 +604,10 @@
     }
   ],
   "narrative": {
-    "northStar": "The Cursor Buddy",
-    "overview": "Saathi is a pointer and a voice, not a signboard. Over any app, one plump blue cursor flies on an upward arc from the Help pill and lands with its tip inside the exact button; the app is only lightly dimmed and the target sits in a soft rounded spotlight with a faint blue halo. A near-black caption card floats above it all and says the step in white system sans: the first sentence large and bold, the rest smaller at 70% white. Everything the senior might press is a full pill.\n\nThe system is clean, modern and calm. Blue is spent only where to press (the cursor, the spotlight halo) and on what can be pressed (the Help pill, the primary pill, a selected tile). The caption is pure contrast, white on near-black, with no grey panels and no borders by day. Setup is the same world on a white ground: one step per screen, five progress segments, a big title, soft grey tiles and one pinned blue pill at the bottom.\n\nThe build explicitly refuses the instructional-UI vocabulary of the superseded world: bordered signboards, edge bands and boxy outline buttons.",
+    "northStar": "The Pointing Hand",
+    "overview": "Saathi is a pointer and a voice, not a signboard. Over any app, one blue pointing hand flies on an upward arc from the Help pill and lands with its fingertip inside the exact button, then taps it with a ripple; the app is only lightly dimmed and the target sits in a soft rounded spotlight with a faint blue halo. A near-black caption card floats above it all and says the step in white system sans: the first sentence large and bold, the rest smaller at 70% white. Everything the senior might press is a full pill.\n\nThe system is clean, modern and calm. Blue is spent only where to press (the hand, the spotlight halo) and on what can be pressed (the Help pill, the primary pill, a selected tile). The caption is pure contrast, white on near-black, with no grey panels and no borders by day. Setup is the same world on a white ground: one step per screen, five progress segments, a big title, soft grey tiles and one pinned blue pill at the bottom.\n\nThe build explicitly refuses the instructional-UI vocabulary of the superseded world: bordered signboards, edge bands and boxy outline buttons.",
     "keyCharacteristics": [
-      "One blue cursor (42dp, white edge, soft shadow) is the system's mark: pointer, Help pill glyph, setup wordmark and launcher icon.",
+      "One blue hand (48dp, white edge, soft shadow) is the system's mark: pointer, Help pill glyph, setup wordmark and launcher icon.",
       "Light veil (22% black by day, 32% at night) with a rounded spotlight; the app stays readable.",
       "Near-black floating caption card, two type sizes ranked by weight and opacity.",
       "Every action is a full pill; containers are softly rounded rectangles (18 to 28dp).",
@@ -647,7 +647,7 @@
       }
     ],
     "dos": [
-      "Do keep blue for where to press and what can be pressed: cursor, spotlight halo, Help pill, primary pill, selected tile.",
+      "Do keep blue for where to press and what can be pressed: hand, spotlight halo, Help pill, primary pill, selected tile.",
       "Do float the caption at the top below the status bar, and move it to the bottom only when it would cover the target.",
       "Do keep the Help pill against a screen edge and move it to the other side when it comes within 24dp of the target.",
       "Do split every caption into a large bold first sentence and a smaller 70%-white remainder.",
@@ -655,13 +655,13 @@
       "Do pair every state colour with a drawn glyph or word (tick, lock, warning, voice bars, arc).",
       "Do draw icons from the shared 24-unit glyph set with its one rounded stroke; never mix in an icon font.",
       "Do set explicit line heights for Indic scripts and shrink pill words to fit instead of truncating.",
-      "Do honour \"Remove animations\": the cursor flight, nod and pulses become instant cuts."
+      "Do honour \"Remove animations\": the hand flight, nod and pulses become instant cuts."
     ],
     "donts": [
       "Don't build bordered signboards, edge bands or boxy outline buttons; the caption is a borderless floating card.",
       "Don't put grey panels, tints or colour inside the caption card; it stays white on near-black.",
       "Don't dim the app heavily; the veil stays at 22% by day and 32% at night.",
-      "Don't let the cursor body or the Help pill sit over the next row or the target; the tip rests inside the target.",
+      "Don't let the hand body or the Help pill sit over the next row or the target; the tip rests inside the target.",
       "Don't use colour alone for any state, selection or warning.",
       "Don't put more than one primary pill on a setup step."
     ]

@@ -24,6 +24,8 @@ class Speaker(
     private val language: () -> String,
     /** Normal speaking rate; 1.0 is the engine default. */
     private val rate: () -> Float = { DEFAULT_RATE },
+    /** The natural voice, tried first; the phone's own voice speaks whatever it can't. */
+    private val cloud: CloudVoice? = null,
 ) : Mouth {
     private var tts: TextToSpeech? = null
     private var ttsReady: CompletableDeferred<Boolean>? = null
@@ -41,6 +43,17 @@ class Speaker(
 
     override suspend fun say(text: String, slow: Boolean) {
         if (text.isBlank()) return
+        val speed = if (slow) rate() * SLOW_FACTOR else rate()
+        cloud?.clip(text, language(), naturalPace(speed))?.let { clip ->
+            val restoreVolume = liftVolume()
+            val gotFocus = audio?.requestAudioFocus(focus) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
+            try {
+                if (cloud.play(clip, attributes)) return
+            } finally {
+                if (gotFocus) audio?.abandonAudioFocusRequest(focus)
+                restoreVolume()
+            }
+        }
         val engine = engine() ?: return
         val locale = Locale.forLanguageTag(language())
         val result = engine.setLanguage(locale)
@@ -50,7 +63,8 @@ class Speaker(
             Log.w(TAG, "no TTS voice for $locale")
             return
         }
-        engine.setSpeechRate(if (slow) rate() * SLOW_FACTOR else rate())
+        VoicePicker.apply(context, engine, locale)
+        engine.setSpeechRate(speed)
         engine.setAudioAttributes(attributes)
         val id = "saathi-${System.nanoTime()}"
         val restoreVolume = liftVolume()
@@ -66,6 +80,7 @@ class Speaker(
     }
 
     override fun stop() {
+        cloud?.stop()
         tts?.stop()
         pending?.invoke()
         pending = null
@@ -133,11 +148,16 @@ class Speaker(
 
     companion object {
         private const val TAG = "Saathi"
-        const val DEFAULT_RATE = 0.85f
-        const val SLOW_RATE = 0.7f
+        // Stretching speech far below 1.0 makes even a good voice sound mechanical, so "normal" is
+        // only a touch slow; seniors who want more pick "slow" in setup.
+        const val DEFAULT_RATE = 0.95f
+        const val SLOW_RATE = 0.8f
         /** A repeat is spoken this much slower than normal. */
-        private const val SLOW_FACTOR = 0.8f
+        private const val SLOW_FACTOR = 0.88f
         /** Media volume is lifted to at least this share of maximum while Saathi speaks. */
         private const val MIN_VOLUME = 0.5f
+
+        /** The natural voice already speaks at a comfortable speed, so "normal" plays it as is. */
+        fun naturalPace(rate: Float) = rate / DEFAULT_RATE
     }
 }
