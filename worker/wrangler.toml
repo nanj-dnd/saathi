@@ -17,7 +17,7 @@ DAILY_TURN_LIMIT = "300"
 GLOBAL_DAILY_LIMIT = "3000"
 # Natural voice (src/speech.ts, Sarvam bulbul:v3). Lines are cached for 90 days in GUIDE_CACHE, so
 # these limits count only new lines. 4,000 lines × ~80 characters ≈ 320k characters/day at most.
-SPEECH_SPEAKER = "shubh"
+SPEECH_SPEAKER = "priya"
 SPEECH_DAILY_LIMIT = "4000"
 DEVICE_SPEECH_LIMIT = "400"
 

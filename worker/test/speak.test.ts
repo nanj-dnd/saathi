@@ -74,7 +74,7 @@ describe("/speak", () => {
     await Promise.all(pending);
 
     const sent = JSON.parse((sarvam.mock.calls[0] as [string, RequestInit])[1].body as string);
-    expect(sent).toMatchObject({ language_code: "hi-IN", model: "bulbul:v3", speaker: "shubh", pace: 1, output_audio_codec: "mp3" });
+    expect(sent).toMatchObject({ language_code: "hi-IN", model: "bulbul:v3", speaker: "priya", pace: 1, output_audio_codec: "mp3" });
 
     const again = await worker.fetch(speakReq({ text: "'Display & touch' पर दबाइए।", language: "hi-IN" }), env as never, ctx());
     expect(again.headers.get("X-Saathi-Source")).toBe("cache");

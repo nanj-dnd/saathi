@@ -5,7 +5,7 @@ import { LANGUAGES, type Language } from "./schema.ts";
 // across every phone. Only the model's own replies are new text.
 
 export const SPEECH_MODEL = "bulbul:v3";
-export const DEFAULT_SPEAKER = "shubh";
+export const DEFAULT_SPEAKER = "priya";
 /** Longest line accepted, in characters. Captions are a sentence or two; this is generous. */
 export const MAX_TEXT = 600;
 const TTL_SECONDS = 60 * 60 * 24 * 90;
