@@ -50,6 +50,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -77,6 +78,7 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -218,8 +220,9 @@ private fun Setup(prefs: Prefs, onFinish: () -> Unit) {
                 ) { GlyphIcon(Glyph.BACK, t.ink, 26.dp) }
             } else {
                 Spacer(Modifier.width(12.dp))
+                // Saathi's mark: स on Saathi blue, as on the launcher icon.
                 Box(Modifier.size(34.dp).background(t.accent, CircleShape), contentAlignment = Alignment.Center) {
-                    GlyphIcon(Glyph.HAND, t.onAccent, 20.dp)
+                    Icon(painterResource(R.drawable.logo_mark), contentDescription = null, tint = t.onAccent, modifier = Modifier.size(24.dp))
                 }
                 Spacer(Modifier.width(10.dp))
                 Txt(s(R.string.app_name), 21, FontWeight.Bold, t.ink)

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- स, Saathi's mark, for use on a blue disc. Made by saathi-demo/logo/make_logo.py. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FFFFFFFF" android:pathData="M12.66 19.26V19.12L11.23 16.77Q10.78 16.02 10.32 15.46Q9.87 14.9 9.34 14.46Q9.05 14.24 8.72 14.02Q10.1 13.7 10.85 13Q10.99 12.86 11.11 12.7L11.43 14.47H15.17V19.26H19.18V7.22H21.1L20.9 4.26H2.9L3.11 7.22H7.36Q7.5 7.4 7.59 7.57Q7.85 8.13 7.85 8.96V9.12Q7.85 10.22 7.25 10.71Q6.65 11.21 5.07 11.21H4.1V14.47L5.33 14.6L7.77 19.26ZM11.8 11.31Q11.98 10.62 11.98 9.77V9.56Q11.98 8.57 11.73 7.85Q11.62 7.52 11.42 7.22H15.17V11.31Z" />
+</vector>
