@@ -10,6 +10,7 @@ import android.view.View
 import android.view.WindowManager
 import android.view.WindowManager.LayoutParams as LP
 import android.view.accessibility.AccessibilityWindowInfo
+import app.saathi.BuildConfig
 import app.saathi.Prefs
 import app.saathi.R
 import app.saathi.capture.Box
@@ -109,6 +110,8 @@ class OverlayController(
 
     override fun point(target: Box?, caption: String, danger: String, done: Boolean) {
         if (!attached) return
+        // Debug builds log what is shown and where, so recordings can be timed and driven.
+        if (BuildConfig.DEBUG) android.util.Log.d("Saathi", "point ${target?.let { "${it.left},${it.top},${it.right},${it.bottom}" } ?: "-"} | $caption")
         val res = strings()
         // The badge's shape carries the state, so nothing depends on telling colours apart.
         val kind = when {

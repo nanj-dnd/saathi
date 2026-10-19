@@ -155,7 +155,11 @@ class BuddyAccessibilityService : AccessibilityService() {
         if (BuildConfig.DEBUG) {
             // adb shell "am broadcast -a app.saathi.DEBUG_ASK --es text 'how do I make text bigger'"
             // adb shell "am broadcast -a app.saathi.DEBUG_OPENED --es pkg com.anydesk.anydeskandroid"
-            registerReceiver(debugAsk, IntentFilter().apply { addAction(DEBUG_ASK); addAction(DEBUG_OPENED) }, RECEIVER_EXPORTED)
+            // adb shell "am broadcast -a app.saathi.DEBUG_LANG --es tag ta-IN"
+            // adb shell "am broadcast -a app.saathi.DEBUG_STOP"
+            registerReceiver(debugAsk, IntentFilter().apply {
+                addAction(DEBUG_ASK); addAction(DEBUG_OPENED); addAction(DEBUG_LANG); addAction(DEBUG_STOP)
+            }, RECEIVER_EXPORTED)
         }
     }
 
@@ -255,6 +259,11 @@ class BuddyAccessibilityService : AccessibilityService() {
                 DEBUG_ASK -> intent.getStringExtra("text")?.let(session::ask)
                 // Pretend an app came to the front, to exercise the scam guard without installing it.
                 DEBUG_OPENED -> intent.getStringExtra("pkg")?.let(::onAppOpened)
+                DEBUG_STOP -> session.stop()
+                DEBUG_LANG -> intent.getStringExtra("tag")?.takeIf { it in Languages.ALL }?.let {
+                    prefs.language = it
+                    overlay.state(session.state.value)
+                }
             }
         }
     }
@@ -272,7 +281,11 @@ class BuddyAccessibilityService : AccessibilityService() {
             return
         }
         if (pkg in IGNORED || "inputmethod" in pkg) return
-        if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) overlay.setBubbleVisible(true)
+        // Events arrive out of order around app switches (the launcher's can land after setup's), so
+        // ask which app is really in front rather than trusting the event: never cover setup.
+        if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
+            overlay.setBubbleVisible(rootInActiveWindow?.packageName?.toString() != packageName)
+        }
 
         when (event.eventType) {
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> onAppOpened(pkg)
@@ -309,6 +322,8 @@ class BuddyAccessibilityService : AccessibilityService() {
         private val IGNORED = setOf("com.android.systemui")
         private const val DEBUG_ASK = "app.saathi.DEBUG_ASK"
         private const val DEBUG_OPENED = "app.saathi.DEBUG_OPENED"
+        private const val DEBUG_LANG = "app.saathi.DEBUG_LANG"
+        private const val DEBUG_STOP = "app.saathi.DEBUG_STOP"
 
         fun isEnabled(context: Context): Boolean {
             val am = context.getSystemService(AccessibilityManager::class.java)
