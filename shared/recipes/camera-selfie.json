@@ -1,6 +1,6 @@
 {
   "id": "camera-selfie",
-  "version": 2,
+  "version": 3,
   "goal": "take a selfie",
   "apps": [
     "com.android.camera",
@@ -64,7 +64,8 @@
       "screen_has": [
         [
           "Switch to rear camera",
-          "Switch to back camera"
+          "Switch to back camera",
+          "Switch Front camera"
         ]
       ],
       "target": [
@@ -118,7 +119,8 @@
         "Switch camera",
         "Flip camera",
         "Switch to selfie camera",
-        "Switch to front"
+        "Switch to front",
+        "Switch Back camera"
       ],
       "exact": true,
       "say": {

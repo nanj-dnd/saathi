@@ -88,7 +88,15 @@ class BuddyAccessibilityService : AccessibilityService() {
             override suspend fun turn(request: TurnRequest): TurnResponse {
                 // Matching walks every recipe and word family: never on the main thread, where a slow
                 // phone turns it into "Saathi isn't responding".
-                val response = withContext(Dispatchers.Default) { local.turn(request) }
+                val response = try {
+                    withContext(Dispatchers.Default) { local.turn(request) }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    // The senior hears "the internet isn't working"; the log says what really broke.
+                    Log.w(TAG, "turn failed", e)
+                    throw e
+                }
                 val recipe = recipes.book.byGoal(response.guide.goal)
                 if (response.source == Source.RECIPE && recipe != null && prefetching?.isActive != true) {
                     val lines = recipe.steps.mapNotNull { it.say[request.language] }
@@ -161,8 +169,9 @@ class BuddyAccessibilityService : AccessibilityService() {
             // adb shell "am broadcast -a app.saathi.DEBUG_OPENED --es pkg com.anydesk.anydeskandroid"
             // adb shell "am broadcast -a app.saathi.DEBUG_LANG --es tag ta-IN"
             // adb shell "am broadcast -a app.saathi.DEBUG_STOP"
+            // adb shell "am broadcast -a app.saathi.DEBUG_TREE"   (logs what Saathi sees, tag SaathiTree)
             registerReceiver(debugAsk, IntentFilter().apply {
-                addAction(DEBUG_ASK); addAction(DEBUG_OPENED); addAction(DEBUG_LANG); addAction(DEBUG_STOP)
+                addAction(DEBUG_ASK); addAction(DEBUG_OPENED); addAction(DEBUG_LANG); addAction(DEBUG_STOP); addAction(DEBUG_TREE)
             }, RECEIVER_EXPORTED)
         }
     }
@@ -264,6 +273,13 @@ class BuddyAccessibilityService : AccessibilityService() {
                 // Pretend an app came to the front, to exercise the scam guard without installing it.
                 DEBUG_OPENED -> intent.getStringExtra("pkg")?.let(::onAppOpened)
                 DEBUG_STOP -> session.stop()
+                // One log line per element: logcat cuts long lines.
+                DEBUG_TREE -> scope.launch {
+                    val snap = ScreenReader(this@BuddyAccessibilityService).look()
+                    Log.d("SaathiTree", "app ${snap.app} secure=${snap.secure}")
+                    snap.tree.lineSequence().forEach { Log.d("SaathiTree", it) }
+                    Log.d("SaathiTree", "end")
+                }
                 DEBUG_LANG -> intent.getStringExtra("tag")?.takeIf { it in Languages.ALL }?.let {
                     prefs.language = it
                     overlay.state(session.state.value)
@@ -328,6 +344,7 @@ class BuddyAccessibilityService : AccessibilityService() {
         private const val DEBUG_OPENED = "app.saathi.DEBUG_OPENED"
         private const val DEBUG_LANG = "app.saathi.DEBUG_LANG"
         private const val DEBUG_STOP = "app.saathi.DEBUG_STOP"
+        private const val DEBUG_TREE = "app.saathi.DEBUG_TREE"
 
         fun isEnabled(context: Context): Boolean {
             val am = context.getSystemService(AccessibilityManager::class.java)

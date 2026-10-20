@@ -60,7 +60,13 @@ class LocalFirstBrain(
         }
 
         val risky = ScreenSafety.scamCue(request.tree) || ScreenSafety.scamCue(request.utterance.orEmpty())
-        if (!risky) RecipeEngine(recipes(), canOpen).guide(request)?.let { return local(it, Source.RECIPE) }
+        if (!risky) {
+            val engine = RecipeEngine(recipes(), canOpen)
+            engine.guide(request)?.let { return local(it, Source.RECIPE) }
+            log("no recipe step: matched ${engine.match(request.utterance ?: request.goal, request.app)?.id ?: "none"} in ${request.app}")
+        } else {
+            log("scam cue on screen or in words: straight to the model")
+        }
 
         val key = if (!risky && cacheable(request)) ScreenKey.turnKey(request) else null
         if (key != null) cache.get(key)?.takeIf { fits(it, request) }?.let { return local(checked(it, request.language), Source.CACHE) }

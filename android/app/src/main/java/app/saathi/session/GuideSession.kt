@@ -10,6 +10,7 @@ import app.saathi.net.Status
 import app.saathi.net.TurnFailure
 import app.saathi.net.TurnRequest
 import app.saathi.net.TurnResponse
+import app.saathi.recipes.RecipeEngine
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -211,6 +212,12 @@ class GuideSession(
             delay(event.settleMs)
             setState(GuideState.THINKING)
             val snap = lookSettled()
+            if (leftForHome(snap)) {
+                // The senior pressed Home in the middle of a task: they're done with it, so Saathi
+                // steps back instead of pulling them into the app again.
+                reset()
+                return@launchPipeline
+            }
             if (!event.progress && unchanged(snap)) {
                 // A scroll that went nowhere or a dialog that flickered: keep the same step on
                 // screen, without asking again or repeating it out loud.
@@ -240,6 +247,13 @@ class GuideSession(
             if (again.app.isNotEmpty() || snap.app.isEmpty()) snap = again
         }
         return snap
+    }
+
+    /** On the home screen now, from an app, and not because Saathi said "press Home first". */
+    private fun leftForHome(snap: Snapshot): Boolean {
+        val before = lastLook?.app ?: return false
+        return RecipeEngine.isLauncher(snap.app) && !RecipeEngine.isLauncher(before) && before != snap.app &&
+            lastGuide?.expect?.endsWith("/find") != true
     }
 
     private fun unchanged(snap: Snapshot): Boolean {

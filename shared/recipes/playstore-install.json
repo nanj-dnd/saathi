@@ -1,6 +1,6 @@
 {
  "id": "playstore-install",
- "version": 1,
+ "version": 2,
  "goal": "download an app from the Play Store",
  "apps": [
   "com.android.vending"
@@ -118,7 +118,8 @@
   {
    "id": "install",
    "target": [
-    "Install"
+    "Install",
+    "Install Install on more devices"
    ],
    "exact": true,
    "say": {
