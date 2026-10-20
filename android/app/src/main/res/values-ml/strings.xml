@@ -50,4 +50,7 @@
     <string name="btn_back">പിന്നോട്ട്</string>
     <string name="mic_body">നിങ്ങൾ സഹായം ബട്ടൺ അമർത്തിയതിനു ശേഷം മാത്രമേ സാഥി കേൾക്കൂ.</string>
     <string name="say_scrolling">താഴേക്ക് നോക്കാം.</string>
+    <!-- After a finished task: Saathi listens once more. -->
+    <string name="say_anything_else">വേറെ എന്തെങ്കിലും സഹായം വേണോ?</string>
+    <string name="say_goodbye">ശരി. ആവശ്യമുള്ളപ്പോൾ സഹായം ബട്ടൺ അമർത്തുക.</string>
 </resources>

@@ -51,4 +51,7 @@
     <string name="btn_back">Back</string>
     <string name="mic_body">Saathi listens only after you press the Help button.</string>
     <string name="say_scrolling">Let me look further down.</string>
+    <!-- After a finished task: Saathi listens once more. -->
+    <string name="say_anything_else">Anything else I can help with?</string>
+    <string name="say_goodbye">Okay. Press Help whenever you need me.</string>
 </resources>

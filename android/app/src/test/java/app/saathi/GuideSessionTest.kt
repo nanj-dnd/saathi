@@ -58,8 +58,11 @@ class GuideSessionTest {
                 )
             }
         }
+        /** Answers for the next listens in order; then [heard]. */
+        val hearNext = ArrayDeque<Heard>()
+        var anythingElse = ""
         val ears = object : Ears {
-            override suspend fun listen() = heard
+            override suspend fun listen() = hearNext.removeFirstOrNull() ?: heard
             override fun finish() { finished = true }
         }
         val mouth = object : Mouth {
@@ -94,6 +97,8 @@ class GuideSessionTest {
             override val busy = "busy"
             override val limit = "limit"
             override val scrolling = "scrolling"
+            override val anythingElse get() = this@Fakes.anythingElse
+            override val goodbye = "goodbye"
         }
 
         var scrolls = 0
@@ -102,6 +107,7 @@ class GuideSessionTest {
         val hands = object : Hands {
             override suspend fun scrollDown(): Boolean { scrolls++; return handsWork }
             override fun openApp(pkg: String): Boolean { opened += pkg; return handsWork }
+            override fun openStorePage(pkg: String): Boolean { opened += "store:$pkg"; return handsWork }
         }
 
         fun session(scope: TestScope, mic: Boolean = true) = GuideSession(
@@ -281,6 +287,53 @@ class GuideSessionTest {
         advanceUntilIdle()
         assertEquals(GuideState.IDLE, s.state.value)
         assertEquals("", s.currentGoal)
+    }
+
+    @Test fun `after a finished task Saathi asks for anything else and listens again`() = runTest {
+        val f = Fakes().apply {
+            anythingElse = "anything-else"
+            replies += step("हो गया", status = Status.DONE)
+            replies += step("ADD दबाइए")
+            hearNext += Heard.Words("दूध मंगाना है")
+            hearNext += Heard.Words("अब दवाई मंगानी है")
+        }
+        val s = f.session(this)
+        s.onBubbleTap()
+        runCurrent()
+        advanceTimeBy(GuideSession.FOLLOW_UP_PAUSE_MS + 1)
+        runCurrent()
+        assertEquals(listOf("हो गया", "anything-else", "ADD दबाइए"), f.said)
+        // The new request is a new task: no old goal or history carried over.
+        assertEquals("अब दवाई मंगानी है", f.requests[1].utterance)
+        assertEquals("", f.requests[1].goal)
+        assertTrue(f.requests[1].history.isEmpty())
+    }
+
+    @Test fun `no thanks after a finished task says goodbye, silence just rests`() = runTest {
+        val f = Fakes().apply {
+            anythingElse = "anything-else"
+            replies += step("हो गया", status = Status.DONE)
+            hearNext += Heard.Words("दूध मंगाना है")
+            hearNext += Heard.Words("nahi bas, thank you")
+        }
+        val s = f.session(this)
+        s.onBubbleTap()
+        advanceUntilIdle()
+        assertEquals(listOf("हो गया", "anything-else", "goodbye"), f.said)
+        assertEquals(1, f.requests.size)
+        assertEquals(GuideState.IDLE, s.state.value)
+
+        val quiet = Fakes().apply {
+            anythingElse = "anything-else"
+            replies += step("हो गया", status = Status.DONE)
+            hearNext += Heard.Words("दूध मंगाना है")
+            hearNext += Heard.Silence
+        }
+        val q = quiet.session(this)
+        q.onBubbleTap()
+        advanceUntilIdle()
+        assertEquals(listOf("हो गया", "anything-else"), quiet.said)
+        assertEquals(GuideState.IDLE, q.state.value)
     }
 
     @Test fun `need_info listens again without another tap`() = runTest {

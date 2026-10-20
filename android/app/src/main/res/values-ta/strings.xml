@@ -50,4 +50,7 @@
     <string name="btn_back">பின்செல்</string>
     <string name="mic_body">நீங்கள் உதவி பொத்தானை அழுத்திய பிறகுதான் சாத்தி கேட்கும்.</string>
     <string name="say_scrolling">கீழே பார்க்கிறேன்.</string>
+    <!-- After a finished task: Saathi listens once more. -->
+    <string name="say_anything_else">வேறு ஏதாவது உதவி வேண்டுமா?</string>
+    <string name="say_goodbye">சரி. தேவைப்படும்போது உதவி பொத்தானை அழுத்துங்கள்.</string>
 </resources>

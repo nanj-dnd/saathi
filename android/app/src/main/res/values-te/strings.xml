@@ -50,4 +50,7 @@
     <string name="btn_back">వెనుకకు</string>
     <string name="mic_body">మీరు సహాయం బటన్ నొక్కిన తర్వాతే సాథీ వింటుంది.</string>
     <string name="say_scrolling">కిందకు చూస్తాను.</string>
+    <!-- After a finished task: Saathi listens once more. -->
+    <string name="say_anything_else">ఇంకా ఏమైనా సహాయం కావాలా?</string>
+    <string name="say_goodbye">సరే. అవసరమైనప్పుడు సహాయం బటన్ నొక్కండి.</string>
 </resources>

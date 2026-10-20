@@ -145,6 +145,8 @@ class BuddyAccessibilityService : AccessibilityService() {
                     override val busy = res.getString(R.string.say_busy)
                     override val limit = res.getString(R.string.say_limit)
                     override val scrolling = res.getString(R.string.say_scrolling)
+                    override val anythingElse = res.getString(R.string.say_anything_else)
+                    override val goodbye = res.getString(R.string.say_goodbye)
                 }
             },
             hasMic = { checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED },

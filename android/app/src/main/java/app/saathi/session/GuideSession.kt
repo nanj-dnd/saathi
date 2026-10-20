@@ -104,6 +104,10 @@ interface Lines {
     val limit: String get() = network
     /** Said while Saathi scrolls to find the next button itself. */
     val scrolling: String get() = ""
+    /** Asked when a task is done, before listening once more. Blank: just rest. */
+    val anythingElse: String get() = ""
+    /** Said when the senior answers that with "no", "that's all", "बस"… */
+    val goodbye: String get() = ""
 }
 
 enum class GuideState { IDLE, LISTENING, THINKING, SPEAKING, WATCHING }
@@ -156,6 +160,8 @@ class GuideSession(
         const val POINT_RADIUS_PX = 90
         /** After this long without an answer, say "one moment". */
         const val WAIT_HINT_MS = 3_500L
+        /** A beat after "done" before asking for anything else. */
+        const val FOLLOW_UP_PAUSE_MS = 1_500L
 
         /** How long a finished step stays up: long enough for a slow reader, not forever. */
         fun readingTimeMs(text: String): Long = (2_500L + text.length * 60L).coerceIn(3_000L, 12_000L)
@@ -354,7 +360,8 @@ class GuideSession(
         when {
             guide.danger == Danger.SCAM -> setState(GuideState.IDLE) // caption stays until closed
             guide.status == Status.NEED_INFO -> spokenTurn()
-            guide.status == Status.DONE || guide.status == Status.CANNOT_HELP -> {
+            guide.status == Status.DONE -> followUp()
+            guide.status == Status.CANNOT_HELP -> {
                 delay(readingTimeMs(guide.say))
                 reset()
             }
@@ -395,15 +402,41 @@ class GuideSession(
             acting = false
         }
         if (guide.status == Status.DONE || autoTurns >= MAX_AUTO_TURNS) {
-            // Opening an app that was asked for is the whole task: let the line finish, then rest.
+            // Opening an app that was asked for is the whole task: let the line finish, then ask
+            // if there is anything else.
             speaking?.join()
-            if (guide.status == Status.DONE) delay(readingTimeMs(guide.say))
-            reset()
+            if (guide.status == Status.DONE) followUp() else reset()
             return@coroutineScope true
         }
         autoTurns++
         runTurn(utterance = null, seen = seen, speaking = speaking)
         true
+    }
+
+    /**
+     * A task is done: asks if there is anything else and listens once, so the senior doesn't have
+     * to find Help again. A new request starts a new task; "no", "that's all", "बस", "thank you"
+     * get a short goodbye; silence just rests.
+     */
+    private suspend fun followUp() {
+        delay(FOLLOW_UP_PAUSE_MS)
+        reset()
+        val ask = lines().anythingElse
+        if (ask.isBlank() || !hasMic() || inCall()) return
+        pointer.point(null, ask, Danger.NONE)
+        setState(GuideState.SPEAKING)
+        mouth.say(ask)
+        setState(GuideState.LISTENING)
+        val heard = ears.listen()
+        pointer.clear()
+        when {
+            heard !is Heard.Words -> reset()
+            Closing.isClosing(heard.text) -> speakAndIdle(lines().goodbye)
+            else -> {
+                silences = 0
+                runTurn(heard.text)
+            }
+        }
     }
 
     private fun enterWatching() {

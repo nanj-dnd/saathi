@@ -150,6 +150,22 @@ class RecipeEngineTest {
         assertTrue(opener.guide(req(launcher, app = "com.android.launcher3", utterance = "uninstall blinkit", language = "en-IN"))?.action != Action.OPEN_STORE_PAGE)
     }
 
+    @Test fun `install never means Instagram, and a misheard name still finds its app`() {
+        val opener = RecipeEngine(book, canOpen = { it == "com.android.vending" })
+        fun store(utterance: String, language: String = "hi-IN") =
+            opener.guide(req(launcher, app = "com.android.launcher3", utterance = utterance, language = language))?.takeIf { it.action == Action.OPEN_STORE_PAGE }?.actionArg
+        // Heard on a Lava phone: "blanket" for Blinkit, and "install" read as "insta".
+        assertEquals("com.grofers.customerapp", store("how do I install blanket", "en-IN"))
+        assertEquals("com.grofers.customerapp", store("how do I install blinkit", "en-IN"))
+        assertEquals("com.grofers.customerapp", store("ब्लिंकिट इंस्टाल करना है"))
+        assertEquals("com.grofers.customerapp", store("பிளிங்கிட் இன்ஸ்டால் பண்ணணும்", "ta-IN"))
+        assertEquals("com.instagram.android", store("install instagram", "en-IN"))
+        assertEquals("com.instagram.android", store("इंस्टाग्राम डाउनलोड करना है"))
+        // No app named: nothing to open.
+        assertEquals(null, store("how do I install an app", "en-IN"))
+        assertEquals(null, store("इंस्टाल कैसे करते हैं"))
+    }
+
     @Test fun `a task in an app the phone doesn't have offers the Play Store, built-in apps never do`() {
         val opener = RecipeEngine(book, canOpen = { it == "com.android.vending" })
         val blinkit = opener.guide(req(launcher, app = "com.android.launcher3", utterance = "ब्लिंकिट से दूध मंगाना है"))!!

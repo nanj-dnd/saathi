@@ -212,8 +212,10 @@ class RecipeEngine(
         fun compact(s: String) = ScreenText.norm(s).replace(" ", "")
         val label = compact(recipe.appLabel)
         val nameGroups = recipe.triggers.flatMap { it.all }.filter { g -> g.any { compact(it) == label } }
-        val said = compact(text)
-        return (recipe.appNames + recipe.appLabel + nameGroups.flatten()).any { val n = compact(it); n.length >= 3 && n in said }
+        // "install" starts with "insta", in every script (इंस्टाल, இன்ஸ்டால்): the download words
+        // themselves never name an app.
+        val rest = text.split(' ').filterNot { w -> DOWNLOAD_STEMS.any { w.startsWith(it) } }.joinToString(" ")
+        return (recipe.appNames + recipe.appLabel + nameGroups.flatten()).any { heardName(rest, ScreenText.norm(it)) }
     }
 
     private fun line(lines: Map<String, String>, language: String) = lines[language] ?: lines.getValue("en-IN")
@@ -253,6 +255,26 @@ class RecipeEngine(
             "download", "install", "डाउनलोड", "इंस्टॉल", "इनस्टॉल", "इंस्टाल", "டவுன்லோட்", "இன்ஸ்டால்", "நிறுவ",
             "డౌన్‌లోడ్", "ఇన్‌స్టాల్", "ಡೌನ್‌ಲೋಡ್", "ಇನ್‌ಸ್ಟಾಲ್", "ഡൗൺലോഡ്", "ഇൻസ്റ്റാൾ",
         )
+        private val DOWNLOAD_STEMS by lazy { DOWNLOAD_WORDS.map(ScreenText::norm) }
+
+        /**
+         * True if [name] starts a word of [text] ("instagram", "इंस्टाग्राम को"), arrives split or a
+         * letter off ("blink it", "whatsap"), or, for a Latin name, has the same consonants with
+         * the vowels misheard: recognisers hear "blanket" for Blinkit.
+         */
+        fun heardName(text: String, name: String): Boolean {
+            if (name.replace(" ", "").length < 3) return false
+            if (contains(text, name)) return true
+            if (name.any { !(it in 'a'..'z' || it == ' ' || it == '-') }) return false
+            val compact = name.replace(" ", "").replace("-", "")
+            val bones = consonants(compact)
+            return bones.length >= 4 && text.split(' ').any { w ->
+                w.length >= 5 && w[0] == compact[0] && w.all { it in 'a'..'z' } && consonants(w) == bones
+            }
+        }
+
+        private fun consonants(w: String) = w.filter { it !in "aeiouy" }
+
         private val UNINSTALL_WORDS = listOf("uninstall", "अनइंस्टॉल", "அன்இன்ஸ்டால்", "అన్‌ఇన్‌స్టాల్", "ಅನ್‌ಇನ್‌ಸ್ಟಾಲ್", "അൺഇൻസ്റ്റാൾ")
 
         /** Hindi is feminine: the voice is a woman's. */
