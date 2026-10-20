@@ -7,6 +7,7 @@ import app.saathi.safety.ScreenSafety
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import java.util.concurrent.ConcurrentHashMap
 
 // Scripted guides for common tasks, run on the phone with no network. The JSON lives in
 // shared/recipes at the repo root; the app ships it as assets and the Worker serves newer copies
@@ -141,10 +142,34 @@ class RecipeBook(val common: Common, val recipes: List<Recipe>) {
      * (send the address) must not make a location group accept every "send" word.
      * கால் (call) inside கால்குலேட்டர் (calculator) is never a member.
      */
-    private fun familiesOf(phrase: String, inside: Boolean = false): Set<String> {
-        val p = ScreenText.norm(phrase)
-        if (p.isEmpty()) return emptySet()
-        return common.concepts.filterValues { c -> c.words.any { w -> member(p, ScreenText.norm(w), inside) } }.keys
+    private fun familiesOf(phrase: String, inside: Boolean = false): Set<String> =
+        known.getOrPut(phrase to inside) {
+            val p = ScreenText.norm(phrase)
+            if (p.isEmpty()) emptySet() else normWords.filterValues { ws -> ws.any { w -> member(p, w, inside) } }.keys
+        }
+
+    /** Every family's words, normalised once: building [triggers] asks about each word many times. */
+    private val normWords: Map<String, List<String>> by lazy {
+        common.concepts.mapValues { (_, c) -> c.words.map(ScreenText::norm) }
+    }
+
+    /** [familiesOf] answers by phrase; the same trigger words recur across recipes. */
+    private val known = ConcurrentHashMap<Pair<String, Boolean>, Set<String>>()
+
+    /** Families [widen] never adds: opposites and exclusive ones. */
+    private val guarded: Set<String> by lazy {
+        common.opposites.flatten().toSet() + common.concepts.filterValues { it.exclusive }.keys
+    }
+
+    /** Only the scam warnings, so one can't be outranked by an ordinary script in the same app. */
+    val scamWarnings: RecipeBook by lazy {
+        RecipeBook(common, recipes.filter { r -> r.steps.isNotEmpty() && r.steps.all { it.danger == Danger.SCAM } })
+    }
+
+    /** Builds the indexes now, off the main thread, so the first request doesn't wait for them. */
+    fun warm() {
+        covers.size
+        scamWarnings.covers.size
     }
 
     private fun member(p: String, n: String, inside: Boolean): Boolean {
@@ -160,7 +185,6 @@ class RecipeBook(val common: Common, val recipes: List<Recipe>) {
      * ("things look small" wants them bigger), so they only guard against the wrong script.
      */
     private fun widen(group: List<String>): List<String> {
-        val guarded = common.opposites.flatten().toSet() + common.concepts.filterValues { it.exclusive }.keys
         val families = group.flatMap(::familiesOf).toSet() - guarded
         if (families.isEmpty()) return group
         return (group + families.flatMap { common.concepts.getValue(it).words }).distinct()

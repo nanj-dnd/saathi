@@ -86,7 +86,9 @@ class BuddyAccessibilityService : AccessibilityService() {
         val brain = object : Brain {
             private var prefetching: Job? = null
             override suspend fun turn(request: TurnRequest): TurnResponse {
-                val response = local.turn(request)
+                // Matching walks every recipe and word family: never on the main thread, where a slow
+                // phone turns it into "Saathi isn't responding".
+                val response = withContext(Dispatchers.Default) { local.turn(request) }
                 val recipe = recipes.book.byGoal(response.guide.goal)
                 if (response.source == Source.RECIPE && recipe != null && prefetching?.isActive != true) {
                     val lines = recipe.steps.mapNotNull { it.say[request.language] }

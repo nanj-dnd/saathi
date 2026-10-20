@@ -19,7 +19,9 @@ class RecipeSource(private val assets: AssetManager, private val downloaded: Fil
 
     /** Reads the bundled and downloaded recipes. A hundred-odd files: call it off the main thread. */
     fun load() {
-        book = read()
+        val t0 = System.currentTimeMillis()
+        book = read().also { it.warm() }
+        Log.i(TAG, "${book.recipes.size} recipes ready in ${System.currentTimeMillis() - t0}ms")
     }
 
     /** Saves a bundle fetched from the Worker if it parses; the merge drops anything invalid. */
@@ -35,7 +37,7 @@ class RecipeSource(private val assets: AssetManager, private val downloaded: Fil
             downloaded.delete()
             tmp.renameTo(downloaded)
         }
-        book = RecipeBook.merge(bundled, bundle)
+        book = RecipeBook.merge(bundled, bundle).also { it.warm() }
         return true
     }
 

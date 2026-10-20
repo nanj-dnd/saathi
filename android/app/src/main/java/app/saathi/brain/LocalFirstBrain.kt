@@ -114,9 +114,7 @@ class LocalFirstBrain(
 
     /** The scripted scam warning that fits what was said, ignoring ordinary scripts that might outrank it in this app. */
     private fun scamWarning(request: TurnRequest): Guide? {
-        val book = recipes()
-        val warnings = book.recipes.filter { r -> r.steps.isNotEmpty() && r.steps.all { it.danger == Danger.SCAM } }
-        return RecipeEngine(RecipeBook(book.common, warnings)).guide(request)
+        return RecipeEngine(recipes().scamWarnings).guide(request)
     }
 
     internal companion object {
