@@ -42,7 +42,7 @@ private fun animationsOn() = ValueAnimator.areAnimatorsEnabled()
 private val SETTLE = PathInterpolator(0.3f, 0f, 0.1f, 1f)
 
 /**
- * The Help button: a blue pill carrying the pointing hand and its word, which the senior taps to talk and
+ * The Help button: a blue pill carrying its word, which the senior taps to talk and
  * drags out of the way. Listening and Looking turn it near-black with a moving icon (voice bars, a
  * spinning arc), so the state reads by shape and word, not colour alone.
  */
@@ -104,11 +104,11 @@ internal class BubbleView(
         textPx = context.dp(19f)
         this.label.textSize = textPx
         // Past the widest pill the word shrinks, but never below 15dp.
-        while (padStart + icon + gap + this.label.measureText(label) + padEnd > maxW && textPx > context.dp(15f)) {
+        while (lead() + this.label.measureText(label) + padEnd > maxW && textPx > context.dp(15f)) {
             textPx -= context.dp(0.5f)
             this.label.textSize = textPx
         }
-        val w = (padStart + icon + gap + this.label.measureText(label) + padEnd).coerceAtMost(maxW)
+        val w = (lead() + this.label.measureText(label) + padEnd).coerceAtMost(maxW)
         if (w != pillW) {
             pillW = w
             requestLayout()
@@ -117,6 +117,9 @@ internal class BubbleView(
         if (moving && animationsOn()) animator.start() else animator.cancel()
         invalidate()
     }
+
+    /** Room before the word: the moving icon while busy; at rest the word sits alone, centred. */
+    private fun lead() = if (state == GuideState.LISTENING || state == GuideState.THINKING) padStart + icon + gap else padEnd
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         setMeasuredDimension(wantedWidth, (pillH + pad * 2).toInt())
@@ -164,12 +167,12 @@ internal class BubbleView(
                 arc.color = buddy.accentLine
                 canvas.drawArc(box, phase * 360f - 90f, 110f, false, arc)
             }
-            else -> Glyphs.draw(canvas, Glyph.HAND, RectF(ix, cy - icon / 2, ix + icon, cy + icon / 2), buddy.onAccent)
+            else -> {}
         }
         label.color = if (busy) buddy.cardInk else buddy.onAccent
         label.textSize = textPx
         val fm = label.fontMetrics
-        canvas.drawText(text, ix + icon + gap, cy - (fm.ascent + fm.descent) / 2, label)
+        canvas.drawText(text, pill.left + lead(), cy - (fm.ascent + fm.descent) / 2, label)
     }
 
     private var downX = 0f

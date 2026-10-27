@@ -136,7 +136,8 @@
           "Proceed to pay",
           "Proceed To Pay",
           "Delivering to",
-          "Delivery address"
+          "Delivery address",
+          "Checkout"
         ]
       ],
       "status": "user_must_do",

@@ -524,11 +524,9 @@ private fun HelpPill(label: String) {
             .shadow(8.dp, CircleShape)
             .background(t.accent, CircleShape)
             .heightIn(min = 56.dp)
-            .padding(start = 18.dp, end = 22.dp),
+            .padding(horizontal = 22.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        GlyphIcon(Glyph.HAND, t.onAccent, 24.dp)
-        Spacer(Modifier.width(8.dp))
         Txt(label, 19, FontWeight.Bold, t.onAccent)
     }
 }
