@@ -37,6 +37,12 @@ android {
         compose = true
         buildConfig = true
     }
+    // All six languages must be available when the senior switches language in setup.
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
     sourceSets {
         // shared/recipes at the repo root becomes assets/recipes, the same files the Worker serves.
         getByName("main").assets.srcDir("../../shared")

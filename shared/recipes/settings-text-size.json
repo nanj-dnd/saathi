@@ -1,6 +1,6 @@
 {
   "id": "settings-text-size",
-  "version": 3,
+  "version": 4,
   "goal": "make the text bigger",
   "apps": [
     "com.android.settings"
@@ -207,7 +207,10 @@
           "Notifications",
           "Sound & vibration",
           "Sounds and vibration",
-          "Apps"
+          "Apps",
+          "Brightness level",
+          "Screen timeout",
+          "Theme mode"
         ]
       ],
       "max_repeats": 4,

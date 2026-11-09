@@ -6,6 +6,9 @@ import kotlinx.serialization.Serializable
 // Mirrors worker/src/schema.ts.
 
 @Serializable
+data class AppInfo(@SerialName("package") val packageName: String, val label: String)
+
+@Serializable
 data class PastStep(
     val say: String,
     val label: String,
@@ -27,6 +30,9 @@ data class TurnRequest(
     val tree: String,
     @SerialName("secure_screen") val secureScreen: Boolean,
     val history: List<PastStep>,
+    @SerialName("app_name") val appName: String = "",
+    /** Only the foreground app and apps named in this task, never the full installed inventory. */
+    @SerialName("installed_apps") val installedApps: List<AppInfo> = emptyList(),
 )
 
 @Serializable

@@ -17,7 +17,11 @@ export interface PastStep {
   app: string;
 }
 
+export interface AppInfo { package: string; label: string }
+
 export interface TurnRequest {
+  /** Missing on existing Android clients. iOS uses OCR and cannot perform Android actions. */
+  platform?: "android" | "ios";
   language: Language;
   /** What the senior said, transcribed on the phone. Absent on auto-advance turns (screen changed, no speech). */
   utterance?: string;
@@ -36,6 +40,10 @@ export interface TurnRequest {
   /** True when the device could not capture because the screen is secure (PIN/OTP). */
   secure_screen: boolean;
   history: PastStep[];
+  /** Display name of the app in front, as reported by this phone. */
+  app_name?: string;
+  /** Foreground app and locally matched names relevant to the task, not the full inventory. */
+  installed_apps?: AppInfo[];
 }
 
 export type GuideStatus =
@@ -74,7 +82,7 @@ export interface Guide {
 }
 
 /** Who answered: the model, the shared cache, or a dev stand-in. The phone adds its own sources. */
-export type Source = "model" | "cache" | "demo" | "mock";
+export type Source = "model" | "cache" | "demo" | "mock" | "local";
 
 export interface TurnResponse {
   guide: Guide;
@@ -170,12 +178,14 @@ export function parseTurnRequest(body: unknown): TurnRequest {
     b[k] === undefined || b[k] === null || b[k] === "" ? undefined : str(k, max);
   const num = (k: string): number => {
     const v = b[k];
-    if (typeof v !== "number" || !Number.isFinite(v)) throw new BadRequest(`${k} must be a number`);
+    if (typeof v !== "number" || !Number.isSafeInteger(v) || v <= 0) throw new BadRequest(`${k} must be a positive integer`);
     return v;
   };
 
   const language = str("language", 8) as Language;
-  if (!(language in LANGUAGES)) throw new BadRequest("unsupported language");
+  if (!Object.hasOwn(LANGUAGES, language)) throw new BadRequest("unsupported language");
+  const platform = b.platform ?? "android";
+  if (platform !== "android" && platform !== "ios") throw new BadRequest("unsupported platform");
 
   const rawHistory = Array.isArray(b.history) ? b.history.slice(-8) : [];
   const history: PastStep[] = rawHistory.map((h) => {
@@ -189,7 +199,19 @@ export function parseTurnRequest(body: unknown): TurnRequest {
     };
   });
 
+  if (b.installed_apps !== undefined && !Array.isArray(b.installed_apps)) throw new BadRequest("installed_apps must be an array");
+  const rawApps = (b.installed_apps ?? []) as unknown[];
+  if (rawApps.length > 12) throw new BadRequest("too many installed app matches");
+  const installedApps: AppInfo[] = rawApps.map((entry) => {
+    if (!entry || typeof entry !== "object") throw new BadRequest("invalid app match");
+    const app = entry as Record<string, unknown>;
+    if (typeof app.package !== "string" || app.package.length > 120 || !PACKAGE.test(app.package)) throw new BadRequest("invalid app package");
+    if (typeof app.label !== "string" || !app.label.trim() || app.label.length > 100) throw new BadRequest("invalid app label");
+    return { package: app.package, label: app.label.trim() };
+  });
+
   return {
+    platform,
     language,
     utterance: optStr("utterance", 1000)?.trim(),
     goal: str("goal", 300),
@@ -201,6 +223,8 @@ export function parseTurnRequest(body: unknown): TurnRequest {
     tree: str("tree", 60_000),
     secure_screen: b.secure_screen === true,
     history,
+    app_name: str("app_name", 100),
+    installed_apps: installedApps.filter((app, i) => installedApps.findIndex((a) => a.package === app.package) === i),
   };
 }
 
@@ -213,7 +237,10 @@ export function normaliseGuide(raw: unknown, nodeIds: Set<string>): Guide {
   let nodeId = String(g.node_id ?? "");
   let x = typeof g.x === "number" ? g.x : -1;
   let y = typeof g.y === "number" ? g.y : -1;
+  const risky = danger === "scam_suspected" || danger === "sensitive_screen" || status === "user_must_do";
 
+  if (kind !== "node" && kind !== "point") kind = "none";
+  if (risky) kind = "none";
   if (kind === "node" && !nodeIds.has(nodeId)) kind = "none";
   if (kind === "point" && !(x >= 0 && x <= 1 && y >= 0 && y <= 1)) kind = "none";
   if (kind !== "node") nodeId = "";
@@ -227,8 +254,7 @@ export function normaliseGuide(raw: unknown, nodeIds: Set<string>): Guide {
   let action = String(g.action ?? "none") as GuideAction;
   let actionArg = String(g.action_arg ?? "").trim();
   if (!ACTIONS.has(action)) action = "";
-  const risky = danger === "scam_suspected" || danger === "sensitive_screen" || status === "user_must_do";
-  if (action && (risky || kind !== "none")) action = "";
+  if (action && (risky || kind !== "none" || (status !== "next_step" && status !== "done"))) action = "";
   if (action && action !== "scroll_down" && !PACKAGE.test(actionArg)) action = "";
   if (action !== "open_app" && action !== "open_store_page") actionArg = "";
 

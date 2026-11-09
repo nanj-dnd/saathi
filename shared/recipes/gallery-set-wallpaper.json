@@ -1,9 +1,10 @@
 {
   "id": "gallery-set-wallpaper",
-  "version": 2,
+  "version": 4,
   "goal": "set a photo as the wallpaper",
   "apps": [
     "com.google.android.apps.photos",
+    "com.google.android.apps.photosgo",
     "com.sec.android.gallery3d",
     "com.miui.gallery",
     "com.coloros.gallery3d",
@@ -111,7 +112,16 @@
         "kn-IN": "ಮೇಲೆ ಅಥವಾ ಕೆಳಗೆ ಮೂರು ಚುಕ್ಕೆಗಳ ಗುರುತು ಒತ್ತಿ.",
         "ml-IN": "മുകളിലോ താഴെയോ ഉള്ള മൂന്ന് കുത്തുകളുള്ള അടയാളം അമർത്തുക.",
         "en-IN": "Press the three dots at the top or bottom."
-      }
+      },
+      "screen_has": [
+        [
+          "Share",
+          "Edit",
+          "Bin",
+          "Delete",
+          "Trash"
+        ]
+      ]
     },
     {
       "id": "open",

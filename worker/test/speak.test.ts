@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { issueToken } from "../src/auth.ts";
-import { parseSpeakRequest, speechKey } from "../src/speech.ts";
+import { DEFAULT_SPEAKER, SPEECH_MODEL, OUTPUT_FORMAT, parseSpeakRequest, speechKey, synthesize } from "../src/speech.ts";
 
 const { default: worker, SpendGuard } = await import("../src/index.ts");
 
@@ -33,7 +33,7 @@ class MemoryStorage {
 }
 
 const MP3 = "ID3-fake-mp3";
-let sarvam: ReturnType<typeof vi.fn>;
+let elevenlabs: ReturnType<typeof vi.fn>;
 /** A SPEECH binding: one in-memory store, as "clips" is the only name used. */
 function speechNamespace() {
   const clips = new Map<string, ArrayBuffer>();
@@ -59,50 +59,53 @@ beforeEach(async () => {
   const guard = new SpendGuard({ storage } as never, {} as never);
   env = {
     TOKEN_SECRET: "s",
-    SARVAM_API_KEY: "k",
+    ELEVENLABS_API_KEY: "k",
     USAGE: new MemoryKV(),
     GUIDE_CACHE: new MemoryKV(),
     SPEND: { idFromName: () => "global", get: () => guard },
     SPEECH: speechNamespace(),
   };
   token = await issueToken("s");
-  sarvam = vi.fn(async () => new Response(JSON.stringify({ audios: [btoa(MP3)] })));
-  vi.stubGlobal("fetch", sarvam);
+  elevenlabs = vi.fn(async () => new Response(MP3, { headers: { "Content-Type": "audio/mpeg" } }));
+  vi.stubGlobal("fetch", elevenlabs);
 });
 
 afterEach(() => vi.unstubAllGlobals());
 
 describe("/speak", () => {
-  it("returns Sarvam's audio as MP3 and serves the same line from the cache after that", async () => {
+  it("returns ElevenLabs's audio as MP3 and serves the same line from the cache after that", async () => {
     const first = await worker.fetch(speakReq({ text: "'Display & touch' पर दबाइए।", language: "hi-IN" }), env as never, ctx());
     expect(first.status).toBe(200);
     expect(first.headers.get("Content-Type")).toBe("audio/mpeg");
-    expect(first.headers.get("X-Saathi-Source")).toBe("sarvam");
+    expect(first.headers.get("X-Saathi-Source")).toBe("elevenlabs");
     expect(new TextDecoder().decode(await first.arrayBuffer())).toBe(MP3);
     await Promise.all(pending);
 
-    const sent = JSON.parse((sarvam.mock.calls[0] as [string, RequestInit])[1].body as string);
-    expect(sent).toMatchObject({ language_code: "hi-IN", model: "bulbul:v3", speaker: "priya", pace: 1, output_audio_codec: "mp3" });
+    const [url, options] = elevenlabs.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(`https://api.elevenlabs.io/v1/text-to-speech/${DEFAULT_SPEAKER}?output_format=${OUTPUT_FORMAT}`);
+    expect(options.headers).toMatchObject({ "xi-api-key": "k", Accept: "audio/mpeg" });
+    const sent = JSON.parse(options.body as string);
+    expect(sent).toMatchObject({ language_code: "hi", model_id: SPEECH_MODEL, voice_settings: { speed: 1, stability: 0.5, similarity_boost: 0.75 } });
 
     const again = await worker.fetch(speakReq({ text: "'Display & touch' पर दबाइए।", language: "hi-IN" }), env as never, ctx());
     expect(again.headers.get("X-Saathi-Source")).toBe("cache");
-    expect(sarvam).toHaveBeenCalledTimes(1);
+    expect(elevenlabs).toHaveBeenCalledTimes(1);
   });
 
   it("still serves lines cached in KV before the speech store existed", async () => {
     const req = parseSpeakRequest({ text: "पुरानी लाइन", language: "hi-IN" });
-    await (env.GUIDE_CACHE as MemoryKV).put(await speechKey(req, "priya"), new TextEncoder().encode("old-mp3").buffer);
+    await (env.GUIDE_CACHE as MemoryKV).put(await speechKey(req, DEFAULT_SPEAKER), new TextEncoder().encode("old-mp3").buffer);
     const res = await worker.fetch(speakReq({ text: "पुरानी लाइन", language: "hi-IN" }), env as never, ctx());
     expect(res.headers.get("X-Saathi-Source")).toBe("cache");
     expect(new TextDecoder().decode(await res.arrayBuffer())).toBe("old-mp3");
-    expect(sarvam).not.toHaveBeenCalled();
+    expect(elevenlabs).not.toHaveBeenCalled();
   });
 
-  it("answers 501 without a Sarvam key, so the phone uses its own voice", async () => {
-    delete env.SARVAM_API_KEY;
+  it("answers 501 without a ElevenLabs key, so the phone uses its own voice", async () => {
+    delete env.ELEVENLABS_API_KEY;
     const res = await worker.fetch(speakReq({ text: "hello", language: "en-IN" }), env as never, ctx());
     expect(res.status).toBe(501);
-    expect(sarvam).not.toHaveBeenCalled();
+    expect(elevenlabs).not.toHaveBeenCalled();
   });
 
   it("needs a device token", async () => {
@@ -118,29 +121,54 @@ describe("/speak", () => {
     expect((await worker.fetch(speakReq({ text: "one", language: "en-IN" }), env as never, ctx())).status).toBe(200);
   });
 
-  it("tells phones there is no voice when the Sarvam account is out of credits", async () => {
-    sarvam.mockResolvedValueOnce(new Response('{"error":{"code":"insufficient_quota_error"}}', { status: 402 }));
+  it.each([401, 402, 403])("falls back when ElevenLabs credentials or credits fail (%s)", async (status) => {
+    elevenlabs.mockResolvedValueOnce(new Response('{"detail":{"status":"quota_exceeded"}}', { status }));
     const res = await worker.fetch(speakReq({ text: "hello", language: "en-IN" }), env as never, ctx());
     expect(res.status).toBe(501);
   });
 
-  it("maps a Sarvam failure to an error the phone treats as 'use your own voice'", async () => {
-    sarvam.mockResolvedValueOnce(new Response("quota", { status: 429 }));
+  it("maps an ElevenLabs failure to an error the phone treats as 'use your own voice'", async () => {
+    elevenlabs.mockResolvedValueOnce(new Response("quota", { status: 429 }));
     const res = await worker.fetch(speakReq({ text: "hello", language: "en-IN" }), env as never, ctx());
     expect(res.status).toBe(503);
   });
 });
 
 describe("speak requests", () => {
+  it.each(["en-IN", "hi-IN", "ta-IN", "te-IN", "kn-IN", "ml-IN"])("sends the ISO language code for %s", async (language) => {
+    await synthesize("k", parseSpeakRequest({ text: "Bob", language }), DEFAULT_SPEAKER);
+    const [, options] = elevenlabs.mock.calls[0] as [string, RequestInit];
+    expect(JSON.parse(options.body as string).language_code).toBe(language.split("-")[0]);
+  });
+
+  it("never reuses clips across voice models", async () => {
+    const req = parseSpeakRequest({ text: "Bob", language: "en-IN" });
+    expect(await speechKey(req, DEFAULT_SPEAKER)).not.toBe(await speechKey(req, DEFAULT_SPEAKER, "another-model"));
+  });
+
+  it.each(["", "{\"audio\":\"missing\"}"])("rejects malformed audio instead of caching it: %s", async (body) => {
+    elevenlabs.mockResolvedValueOnce(new Response(body, { headers: { "Content-Type": "audio/mpeg" } }));
+    const res = await worker.fetch(speakReq({ text: "hello", language: "en-IN" }), env as never, ctx());
+    expect(res.status).toBe(502);
+    expect((env.SPEECH as ReturnType<typeof speechNamespace>).clips.size).toBe(0);
+  });
+
+  it("returns a fallback response on a network failure", async () => {
+    elevenlabs.mockRejectedValueOnce(new TypeError("fetch failed"));
+    expect((await worker.fetch(speakReq({ text: "hello", language: "en-IN" }), env as never, ctx())).status).toBe(502);
+  });
+
   it("rejects empty, overlong and unknown-language lines", () => {
     expect(() => parseSpeakRequest({ text: "", language: "hi-IN" })).toThrow();
     expect(() => parseSpeakRequest({ text: "x".repeat(601), language: "hi-IN" })).toThrow();
     expect(() => parseSpeakRequest({ text: "hi", language: "fr-FR" })).toThrow();
+    expect(() => parseSpeakRequest({ text: "hi", language: "toString" })).toThrow();
+    expect(() => parseSpeakRequest({ text: "hi", language: "valueOf" })).toThrow();
   });
 
   it("rounds and clamps the pace, so near-identical speeds share one cached line", async () => {
     expect(parseSpeakRequest({ text: "a", language: "hi-IN", pace: 0.83 }).pace).toBe(0.85);
-    expect(parseSpeakRequest({ text: "a", language: "hi-IN", pace: 9 }).pace).toBe(1.3);
+    expect(parseSpeakRequest({ text: "a", language: "hi-IN", pace: 9 }).pace).toBe(1.2);
     const a = await speechKey(parseSpeakRequest({ text: "a", language: "hi-IN", pace: 0.84 }), "shubh");
     const b = await speechKey(parseSpeakRequest({ text: "a", language: "hi-IN", pace: 0.86 }), "shubh");
     const c = await speechKey(parseSpeakRequest({ text: "a", language: "hi-IN", pace: 0.86 }), "priya");

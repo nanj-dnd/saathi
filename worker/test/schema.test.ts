@@ -15,6 +15,11 @@ const base = {
 };
 
 describe("parseTurnRequest", () => {
+  it("defaults old clients to Android and validates explicit iOS requests", () => {
+    expect(parseTurnRequest(base).platform).toBe("android");
+    expect(parseTurnRequest({ ...base, platform: "ios" }).platform).toBe("ios");
+    expect(() => parseTurnRequest({ ...base, platform: "web" })).toThrow(BadRequest);
+  });
   it("accepts a minimal auto-advance turn", () => {
     const r = parseTurnRequest(base);
     expect(r.utterance).toBeUndefined();
@@ -25,12 +30,33 @@ describe("parseTurnRequest", () => {
     expect(() => parseTurnRequest({ ...base, language: "fr-FR" })).toThrow(BadRequest);
   });
 
+  it.each(["toString", "valueOf", "__proto__"])("rejects inherited language key %s", (language) => {
+    expect(() => parseTurnRequest({ ...base, language })).toThrow(BadRequest);
+  });
+
+  it.each([0, -1, 1.5, Number.MAX_SAFE_INTEGER + 1])("rejects invalid screen dimensions %s", (size) => {
+    expect(() => parseTurnRequest({ ...base, screen_w: size })).toThrow(BadRequest);
+    expect(() => parseTurnRequest({ ...base, screen_h: size })).toThrow(BadRequest);
+  });
+
   it("keeps only the last 8 history steps and sanitises status", () => {
     const history = Array.from({ length: 12 }, (_, i) => ({ say: `s${i}`, status: "weird", app: "a" }));
     const r = parseTurnRequest({ ...base, history });
     expect(r.history).toHaveLength(8);
     expect(r.history[0].say).toBe("s4");
     expect(r.history[0].status).toBe("next_step");
+  });
+
+  it("accepts bounded app context while keeping old clients compatible", () => {
+    expect(parseTurnRequest(base).installed_apps).toEqual([]);
+    const installed_apps = [{ package: "example.reader.app", label: "Reader" }];
+    expect(parseTurnRequest({ ...base, app_name: "Reader", installed_apps })).toMatchObject({ app_name: "Reader", installed_apps });
+  });
+
+  it("rejects malformed or excessive installed app matches", () => {
+    for (const installed_apps of ["apps", [null], [{ package: "bad package", label: "Reader" }],
+      [{ package: "example.reader", label: "" }], Array(13).fill({ package: "example.reader", label: "Reader" }),
+    ]) expect(() => parseTurnRequest({ ...base, installed_apps })).toThrow(BadRequest);
   });
 });
 
@@ -58,10 +84,24 @@ describe("normaliseGuide", () => {
     expect(g.target_kind).toBe("none");
   });
 
+  it.each([
+    { danger: "sensitive_screen" }, { danger: "scam_suspected" }, { status: "user_must_do" },
+  ])("removes node and point targets on protected steps: %j", (protectedFields) => {
+    for (const target_kind of ["node", "point"]) {
+      const g = normaliseGuide({
+        say: "Do this yourself", status: "next_step", danger: "none",
+        target_kind, node_id: "n2", x: 0.5, y: 0.5,
+        action: "scroll_down", ...protectedFields,
+      }, ids);
+      expect(g).toMatchObject({ target_kind: "none", node_id: "", x: -1, y: -1, action: "", action_arg: "" });
+    }
+  });
+
   it("defaults unknown enums", () => {
     const g = normaliseGuide({ say: "x", status: "??", danger: "??" }, ids);
     expect(g.status).toBe("next_step");
     expect(g.danger).toBe("none");
+    expect(g.target_kind).toBe("none");
   });
 });
 
@@ -110,5 +150,7 @@ describe("guide actions", () => {
     expect(normaliseGuide({ ...base, action: "open_store_page", action_arg: "WhatsApp app" }, ids).action).toBe("");
     expect(normaliseGuide({ ...base, action: "tap", action_arg: "com.whatsapp" }, ids).action).toBe("");
     expect(normaliseGuide({ ...base, action: "none" }, ids).action).toBe("");
+    expect(normaliseGuide({ ...base, status: "cannot_help", action: "scroll_down" }, ids).action).toBe("");
+    expect(normaliseGuide({ ...base, status: "need_info", action: "open_app", action_arg: "com.whatsapp" }, ids).action).toBe("");
   });
 });

@@ -121,6 +121,15 @@ beforeEach(async () => {
 });
 
 describe("global daily cap", () => {
+  it("does not charge the model budget for unreadable screens", async () => {
+    env.DAILY_TURN_LIMIT = "1";
+    const hidden = await turn({ tree: "", screenshot_b64: undefined });
+    expect(hidden.json.source).toBe("local");
+    expect(hidden.json.guide.status).toBe("cannot_help");
+    expect(askGuide).not.toHaveBeenCalled();
+    expect((await turn()).status).toBe(200);
+    expect(askGuide).toHaveBeenCalledTimes(1);
+  });
   it("refuses model turns from every phone once the shared budget is spent", async () => {
     env.GLOBAL_DAILY_LIMIT = "2";
     delete env.GUIDE_CACHE;

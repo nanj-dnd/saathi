@@ -1,6 +1,6 @@
 /// <reference types="node" />
-// Fills the Worker's speech cache with every fixed line Saathi can say, in every language, so the
-// natural voice plays at once on every phone instead of waiting on Sarvam the first time a line is
+// Fills the Worker's speech cache with every fixed line Bob can say, in every language, so the
+// natural voice plays at once on every phone instead of waiting on ElevenLabs the first time a line is
 // heard. Lines already cached cost nothing, so it is safe to run again after recipes change.
 //   node --experimental-strip-types scripts/prewarm-speech.ts [https://saathi-worker.example.workers.dev]
 //
@@ -17,7 +17,7 @@ const LANGS = ["hi-IN", "en-IN", "ta-IN", "te-IN", "kn-IN", "ml-IN"] as const;
 type Lang = (typeof LANGS)[number];
 /** /speak allows 400 new lines per phone per day; a fresh registration is used before that. */
 const PER_TOKEN = 350;
-/** Lines in flight at once; PREWARM_CONCURRENCY overrides. Sarvam's 429s are retried. */
+/** Lines in flight at once; PREWARM_CONCURRENCY overrides. ElevenLabs's 429s are retried. */
 const CONCURRENCY = Number(process.env.PREWARM_CONCURRENCY) || 3;
 
 const root = join(import.meta.dirname, "../..");
@@ -77,7 +77,7 @@ async function main() {
   console.log(`${lines.length} lines to check (${chars} characters at most)`);
   if (process.argv.includes("--count")) return;
   let made = 0;
-  const counts = { cache: 0, sarvam: 0, failed: 0 };
+  const counts = { cache: 0, elevenlabs: 0, failed: 0 };
   let next = 0;
 
   // Each worker has its own registration: the Worker keeps one usage counter per phone, and its
@@ -98,8 +98,8 @@ async function main() {
     await res.arrayBuffer();
     if (res.ok) {
       const source = res.headers.get("X-Saathi-Source");
-      if (source === "sarvam") {
-        counts.sarvam++;
+      if (source === "elevenlabs") {
+        counts.elevenlabs++;
         lane.sinceToken++;
         made += line.text.length;
       } else counts.cache++;
@@ -122,12 +122,12 @@ async function main() {
     while (next < lines.length) {
       const line = lines[next++];
       await speakOne(lane, line);
-      const done = counts.cache + counts.sarvam + counts.failed;
-      if (done % 100 === 0) console.log(`${done}/${lines.length}  new ${counts.sarvam}  cached ${counts.cache}  failed ${counts.failed}`);
+      const done = counts.cache + counts.elevenlabs + counts.failed;
+      if (done % 100 === 0) console.log(`${done}/${lines.length}  new ${counts.elevenlabs}  cached ${counts.cache}  failed ${counts.failed}`);
     }
   }
   await Promise.all(Array.from({ length: CONCURRENCY }, worker));
-  console.log(`done: ${counts.sarvam} new (${made} characters), ${counts.cache} already cached, ${counts.failed} failed`);
+  console.log(`done: ${counts.elevenlabs} new (${made} characters), ${counts.cache} already cached, ${counts.failed} failed`);
 }
 
 await main();

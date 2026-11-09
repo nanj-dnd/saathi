@@ -1,9 +1,10 @@
 {
   "id": "gallery-delete",
-  "version": 2,
+  "version": 3,
   "goal": "delete a photo",
   "apps": [
     "com.google.android.apps.photos",
+    "com.google.android.apps.photosgo",
     "com.sec.android.gallery3d",
     "com.miui.gallery",
     "com.coloros.gallery3d",

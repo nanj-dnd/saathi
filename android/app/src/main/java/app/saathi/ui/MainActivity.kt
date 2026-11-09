@@ -220,7 +220,7 @@ private fun Setup(prefs: Prefs, onFinish: () -> Unit) {
                 ) { GlyphIcon(Glyph.BACK, t.ink, 26.dp) }
             } else {
                 Spacer(Modifier.width(12.dp))
-                // Saathi's mark: स on Saathi blue, as on the launcher icon.
+                // Bob's lowercase b on the shared brand blue, as on the launcher icon.
                 Box(Modifier.size(34.dp).background(t.accent, CircleShape), contentAlignment = Alignment.Center) {
                     Icon(painterResource(R.drawable.logo_mark), contentDescription = null, tint = t.onAccent, modifier = Modifier.size(24.dp))
                 }

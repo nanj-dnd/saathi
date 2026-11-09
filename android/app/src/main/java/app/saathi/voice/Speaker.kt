@@ -12,7 +12,6 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.Locale
-import kotlin.coroutines.resume
 
 /**
  * Speaks with the phone's own TextToSpeech, slowed down for older listeners. While speaking it
@@ -95,10 +94,11 @@ class Speaker(
     }
 
     override fun stop() {
+        val complete = pending
+        pending = null
         cloud?.stop()
         tts?.stop()
-        pending?.invoke()
-        pending = null
+        complete?.invoke()
     }
 
     /** Whether this phone can speak [tag]; setup uses it to offer the voice download. */
@@ -130,7 +130,7 @@ class Speaker(
 
     private suspend fun awaitUtterance(engine: TextToSpeech, text: String, id: String) {
         suspendCancellableCoroutine { cont ->
-            val done = { if (cont.isActive) cont.resume(Unit) }
+            val done = completionOnce(cont, Unit)
             pending = done
             engine.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                 override fun onStart(utteranceId: String?) {}

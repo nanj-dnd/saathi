@@ -1,5 +1,7 @@
 package app.saathi.capture
 
+import app.saathi.safety.ScreenSafety
+
 /** Screen rectangle in physical pixels, same space as AccessibilityNodeInfo.getBoundsInScreen. */
 data class Box(val left: Int, val top: Int, val right: Int, val bottom: Int) {
     val width get() = right - left
@@ -34,7 +36,14 @@ data class RawNode(
     val children: List<RawNode> = emptyList(),
 )
 
-class SerializedTree(val text: String, val boxes: Map<String, Box>)
+class SerializedTree(
+    val text: String,
+    val boxes: Map<String, Box>,
+    /** A picture would expose fields or secrets that the text representation hides. */
+    val omitScreenshot: Boolean = false,
+    /** A web surface is still waiting for its accessibility document. */
+    val opaqueWebView: Boolean = false,
+)
 
 object TreeSerializer {
     const val MAX_NODES = 220
@@ -42,12 +51,41 @@ object TreeSerializer {
 
     // Numbers near these words are one-time codes; keep them out of what leaves the phone.
     private val codeWords = Regex(
-        "otp|one[- ]time|pin|passcode|verification|cvv|ओटीपी|पिन|ஓடிபி|ఓటీపీ|ಒಟಿಪಿ|ഒടിപി",
+        "\\b(otp|pin|cvv)\\b|one[- ]time|passcode|verification|ओटीपी|पिन|ஓடிபி|ఓటీపీ|ಒಟಿಪಿ|ഒടിപി",
         RegexOption.IGNORE_CASE,
     )
-    private val digitRun = Regex("\\d[\\d ]{2,10}\\d")
+    private val digitRun = Regex("\\p{Nd}+(?:[ \\t]+\\p{Nd}+)*")
 
     fun serialize(root: RawNode, screenW: Int, screenH: Int): SerializedTree {
+        // Inspect the whole visible tree before truncating labels or limiting emitted nodes.
+        // A code may be a sibling of its heading, or split across individual digit views.
+        var codeContext = false
+        var omitScreenshot = false
+        var opaqueWebView = false
+        fun hasWebContent(node: RawNode): Boolean {
+            if (!node.visible || node.bounds.clip(screenW, screenH).isEmpty) return false
+            return node.editable || node.password || listOfNotNull(node.text, node.desc, node.hint).any { it.isNotBlank() } ||
+                node.children.any(::hasWebContent)
+        }
+        fun inspect(node: RawNode) {
+            if (!node.visible || node.bounds.clip(screenW, screenH).isEmpty) return
+            if (node.className?.endsWith("WebView") == true || node.className?.endsWith("GeckoView") == true) {
+                // A web page may paint a field before its accessibility node appears. Even a
+                // populated document can add fields later, so its picture is never safe to send.
+                omitScreenshot = true
+                if (node.children.none(::hasWebContent)) opaqueWebView = true
+            }
+            if (node.editable || node.password) omitScreenshot = true
+            for (value in listOfNotNull(node.text, node.desc, node.hint)) {
+                if (codeWords.containsMatchIn(value) || ScreenSafety.sensitive(value)) {
+                    codeContext = true
+                    omitScreenshot = true
+                }
+            }
+            node.children.forEach(::inspect)
+        }
+        inspect(root)
+
         val lines = StringBuilder()
         val boxes = LinkedHashMap<String, Box>()
         var next = 1
@@ -58,8 +96,8 @@ object TreeSerializer {
             val box = node.bounds.clip(screenW, screenH)
             if (box.isEmpty) return
 
-            val own = labelOf(node)
-            val label = if (own.isEmpty() && node.clickable) descendantLabel(node) else own
+            val own = labelOf(node, codeContext)
+            val label = if (own.isEmpty() && node.clickable) descendantLabel(node, codeContext) else own
             val emit = label.isNotEmpty() || node.clickable || node.editable || node.scrollable
             if (emit) {
                 val id = "n${next++}"
@@ -70,33 +108,37 @@ object TreeSerializer {
                 flags(node).forEach { lines.append(' ').append(it) }
                 lines.append('\n')
             }
-            node.children.forEach(::visit)
+            // A custom text field may expose its entered value again in child text views.
+            if (!node.editable && !node.password) node.children.forEach(::visit)
         }
 
         visit(root)
-        return SerializedTree(lines.toString().trimEnd(), boxes)
+        return SerializedTree(lines.toString().trimEnd(), boxes, omitScreenshot, opaqueWebView)
     }
 
     /** What we are willing to send for this node. Typed text and passwords never leave the device. */
-    fun labelOf(node: RawNode): String {
+    fun labelOf(node: RawNode): String = labelOf(node, false)
+
+    private fun labelOf(node: RawNode, codeContext: Boolean): String {
         val raw = when {
             node.password -> "(hidden)"
-            node.editable -> node.hint ?: node.desc ?: "(text box)"
+            // Some apps mirror the entered value in contentDescription as well as text.
+            node.editable -> node.hint ?: "(text box)"
             else -> node.text ?: node.desc ?: ""
         }
-        return redactCodes(clean(raw))
+        return clean(if (codeContext) digitRun.replace(raw, "••••") else redactCodes(raw))
     }
 
     fun redactCodes(s: String): String =
         if (codeWords.containsMatchIn(s)) digitRun.replace(s, "••••") else s
 
-    private fun descendantLabel(node: RawNode): String {
+    private fun descendantLabel(node: RawNode, codeContext: Boolean): String {
         val parts = ArrayList<String>(3)
         fun walk(n: RawNode) {
             for (c in n.children) {
                 if (parts.size >= 3) return
                 if (!c.visible) continue
-                val l = labelOf(c)
+                val l = labelOf(c, codeContext)
                 if (l.isNotEmpty()) parts += l else walk(c)
             }
         }

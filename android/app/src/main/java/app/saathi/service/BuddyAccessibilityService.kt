@@ -18,6 +18,7 @@ import app.saathi.BuildConfig
 import app.saathi.Languages
 import app.saathi.Prefs
 import app.saathi.R
+import app.saathi.apps.InstalledApps
 import app.saathi.brain.FileCacheStore
 import app.saathi.brain.LocalFirstBrain
 import app.saathi.brain.TurnCache
@@ -66,6 +67,7 @@ class BuddyAccessibilityService : AccessibilityService() {
         prefs = Prefs(this)
         val playbooks = PlaybookStore(assets)
         val recipes = RecipeSource(assets, File(filesDir, "recipes.json"))
+        val installedApps = InstalledApps(this)
         val worker = WorkerClient(
             baseUrl = BuildConfig.WORKER_URL,
             prefs = prefs,
@@ -80,6 +82,8 @@ class BuddyAccessibilityService : AccessibilityService() {
             sensitiveLine = { tag -> Languages.context(this, tag).getString(R.string.say_sensitive) },
             log = { if (BuildConfig.DEBUG) Log.d(TAG, it) },
             canOpen = { packageManager.getLaunchIntentForPackage(it) != null },
+            resolveApp = installedApps::resolve,
+            unreadableLine = { tag -> Languages.context(this, tag).getString(R.string.say_unreadable) },
         )
         // Once a recipe is running, its other lines are fetched in the natural voice while the senior
         // acts, so every step of a task sounds the same and plays at once.
@@ -89,7 +93,8 @@ class BuddyAccessibilityService : AccessibilityService() {
                 // Matching walks every recipe and word family: never on the main thread, where a slow
                 // phone turns it into "Saathi isn't responding".
                 val response = try {
-                    withContext(Dispatchers.Default) { local.turn(request) }
+                    val contextualized = installedApps.contextualize(request)
+                    withContext(Dispatchers.Default) { local.turn(contextualized) }
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
@@ -144,6 +149,7 @@ class BuddyAccessibilityService : AccessibilityService() {
                     override val noSpeech = res.getString(R.string.say_no_speech)
                     override val network = res.getString(R.string.say_network)
                     override val micDenied = res.getString(R.string.say_mic_denied)
+                    override val sensitive = res.getString(R.string.say_sensitive)
                     override val noSpeechAgain = res.getString(R.string.say_no_speech_again)
                     override val micBusy = res.getString(R.string.say_mic_busy)
                     override val inCall = res.getString(R.string.say_in_call)
@@ -160,6 +166,7 @@ class BuddyAccessibilityService : AccessibilityService() {
             hasMic = { checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED },
             inCall = ::inCall,
             hands = hands,
+            reportFailure = { Log.w(TAG, "guide failed", it) },
         )
         // A screen that turns off mid-task means the senior put the phone down: stop talking.
         registerReceiver(screenOff, IntentFilter(Intent.ACTION_SCREEN_OFF))
@@ -190,7 +197,12 @@ class BuddyAccessibilityService : AccessibilityService() {
 
         override fun openApp(pkg: String): Boolean {
             val launch = packageManager.getLaunchIntentForPackage(pkg) ?: return false
-            return runCatching { startActivity(launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }.isSuccess
+            launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            // Settings reopens on whatever page it was left on (often one Saathi can't even read);
+            // every Settings script starts from its main list. Other apps keep their place: a
+            // paused video or a half-filled cart is the senior's.
+            if (pkg == SETTINGS) launch.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            return runCatching { startActivity(launch) }.isSuccess
         }
 
         override fun openStorePage(pkg: String): Boolean = runCatching {
@@ -312,6 +324,7 @@ class BuddyAccessibilityService : AccessibilityService() {
             AccessibilityEvent.TYPE_VIEW_CLICKED -> session.onScreenEvent(ScreenEvent.CLICK)
             AccessibilityEvent.TYPE_VIEW_SCROLLED -> session.onScreenEvent(ScreenEvent.SCROLLED)
             AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED -> session.onScreenEvent(ScreenEvent.TYPED)
+            AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> session.onScreenEvent(ScreenEvent.CONTENT_CHANGED)
         }
     }
 
@@ -345,6 +358,7 @@ class BuddyAccessibilityService : AccessibilityService() {
         private const val DEBUG_LANG = "app.saathi.DEBUG_LANG"
         private const val DEBUG_STOP = "app.saathi.DEBUG_STOP"
         private const val DEBUG_TREE = "app.saathi.DEBUG_TREE"
+        private const val SETTINGS = "com.android.settings"
 
         fun isEnabled(context: Context): Boolean {
             val am = context.getSystemService(AccessibilityManager::class.java)

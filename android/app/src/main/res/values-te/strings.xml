@@ -5,11 +5,11 @@
     <string name="step_mic">2. మైక్ అనుమతి ఇవ్వండి</string>
     <string name="btn_allow">అనుమతించు</string>
     <string name="done">పూర్తయింది</string>
-    <string name="step_access">3. సాథీని ఆన్ చేయండి</string>
-    <string name="disclosure">సహాయం బటన్ నొక్కినప్పుడు లేదా సాథీ ఒక పనిలో దారి చూపుతున్నప్పుడు మాత్రమే, అది స్క్రీన్‌పై ఉన్నది చదివి దాని ఫోటో తీస్తుంది. సాధారణ పనులకు ఫోన్‌లోనే దారి చూపుతుంది. మిగతా వాటికి, తదుపరి అడుగు నిర్ణయించడానికి ఇవి సాథీ సర్వర్‌కు పంపబడతాయి, దాచబడవు; షాపింగ్ లేదా సెట్టింగ్‌ల యాప్‌లోని ఒక స్క్రీన్‌కు చెప్పిన అడుగు మాత్రం కొన్ని రోజులు ఉంచవచ్చు, మీ ఫోన్‌ను గుర్తించకుండా. సాథీ తనంతట తాను ఏదీ నొక్కదు; PIN లేదా చెల్లింపు స్క్రీన్‌లను చూడలేదు.</string>
+    <string name="step_access">3. Bobను ఆన్ చేయండి</string>
+    <string name="disclosure">సహాయం బటన్ నొక్కినప్పుడు లేదా Bob ఒక పనిలో దారి చూపుతున్నప్పుడు మాత్రమే, అది స్క్రీన్‌పై ఉన్నది చదివి దాని ఫోటో తీస్తుంది. సాధారణ పనులకు ఫోన్‌లోనే దారి చూపుతుంది. మిగతా వాటికి, తదుపరి అడుగు నిర్ణయించడానికి ఇవి Bob సర్వర్‌కు పంపబడతాయి, దాచబడవు; షాపింగ్ లేదా సెట్టింగ్‌ల యాప్‌లోని ఒక స్క్రీన్‌కు చెప్పిన అడుగు మాత్రం కొన్ని రోజులు ఉంచవచ్చు, మీ ఫోన్‌ను గుర్తించకుండా. Bob తనంతట తాను ఏదీ నొక్కదు; PIN లేదా చెల్లింపు స్క్రీన్‌లను చూడలేదు.</string>
     <string name="btn_open_settings">అంగీకరిస్తున్నాను, సెట్టింగ్స్ తెరవండి</string>
-    <string name="access_on">సాథీ ఆన్‌లో ఉంది</string>
-    <string name="access_hint">సెట్టింగ్స్‌లో \"డౌన్‌లోడ్ చేసిన యాప్‌లు\" లేదా \"ఇన్‌స్టాల్ చేసిన యాప్‌లు\" తెరిచి, సాథీని ఎంచుకుని ఆన్ చేయండి.</string>
+    <string name="access_on">Bob ఆన్‌లో ఉంది</string>
+    <string name="access_hint">సెట్టింగ్స్‌లో \"డౌన్‌లోడ్ చేసిన యాప్‌లు\" లేదా \"ఇన్‌స్టాల్ చేసిన యాప్‌లు\" తెరిచి, Bobను ఎంచుకుని ఆన్ చేయండి.</string>
     <string name="access_restricted">బటన్ మసకగా ఉంటే, యాప్ సమాచారం తెరిచి, పైన ⋮ నొక్కి \"పరిమిత సెట్టింగ్‌లను అనుమతించు\" ఎంచుకోండి.</string>
     <string name="btn_app_info">యాప్ సమాచారం</string>
     <string name="step_ready">5. సిద్ధం</string>
@@ -21,7 +21,7 @@
     <string name="btn_close">మూసివేయి</string>
     <string name="say_no_speech">నాకు మీ మాట వినిపించలేదు. సహాయం బటన్ నొక్కి మళ్ళీ చెప్పండి.</string>
     <string name="say_network">ఇంటర్నెట్ పని చేయడం లేదు. కొంచెం సేపటి తర్వాత మళ్ళీ ప్రయత్నించండి.</string>
-    <string name="say_mic_denied">ముందుగా సాథీకి మైక్ అనుమతి ఇవ్వండి.</string>
+    <string name="say_mic_denied">ముందుగా Bobకు మైక్ అనుమతి ఇవ్వండి.</string>
     <string name="say_scam_remote">జాగ్రత్త! ఈ యాప్ ఒక అపరిచితుడికి మీ ఫోన్‌ను నడిపే అవకాశం ఇస్తుంది. ఫోన్‌లో ఎవరైనా దీన్ని తెరవమని చెబితే, వెంటనే మూసివేసి మీ కుటుంబ సభ్యులకు ఫోన్ చేయండి.</string>
     <string name="say_sensitive">ఈ భాగం మీరే చేయండి. ఈ నంబర్ ఎవరికీ చెప్పకండి, ఫోన్‌లో కూడా.</string>
     <string name="say_in_call">మీరు ఇప్పుడు కాల్‌లో ఉన్నారు. ఎవరైనా OTP, PIN లేదా డబ్బు అడిగితే వెంటనే కాల్ కట్ చేయండి. కాల్ అయ్యాక మళ్ళీ సహాయం బటన్ నొక్కండి. బాగా వినడానికి కాల్ స్క్రీన్‌పై \'Speaker\' నొక్కవచ్చు.</string>
@@ -30,27 +30,28 @@
     <string name="say_speech_unavailable">ఈ ఫోన్ ఇంకా వినలేకపోతోంది. ఇంట్లో వాళ్ళతో Google యాప్ ఇన్‌స్టాల్ లేదా అప్‌డేట్ చేయించండి.</string>
     <string name="say_no_speech_again">ఫోన్‌ను నోటి దగ్గర పెట్టి కొంచెం గట్టిగా మాట్లాడండి. సహాయం బటన్ నొక్కి మళ్ళీ ప్రయత్నించండి.</string>
     <string name="say_wait">ఒక్క క్షణం, చూస్తున్నాను.</string>
-    <string name="say_busy">సాథీ ఇప్పుడు బిజీగా ఉంది. ఒక నిమిషం తర్వాత మళ్ళీ ప్రయత్నించండి.</string>
+    <string name="say_busy">Bob ఇప్పుడు బిజీగా ఉంది. ఒక నిమిషం తర్వాత మళ్ళీ ప్రయత్నించండి.</string>
     <string name="say_limit">ఈరోజు మీరు చాలా ప్రశ్నలు అడిగారు. సులభమైన పనులు ఇంకా జరుగుతాయి, మిగతా వాటికి రేపు మళ్ళీ అడగండి.</string>
     <string name="notif_channel">వినడం</string>
-    <string name="notif_listening">సాథీ వింటోంది</string>
-    <string name="service_desc">సాథీ స్క్రీన్ చూసి తర్వాత ఏమి నొక్కాలో చెబుతుంది. అది తనంతట తాను ఏదీ నొక్కదు.</string>
+    <string name="notif_listening">Bob వింటోంది</string>
+    <string name="service_desc">Bob స్క్రీన్ చూసి తర్వాత ఏమి నొక్కాలో చెబుతుంది. అది తనంతట తాను ఏదీ నొక్కదు.</string>
     <string name="step_voice">4. వాయిస్ చూడండి</string>
     <string name="voice_test">వాయిస్ విని చూడండి</string>
-    <string name="voice_sample">నమస్తే, నేను సాథీ. ఒక్కో అడుగు చొప్పున మీకు సహాయం చేస్తాను.</string>
-    <string name="voice_missing">ఈ ఫోన్‌లో ఈ భాషకు వాయిస్ లేదు. సాథీ మాట్లాడటానికి దాన్ని ఇన్‌స్టాల్ చేయండి.</string>
+    <string name="voice_sample">నమస్తే, నేను Bob. ఒక్కో అడుగు చొప్పున మీకు సహాయం చేస్తాను.</string>
+    <string name="voice_missing">ఈ ఫోన్‌లో ఈ భాషకు వాయిస్ లేదు. Bob మాట్లాడటానికి దాన్ని ఇన్‌స్టాల్ చేయండి.</string>
     <string name="voice_install">వాయిస్ ఇన్‌స్టాల్ చేయండి</string>
     <string name="voice_ok">వాయిస్ వినిపించిందా? అయితే అంతా సిద్ధం.</string>
     <string name="speed_slow">నెమ్మదిగా</string>
     <string name="speed_normal">సాధారణం</string>
     <string name="offline_download">ఇంటర్నెట్ లేకుండా వినడానికి వాయిస్ గుర్తింపు డౌన్‌లోడ్ చేయండి</string>
     <string name="offline_started">డౌన్‌లోడ్ అవుతోంది. ఫోన్‌ను Wi-Fi లో ఉంచండి.</string>
-    <string name="access_summary">బటన్లు చూపించడానికి సాథీ స్క్రీన్ చూడాలి. అది తనంతట తాను ఏదీ నొక్కదు.</string>
+    <string name="access_summary">బటన్లు చూపించడానికి Bob స్క్రీన్ చూడాలి. అది తనంతట తాను ఏదీ నొక్కదు.</string>
     <string name="btn_continue">కొనసాగించండి</string>
     <string name="btn_back">వెనుకకు</string>
-    <string name="mic_body">మీరు సహాయం బటన్ నొక్కిన తర్వాతే సాథీ వింటుంది.</string>
+    <string name="mic_body">మీరు సహాయం బటన్ నొక్కిన తర్వాతే Bob వింటుంది.</string>
     <string name="say_scrolling">కిందకు చూస్తాను.</string>
-    <!-- After a finished task: Saathi listens once more. -->
+    <!-- After a finished task: Bob listens once more. -->
     <string name="say_anything_else">ఇంకా ఏమైనా సహాయం కావాలా?</string>
     <string name="say_goodbye">సరే. అవసరమైనప్పుడు సహాయం బటన్ నొక్కండి.</string>
+    <string name="say_unreadable">ఈ స్క్రీన్ చదవలేకపోతున్నాను. యాప్ తెరిచి మళ్ళీ సహాయం నొక్కండి.</string>
 </resources>

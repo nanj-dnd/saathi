@@ -161,6 +161,14 @@ class RecipeBook(val common: Common, val recipes: List<Recipe>) {
         common.opposites.flatten().toSet() + common.concepts.filterValues { it.exclusive }.keys
     }
 
+    /** Each recipe's normalised trigger phrases that have a space in them, for the negation check. */
+    val spacedPhrases: Map<String, List<String>> by lazy {
+        triggers.mapValues { (_, ts) -> ts.flatMap { t -> t.all.flatten() }.map(RecipeEngine::normed).filter { ' ' in it }.distinct() }
+    }
+
+    /** Families a request may only get from a script that covers them ("download", "bigger"). */
+    val exclusive: Set<String> by lazy { common.concepts.filterValues { it.exclusive }.keys }
+
     /** Only the scam warnings, so one can't be outranked by an ordinary script in the same app. */
     val scamWarnings: RecipeBook by lazy {
         RecipeBook(common, recipes.filter { r -> r.steps.isNotEmpty() && r.steps.all { it.danger == Danger.SCAM } })
@@ -169,7 +177,9 @@ class RecipeBook(val common: Common, val recipes: List<Recipe>) {
     /** Builds the indexes now, off the main thread, so the first request doesn't wait for them. */
     fun warm() {
         covers.size
+        spacedPhrases.size
         scamWarnings.covers.size
+        scamWarnings.spacedPhrases.size
     }
 
     private fun member(p: String, n: String, inside: Boolean): Boolean {

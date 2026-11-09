@@ -2,6 +2,8 @@ package app.saathi.brain
 
 import app.saathi.capture.ScreenText
 import app.saathi.net.TurnRequest
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.security.MessageDigest
 
 /** Turns a screen plus the task so far into a cache key: same key, same next step. */
@@ -25,19 +27,23 @@ object ScreenKey {
 
     /**
      * Everything the next step depends on: language, app, goal, what was just said, the screen,
-     * and the last two steps (the same screen can need a different step once a button was pressed).
+     * and the full history sent to the model. Spoken details and earlier apps can change the answer
+     * even when the last two targets and statuses are identical.
      */
     fun turnKey(req: TurnRequest): String {
         val parts = listOf(
-            "v1",
+            "v4-bob",
             req.language,
             req.app,
-            ScreenText.norm(req.goal),
-            ScreenText.norm(req.utterance.orEmpty()),
+            req.goal,
+            req.utterance.orEmpty(),
+            req.playbook,
+            req.appName,
+            Json.encodeToString(req.installedApps),
             signature(req.tree, req.screenW, req.screenH),
-            req.history.takeLast(2).joinToString(";") { "${it.label}|${it.status}" },
+            Json.encodeToString(req.history.takeLast(8)),
         )
-        return sha256(parts.joinToString("\u0001"))
+        return sha256(Json.encodeToString(parts))
     }
 
     private fun sha256(s: String): String =

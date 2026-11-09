@@ -6,12 +6,14 @@ import android.accessibilityservice.AccessibilityService.TakeScreenshotCallback
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.os.Build
+import android.os.SystemClock
 import android.util.Base64
+import android.util.Log
 import android.view.Display
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityWindowInfo
-import app.saathi.safety.ScreenSafety
+import app.saathi.BuildConfig
 import app.saathi.session.Eyes
 import app.saathi.session.Snapshot
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +31,8 @@ class ScreenReader(private val service: AccessibilityService) : Eyes {
         const val LONG_SIDE = 768
         const val JPEG_QUALITY = 70
         const val MAX_DEPTH = 40
+        const val WEB_TREE_RETRIES = 3
+        const val WEB_TREE_WAIT_MS = 250L
     }
 
     override suspend fun look(): Snapshot {
@@ -36,19 +40,33 @@ class ScreenReader(private val service: AccessibilityService) : Eyes {
         val w = bounds.width()
         val h = bounds.height()
 
-        // A window can briefly report no content while it redraws (the Internet page's live
-        // "Searching for networks" bar); take the first candidate that has some.
+        // A secure or redrawing foreground window can have no root. Do not substitute a
+        // readable background app: its tree and picture would describe the wrong screen.
         val candidates = appWindows()
-        val window = candidates.firstOrNull { it.root != null } ?: candidates.firstOrNull()
+        val window = candidates.firstOrNull()
         val root = window?.root ?: service.rootInActiveWindow
         val app = root?.packageName?.toString().orEmpty()
-        val tree = withContext(Dispatchers.Default) {
+        val t0 = SystemClock.elapsedRealtime()
+        var tree = withContext(Dispatchers.Default) {
             root?.let { TreeSerializer.serialize(toRaw(it, 0), w, h) } ?: SerializedTree("", emptyMap())
         }
+        // WebView turns on its accessibility document lazily. Wait briefly for labels instead
+        // of sending a picture containing values that have not reached the tree yet.
+        repeat(WEB_TREE_RETRIES) {
+            if (tree.opaqueWebView) {
+                delay(WEB_TREE_WAIT_MS)
+                val updated = window?.root ?: service.rootInActiveWindow
+                tree = if (updated?.packageName?.toString() == app) withContext(Dispatchers.Default) {
+                    TreeSerializer.serialize(toRaw(updated, 0), w, h)
+                } else SerializedTree("", emptyMap(), omitScreenshot = true, opaqueWebView = true)
+            }
+        }
 
-        // The tree already masks one-time codes, but a picture of an SMS with an OTP would show it.
-        // When codes or passwords are mentioned, the masked tree goes alone.
-        val shot = if (ScreenSafety.sensitive(tree.text)) Shot(null, false, Box(0, 0, w, h)) else capture(window, Box(0, 0, w, h))
+        // A screenshot must not bypass text redaction. Send only the tree when visible fields
+        // or sensitive context were found, including nodes beyond the serialized output limit.
+        val t1 = SystemClock.elapsedRealtime()
+        val shot = if (tree.omitScreenshot) Shot(null, false, Box(0, 0, w, h)) else capture(window, Box(0, 0, w, h))
+        if (BuildConfig.DEBUG) Log.d("Saathi", "look $app: tree ${t1 - t0}ms, picture ${SystemClock.elapsedRealtime() - t1}ms")
         return Snapshot(
             app = app,
             screenshotB64 = shot.jpegB64,
@@ -94,10 +112,19 @@ class ScreenReader(private val service: AccessibilityService) : Eyes {
         // and our own overlay is not in the picture.
         if (window != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             val r = Rect().also(window::getBoundsInScreen)
-            when (val res = screenshot { cb -> service.takeScreenshotOfWindow(window.id, service.mainExecutor, cb) }) {
-                is Result.Ok -> return Shot(encode(res.shot), false, Box(r.left, r.top, r.right, r.bottom))
-                is Result.Err -> if (res.code == AccessibilityService.ERROR_TAKE_SCREENSHOT_SECURE_WINDOW) {
-                    return Shot(null, true, screen)
+            val box = Box(r.left, r.top, r.right, r.bottom)
+            var res = screenshot { cb -> service.takeScreenshotOfWindow(window.id, service.mainExecutor, cb) }
+            if (res is Result.Err && res.code == AccessibilityService.ERROR_TAKE_SCREENSHOT_INTERVAL_TIME_SHORT) {
+                delay(400)
+                res = screenshot { cb -> service.takeScreenshotOfWindow(window.id, service.mainExecutor, cb) }
+            }
+            // Never fall back to a display capture after a window failure. It can include other
+            // windows and may not preserve the secure-window result, especially when throttled.
+            return when (res) {
+                is Result.Ok -> Shot(encode(res.shot), false, box)
+                is Result.Err -> {
+                    if (BuildConfig.DEBUG) Log.d("Saathi", "window screenshot error ${res.code}")
+                    Shot(null, res.code == AccessibilityService.ERROR_TAKE_SCREENSHOT_SECURE_WINDOW, box)
                 }
             }
         }
@@ -106,7 +133,12 @@ class ScreenReader(private val service: AccessibilityService) : Eyes {
             delay(400)
             res = screenshot { cb -> service.takeScreenshot(Display.DEFAULT_DISPLAY, service.mainExecutor, cb) }
         }
-        if (res !is Result.Ok) return Shot(null, false, screen)
+        if (res !is Result.Ok) {
+            val code = (res as Result.Err).code
+            if (BuildConfig.DEBUG) Log.d("Saathi", "display screenshot error $code")
+            return Shot(null, Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
+                code == AccessibilityService.ERROR_TAKE_SCREENSHOT_SECURE_WINDOW, screen)
+        }
         return withContext(Dispatchers.Default) {
             val bmp = toBitmap(res.shot)
             // Before Android 14 secure windows come back as solid black instead of an error.

@@ -1,12 +1,12 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-18T14:39:41.219140+00:00",
-  "title": "Design System: Saathi",
+  "generatedAt": "2026-11-09T00:00:00+05:30",
+  "title": "Design System: Bob",
   "extensions": {
     "colorMeta": {
       "saathi-blue": {
         "role": "primary",
-        "displayName": "Saathi Blue",
+        "displayName": "Bob Blue",
         "canonical": "#1F5FE0",
         "tonalRamp": [
           "#00003A",
@@ -601,13 +601,21 @@
       "description": "Five pill segments, blue up to and including the current step.",
       "html": "<div class=\"ds-progress\"><i class=\"on\"></i><i class=\"on\"></i><i></i><i></i><i></i></div>",
       "css": ".ds-progress { display: flex; gap: 6px; max-width: 380px; } .ds-progress i { flex: 1; height: 6px; border-radius: 9999px; background: #E3E6EA; } .ds-progress i.on { background: #1F5FE0; }"
+    },
+    {
+      "name": "Bob Logo",
+      "kind": "custom",
+      "description": "Authored lowercase b shared by setup, adaptive launcher and themed icon; white on flat Bob Blue with one open counter.",
+      "html": "<div class=\"ds-bob-brand\"><span class=\"ds-bob-disc\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path fill=\"#FFFFFF\" fill-rule=\"evenodd\" d=\"M4,1.2 H9 V8.4 C10.25,7.6 11.65,7.2 13.2,7.2 C17.5,7.2 21,10.7 21,15 C21,19.3 17.5,22.8 13.2,22.8 C8.12,22.8 4,18.68 4,13.6 Z M16.5,15 A3.3,3.3 0,1 0,9.9 15 A3.3,3.3 0,1 0,16.5 15 Z\"/></svg></span><span>Bob</span></div>",
+      "css": ".ds-bob-brand { display: inline-flex; align-items: center; gap: 10px; color: #101215; font: 700 21px/1.4 Roboto, sans-serif; } .ds-bob-disc { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: #1F5FE0; } .ds-bob-disc svg { width: 24px; height: 24px; }"
     }
   ],
   "narrative": {
     "northStar": "The Pointing Hand",
-    "overview": "Saathi is a pointer and a voice, not a signboard. Over any app, one blue pointing hand flies on an upward arc from the Help pill and lands with its fingertip inside the exact button, then taps it with a ripple; the app is only lightly dimmed and the target sits in a soft rounded spotlight with a faint blue halo. A near-black caption card floats above it all and says the step in white system sans: the first sentence large and bold, the rest smaller at 70% white. Everything the senior might press is a full pill.\n\nThe system is clean, modern and calm. Blue is spent only where to press (the hand, the spotlight halo) and on what can be pressed (the Help pill, the primary pill, a selected tile). The caption is pure contrast, white on near-black, with no grey panels and no borders by day. Setup is the same world on a white ground: one step per screen, five progress segments, a big title, soft grey tiles and one pinned blue pill at the bottom.\n\nThe build explicitly refuses the instructional-UI vocabulary of the superseded world: bordered signboards, edge bands and boxy outline buttons.",
+    "overview": "Bob is a pointer and a voice, not a signboard. Over any app, one blue pointing hand flies on an upward arc from the Help pill and lands with its fingertip inside the exact button, then taps it with a ripple; the app is only lightly dimmed and the target sits in a soft rounded spotlight with a faint blue halo. A near-black caption card floats above it all and says the step in white system sans: the first sentence large and bold, the rest smaller at 70% white. Everything the senior might press is a full pill.\n\nThe system is clean, modern and calm. Blue is spent only where to press (the hand, the spotlight halo) and on what can be pressed (the Help pill, the primary pill, a selected tile). The caption is pure contrast, white on near-black, with no grey panels and no borders by day. Setup is the same world on a white ground: one step per screen, five progress segments, a big title, soft grey tiles and one pinned blue pill at the bottom.\n\nThe build explicitly refuses the instructional-UI vocabulary of the superseded world: bordered signboards, edge bands and boxy outline buttons.\n\nBob's spoken voice is the calm male ElevenLabs Eric (`cjVigY5qzO86Huf0OWal`), using `eleven_v3_conversational` across all six app languages. Speech is cached on the Worker and phone, with native Android speech fallback; recognition stays on Android.",
     "keyCharacteristics": [
-      "One blue hand (48dp, white edge, soft shadow) is the system's mark: pointer, Help pill glyph, setup wordmark and launcher icon.",
+      "The logo is an unmistakable lowercase b: white on Bob Blue, with a tall stem and one clear open counter. The background is flat, with no gradient. Independently authored vector geometry in `branding/bob-mark.svg` supplies the setup mark, adaptive launcher and monochrome themed icon; no font dependency or generated raster ships as the mark.",
+      "One blue pointing hand (48dp, white edge, soft shadow) is the in-use mark: pointer and Help pill glyph.",
       "Light veil (22% black by day, 32% at night) with a rounded spotlight; the app stays readable.",
       "Near-black floating caption card, two type sizes ranked by weight and opacity.",
       "Every action is a full pill; containers are softly rounded rectangles (18 to 28dp).",
@@ -617,7 +625,7 @@
     "rules": [
       {
         "name": "The Press-Here Rule",
-        "body": "Blue marks only where to press or what can be pressed. Body copy, headings, cards and decoration are never blue.",
+        "body": "Outside the approved logo treatment, blue marks only where to press or what can be pressed. Body copy, headings, cards and decoration are never blue.",
         "section": "colors"
       },
       {

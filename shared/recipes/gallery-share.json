@@ -1,9 +1,10 @@
 {
   "id": "gallery-share",
-  "version": 2,
+  "version": 3,
   "goal": "send a photo from the gallery",
   "apps": [
     "com.google.android.apps.photos",
+    "com.google.android.apps.photosgo",
     "com.sec.android.gallery3d",
     "com.miui.gallery",
     "com.coloros.gallery3d",
@@ -139,7 +140,8 @@
         "com.android.intentresolver",
         "com.google.android.apps.photos",
         "com.sec.android.gallery3d",
-        "com.miui.gallery"
+        "com.miui.gallery",
+        "com.google.android.apps.photosgo"
       ],
       "after": {
         "step": "share",

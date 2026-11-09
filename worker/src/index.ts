@@ -2,15 +2,15 @@ import Anthropic from "@anthropic-ai/sdk";
 import { issueToken, verifyToken } from "./auth.ts";
 import { demoGuide } from "./demo.ts";
 import { readShared, shareable, sharedKey, writeShared } from "./cache.ts";
-import { askGuide, mockGuide } from "./guide.ts";
+import { askGuide, mockGuide, unreadableGuide } from "./guide.ts";
 import { SpendGuard, today } from "./spend.ts";
 import { SpeechStore } from "./speech-store.ts";
 import recipeBundle from "./recipe-bundle.json";
-import { BadSpeakRequest, DEFAULT_SPEAKER, parseSpeakRequest, readSpeech, speechKey, synthesize, UpstreamError } from "./speech.ts";
+import { BadSpeakRequest, DEFAULT_SPEAKER, SPEECH_MODEL, parseSpeakRequest, readSpeech, speechKey, synthesize, UpstreamError } from "./speech.ts";
 import { BadRequest, parseTurnRequest, type Guide, type Source, type TurnResponse } from "./schema.ts";
 
 // Listening happens on the phone (Android SpeechRecognizer), so a turn is one model call: screen +
-// what the senior said in, the next step out. Speaking can use /speak (Sarvam's natural voices,
+// what the senior said in, the next step out. Speaking can use /speak (ElevenLabs natural voice,
 // cached per line); the phone falls back to its own text-to-speech when that is unavailable.
 
 export interface Env {
@@ -29,11 +29,12 @@ export interface Env {
   USAGE: KVNamespace;
   /** Answers shared between phones (src/cache.ts). Optional: without it every turn asks the model. */
   GUIDE_CACHE?: KVNamespace;
-  /** Sarvam key for /speak. Without it /speak answers 501 and phones use their own voice. */
-  SARVAM_API_KEY?: string;
-  /** Sarvam bulbul:v3 speaker name (lowercase), e.g. "shubh", "priya". */
-  SPEECH_SPEAKER?: string;
-  /** Uncached /speak lines per day across all phones; a ceiling on the Sarvam bill. */
+  /** ElevenLabs key for /speak. Without it /speak answers 501 and phones use their own voice. */
+  ELEVENLABS_API_KEY?: string;
+  /** ElevenLabs voice ID; defaults to Eric, Bob's calm male voice. */
+  ELEVENLABS_VOICE_ID?: string;
+  ELEVENLABS_MODEL_ID?: string;
+  /** Uncached /speak lines per day across all phones; a ceiling on the ElevenLabs bill. */
   SPEECH_DAILY_LIMIT?: string;
   /** Uncached /speak lines per phone per day. */
   DEVICE_SPEECH_LIMIT?: string;
@@ -91,6 +92,9 @@ export default {
       if (env.DEMO === "1") {
         guide = demoGuide(req);
         source = "demo";
+      } else if (!req.tree.trim() && !req.screenshot_b64) {
+        guide = unreadableGuide(req);
+        source = "local";
       } else if (!env.ANTHROPIC_API_KEY) {
         guide = mockGuide(req);
         source = "mock";
@@ -135,9 +139,9 @@ export default {
   },
 } satisfies ExportedHandler<Env>;
 
-/** One line of speech as MP3: from the shared cache, or made by Sarvam and cached for everyone. */
+/** One line of speech as MP3: from the shared cache, or made by ElevenLabs and cached for everyone. */
 async function speak(request: Request, env: Env, ctx: ExecutionContext, deviceId: string): Promise<Response> {
-  if (!env.SARVAM_API_KEY) return json({ error: "no voice configured" }, 501);
+  if (!env.ELEVENLABS_API_KEY) return json({ error: "no voice configured" }, 501);
   let req;
   try {
     req = parseSpeakRequest(await request.json());
@@ -145,11 +149,12 @@ async function speak(request: Request, env: Env, ctx: ExecutionContext, deviceId
     if (err instanceof BadSpeakRequest || err instanceof SyntaxError) return json({ error: (err as Error).message }, 400);
     throw err;
   }
-  const speaker = env.SPEECH_SPEAKER || DEFAULT_SPEAKER;
+  const speaker = env.ELEVENLABS_VOICE_ID || DEFAULT_SPEAKER;
+  const model = env.ELEVENLABS_MODEL_ID || SPEECH_MODEL;
   const audio = (body: ArrayBuffer, source: string) =>
     new Response(body, { headers: { "Content-Type": "audio/mpeg", "X-Saathi-Source": source } });
 
-  const key = await speechKey(req, speaker);
+  const key = await speechKey(req, speaker, model);
   const store = env.SPEECH.get(env.SPEECH.idFromName("clips"));
   // Lines cached in KV before the store existed are still served from there.
   const hit = (await store.read(key)) ?? (env.GUIDE_CACHE ? await readSpeech(env.GUIDE_CACHE, key) : null);
@@ -160,14 +165,14 @@ async function speak(request: Request, env: Env, ctx: ExecutionContext, deviceId
   if (!(await under(env, "speech", Number(env.SPEECH_DAILY_LIMIT) || 4000))) return json({ error: "busy" }, 503);
   try {
     const t0 = Date.now();
-    const body = await synthesize(env.SARVAM_API_KEY, req, speaker);
+    const body = await synthesize(env.ELEVENLABS_API_KEY, req, speaker, model);
     console.log(JSON.stringify({ deviceId, speech: req.language, chars: req.text.length, ms: Date.now() - t0 }));
     ctx.waitUntil(store.write(key, body).catch((e) => console.error(`speech not cached: ${e.message}`)));
-    return audio(body, "sarvam");
+    return audio(body, "elevenlabs");
   } catch (err) {
     if (err instanceof UpstreamError) {
       console.error(err.message);
-      // Out of Sarvam credits (402) or a bad key (401/403): there is no voice until someone fixes the
+      // Out of ElevenLabs credits (402) or a bad key (401/403): there is no voice until someone fixes the
       // account, so tell phones "none" (501) and they stop asking for a while instead of every line.
       if (err.status === 402 || err.status === 401 || err.status === 403) return json({ error: "no voice available" }, 501);
       return json({ error: "voice" }, err.status === 429 ? 503 : 502);

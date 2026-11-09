@@ -112,7 +112,7 @@ class RecipeEngineTest {
         val home = opener.guide(req(launcher, app = "com.miui.home", utterance = "अक्षर बड़े करने हैं"))!!
         assertEquals(Action.OPEN_APP, home.action)
         assertEquals("com.android.settings", home.actionArg)
-        assertEquals("'Settings' खोल रही हूँ।", home.say)
+        assertEquals("'Settings' खोल रहा हूँ।", home.say)
 
         val fromAnotherApp = opener.guide(req(launcher, app = "com.google.android.youtube", utterance = "अक्षर बड़े करने हैं"))!!
         assertEquals(Action.OPEN_APP, fromAnotherApp.action)
@@ -144,7 +144,7 @@ class RecipeEngineTest {
         val have = installed.guide(req(launcher, app = "com.android.launcher3", utterance = "Blinkit डाउनलोड करना है"))!!
         assertEquals(Action.OPEN_APP, have.action)
         assertEquals(Status.DONE, have.status)
-        assertEquals("'Blinkit' पहले से इस फ़ोन में है। उसे खोल रही हूँ।", have.say)
+        assertEquals("'Blinkit' पहले से इस फ़ोन में है। उसे खोल रहा हूँ।", have.say)
 
         // Uninstalling is a different wish entirely.
         assertTrue(opener.guide(req(launcher, app = "com.android.launcher3", utterance = "uninstall blinkit", language = "en-IN"))?.action != Action.OPEN_STORE_PAGE)

@@ -1,6 +1,6 @@
 {
   "id": "camera-video",
-  "version": 2,
+  "version": 3,
   "goal": "record a video",
   "apps": [
     "com.android.camera",
@@ -145,6 +145,27 @@
         "Record",
         "Record video",
         "Start video recording"
+      ],
+      "exact": true,
+      "say": {
+        "hi-IN": "नीचे बीच वाला लाल गोल बटन दबाइए, रिकॉर्डिंग शुरू होगी।",
+        "ta-IN": "கீழே நடுவில் உள்ள சிவப்பு வட்ட பொத்தானை அழுத்துங்கள், பதிவு தொடங்கும்.",
+        "te-IN": "కింద మధ్యలో ఉన్న ఎరుపు గుండ్రని బటన్ నొక్కండి, రికార్డింగ్ మొదలవుతుంది.",
+        "kn-IN": "ಕೆಳಗೆ ಮಧ್ಯದ ಕೆಂಪು ವೃತ್ತದ ಬಟನ್ ಒತ್ತಿ, ರೆಕಾರ್ಡಿಂಗ್ ಶುರುವಾಗುತ್ತದೆ.",
+        "ml-IN": "താഴെ നടുവിലുള്ള ചുവന്ന വട്ട ബട്ടൺ അമർത്തുക, റെക്കോർഡിംഗ് തുടങ്ങും.",
+        "en-IN": "Press the red round button in the middle at the bottom. Recording will start."
+      }
+    },
+    {
+      "id": "shutter",
+      "screen_has": [
+        [
+          "Torch off",
+          "Torch on"
+        ]
+      ],
+      "target": [
+        "Shutter"
       ],
       "exact": true,
       "say": {

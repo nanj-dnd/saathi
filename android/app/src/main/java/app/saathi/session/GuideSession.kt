@@ -2,6 +2,7 @@ package app.saathi.session
 
 import app.saathi.brain.ScreenKey
 import app.saathi.capture.Box
+import app.saathi.capture.ScreenText
 import app.saathi.net.Action
 import app.saathi.net.Danger
 import app.saathi.net.Guide
@@ -11,6 +12,7 @@ import app.saathi.net.TurnFailure
 import app.saathi.net.TurnRequest
 import app.saathi.net.TurnResponse
 import app.saathi.recipes.RecipeEngine
+import app.saathi.safety.ScreenSafety
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -92,6 +94,7 @@ interface Lines {
     val noSpeech: String
     val network: String
     val micDenied: String
+    val sensitive: String get() = "Do this part yourself. Never share your PIN or OTP."
     /** Second silence in a row: how to be heard. */
     val noSpeechAgain: String get() = noSpeech
     val micBusy: String get() = noSpeech
@@ -123,6 +126,7 @@ enum class ScreenEvent(val settleMs: Long, val progress: Boolean) {
     NAVIGATED(500, false),
     SCROLLED(600, false),
     TYPED(3000, false),
+    CONTENT_CHANGED(800, false),
 }
 
 /**
@@ -143,6 +147,7 @@ class GuideSession(
     /** True during a phone or video call: the mic is taken and narrating over a call helps no one. */
     private val inCall: () -> Boolean = { false },
     private val hands: Hands = NoHands,
+    private val reportFailure: (Exception) -> Unit = {},
 ) {
     companion object {
         const val MAX_AUTO_TURNS = 15
@@ -151,6 +156,9 @@ class GuideSession(
         const val SETTLE_STEP_MS = 250L
         /** After Saathi scrolls or opens an app silently, the screen gets this long to move. */
         const val ACT_SETTLE_MS = 600L
+        /** How long an app Saathi opened may take to come up. */
+        const val APP_START_MS = 6_000L
+        const val PLAY_STORE = "com.android.vending"
         /**
          * Screen changes this soon after Saathi's own scroll or app launch are its own doing (an app
          * can take a second to finish opening), not the senior's. A real tap still counts.
@@ -163,6 +171,7 @@ class GuideSession(
         const val WAIT_HINT_MS = 3_500L
         /** A beat after "done" before asking for anything else. */
         const val FOLLOW_UP_PAUSE_MS = 1_500L
+        private val CLOCK_LABEL = Regex("\\p{Nd}{1,2}:\\p{Nd}{2}(?::\\p{Nd}{2})?")
 
         /** How long a finished step stays up: long enough for a slow reader, not forever. */
         fun readingTimeMs(text: String): Long = (2_500L + text.length * 60L).coerceIn(3_000L, 12_000L)
@@ -185,6 +194,10 @@ class GuideSession(
     private var acting = false
     /** Active for [OWN_CHANGE_MS] after Saathi acted. */
     private var ownChange: Job? = null
+    /** Changes while a reply is pending invalidate it, even if a tap left the text unchanged. */
+    private var screenVersion = 0L
+    private var pendingContent = false
+    private var settlingEvent: ScreenEvent? = null
 
     fun onBubbleTap() {
         if (_state.value == GuideState.LISTENING) {
@@ -196,20 +209,35 @@ class GuideSession(
 
     fun onScreenEvent(event: ScreenEvent) {
         val s = _state.value
-        // Only re-look while we are waiting on the senior, or if they acted before we finished talking.
-        if (s != GuideState.WATCHING && s != GuideState.SPEAKING) return
+        if (s != GuideState.WATCHING && s != GuideState.SPEAKING && s != GuideState.THINKING) return
+        if (lastGuide?.danger == Danger.SCAM) return
         if (acting || (event != ScreenEvent.CLICK && ownChange?.isActive == true)) return
         if (inCall()) {
             // A call started (often the one the senior was just helped to make): get out of the way.
             stop()
             return
         }
+        if (event == ScreenEvent.CONTENT_CHANGED) {
+            // A loading spinner or live region must not cancel narration or reset a typing pause.
+            // Replies already revalidate their screen after THINKING.
+            if (s == GuideState.THINKING) return
+            if (s == GuideState.SPEAKING) {
+                pendingContent = true
+                return
+            }
+            if (settlingEvent != null && settlingEvent != ScreenEvent.CONTENT_CHANGED) return
+        }
+        if (s == GuideState.THINKING) {
+            screenVersion++
+            return
+        }
         if (autoTurns >= MAX_AUTO_TURNS) return
         // The senior acted, so the old spotlight is probably pointing at something that moved or is gone.
         pointer.clear()
-        launchPipeline {
+        launchPipeline(settleEvent = event) {
             setState(GuideState.WATCHING)
             delay(event.settleMs)
+            settlingEvent = null
             setState(GuideState.THINKING)
             val snap = lookSettled()
             if (leftForHome(snap)) {
@@ -243,22 +271,37 @@ class GuideSession(
             delay(SETTLE_STEP_MS)
             val again = eyes.look()
             // An empty read (no window content yet) never counts as settled.
-            if (again.app.isNotEmpty() && again.app == snap.app && again.tree == snap.tree) return again
+            if (again.app.isNotEmpty() && sameScreen(snap, again)) return again
             if (again.app.isNotEmpty() || snap.app.isEmpty()) snap = again
         }
         return snap
     }
 
     /** On the home screen now, from an app, and not because Saathi said "press Home first". */
-    private fun leftForHome(snap: Snapshot): Boolean {
-        val before = lastLook?.app ?: return false
+    private fun leftForHome(snap: Snapshot, before: String? = lastLook?.app): Boolean {
+        before ?: return false
         return RecipeEngine.isLauncher(snap.app) && !RecipeEngine.isLauncher(before) && before != snap.app &&
             lastGuide?.expect?.endsWith("/find") != true
     }
 
+    /**
+     * Looks until [pkg] is on screen, then until it settles. A cold start on a budget phone takes
+     * seconds; looking too soon sees the home screen and would open the app all over again.
+     */
+    private suspend fun lookFor(pkg: String): Snapshot {
+        var waited = 0L
+        var snap = eyes.look()
+        while (snap.app != pkg && waited < APP_START_MS) {
+            delay(SETTLE_STEP_MS)
+            waited += SETTLE_STEP_MS
+            snap = eyes.look()
+        }
+        return if (snap.app == pkg) lookSettled() else snap
+    }
+
     private fun unchanged(snap: Snapshot): Boolean {
         val last = lastLook ?: return false
-        return lastGuide != null && snap.app == last.app && snap.tree == last.tree && ScreenKey.informative(snap.tree)
+        return lastGuide != null && sameScreen(snap, last) && ScreenKey.informative(snap.tree)
     }
 
     /** A typed request instead of a spoken one (debug broadcast today; a text box later). */
@@ -273,10 +316,11 @@ class GuideSession(
 
     fun repeat() {
         val say = lastSay ?: return
+        val guide = lastGuide
         launchPipeline {
             setState(GuideState.SPEAKING)
             mouth.say(say, slow = true)
-            enterWatching()
+            if (guide == null) setState(GuideState.IDLE) else afterGuide(guide)
         }
     }
 
@@ -288,20 +332,44 @@ class GuideSession(
     /** Speaks a local warning (scam guard) regardless of what the session is doing. */
     fun warn(text: String) {
         launchPipeline {
-            pointer.point(null, text, Danger.SCAM)
-            setState(GuideState.SPEAKING)
-            mouth.say(text)
-            setState(GuideState.IDLE)
+            speakWarning(Guide(say = text, danger = Danger.SCAM, status = Status.CANNOT_HELP))
         }
     }
 
-    private fun launchPipeline(block: suspend () -> Unit) {
+    private suspend fun speakWarning(guide: Guide) {
+        reset()
+        lastSay = guide.say
+        lastGuide = guide.copy(goal = "")
+        pointer.point(null, guide.say, Danger.SCAM)
+        setState(GuideState.SPEAKING)
+        mouth.say(guide.say)
+        setState(GuideState.IDLE)
+    }
+
+    private fun launchPipeline(settleEvent: ScreenEvent? = null, block: suspend () -> Unit) {
         val previous = job
+        settlingEvent = settleEvent
+        if (settleEvent != null) pendingContent = false
         watchTimeout?.cancel()
         mouth.stop()
         job = scope.launch {
             previous?.cancelAndJoin()
-            block()
+            try {
+                block()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                reportFailure(e)
+                reset()
+                try {
+                    speakAndIdle(failureLine(e))
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    reportFailure(e)
+                    reset()
+                }
+            }
         }
     }
 
@@ -333,6 +401,7 @@ class GuideSession(
     /** [speaking] is a line still being said (Saathi announcing its own scroll); the next step waits for it. */
     private suspend fun runTurn(utterance: String?, seen: Snapshot? = null, speaking: Job? = null) {
         setState(GuideState.THINKING)
+        val version = screenVersion
         val snap = seen ?: eyes.look()
         val request = TurnRequest(
             language = language(),
@@ -357,7 +426,37 @@ class GuideSession(
         }
 
         speaking?.join()
-        val guide = response.guide
+        if (inCall()) {
+            reset()
+            return
+        }
+        // Events can be delayed or absent during app switches. Check the actual screen too,
+        // before recording this reply, drawing a pointer, or performing an automatic action.
+        val current = eyes.look()
+        // Screenshot throttling can briefly hide a window's secure flag. Once either look
+        // identifies this app's screen as protected, hand it back instead of retrying the model.
+        val protectedScreen = snap.app == current.app && (snap.secure || current.secure)
+        if (!protectedScreen && (screenVersion != version || !sameScreen(snap, current))) {
+            if (leftForHome(current, snap.app) || autoTurns >= MAX_AUTO_TURNS) {
+                reset()
+                return
+            }
+            autoTurns++
+            val settled = lookSettled()
+            if (leftForHome(settled, snap.app)) {
+                reset()
+                return
+            }
+            runTurn(utterance, seen = settled)
+            return
+        }
+        val responseGuide = if (protectedScreen && response.guide.danger != Danger.SCAM)
+            response.guide.copy(status = Status.USER_MUST_DO, danger = Danger.SENSITIVE) else response.guide
+        val guide = safeGuide(responseGuide, current)
+        if (guide.danger == Danger.SCAM) {
+            speakWarning(guide)
+            return
+        }
         if (guide.goal.isNotBlank()) goal = guide.goal
         history.addLast(PastStep(guide.say, guide.label, guide.status, snap.app))
         while (history.size > HISTORY) history.removeFirst()
@@ -367,10 +466,14 @@ class GuideSession(
 
         if (guide.action.isNotEmpty() && act(guide)) return
 
-        pointer.point(targetBox(guide, snap), guide.say, guide.danger, done = guide.status == Status.DONE)
+        pointer.point(targetBox(guide, current), guide.say, guide.danger, done = guide.status == Status.DONE)
         setState(GuideState.SPEAKING)
         mouth.say(guide.say)
 
+        afterGuide(guide)
+    }
+
+    private suspend fun afterGuide(guide: Guide) {
         when {
             guide.danger == Danger.SCAM -> setState(GuideState.IDLE) // caption stays until closed
             guide.status == Status.NEED_INFO -> spokenTurn()
@@ -410,7 +513,11 @@ class GuideSession(
             ownChange?.cancel()
             ownChange = scope.launch { delay(OWN_CHANGE_MS) }
             delay(ACT_SETTLE_MS)
-            seen = lookSettled()
+            seen = when (guide.action) {
+                Action.OPEN_APP -> lookFor(guide.actionArg)
+                Action.OPEN_STORE_PAGE -> lookFor(PLAY_STORE)
+                else -> lookSettled()
+            }
         } finally {
             // runTurn turns THINKING straight away, which ignores screen events on its own.
             acting = false
@@ -460,6 +567,10 @@ class GuideSession(
             delay(WATCH_TIMEOUT_MS)
             if (_state.value == GuideState.WATCHING) reset()
         }
+        if (pendingContent) {
+            pendingContent = false
+            onScreenEvent(ScreenEvent.CONTENT_CHANGED)
+        }
     }
 
     /** Runs [block]; if it is slow, says "one moment" meanwhile and stops saying it once it returns. */
@@ -486,6 +597,8 @@ class GuideSession(
     }
 
     private suspend fun speakAndIdle(text: String, danger: String = Danger.NONE) {
+        lastSay = text
+        lastGuide = null
         pointer.point(null, text, danger)
         setState(GuideState.SPEAKING)
         mouth.say(text)
@@ -494,6 +607,8 @@ class GuideSession(
 
     private fun reset() {
         watchTimeout?.cancel()
+        ownChange?.cancel()
+        ownChange = null
         mouth.stop()
         pointer.clear()
         goal = ""
@@ -501,6 +616,9 @@ class GuideSession(
         autoTurns = 0
         lastLook = null
         lastGuide = null
+        lastSay = null
+        pendingContent = false
+        settlingEvent = null
         silences = 0
         setState(GuideState.IDLE)
     }
@@ -510,16 +628,63 @@ class GuideSession(
         pointer.state(s)
     }
 
-    internal fun targetBox(guide: Guide, snap: Snapshot): Box? = when (guide.targetKind) {
-        "node" -> snap.boxes[guide.nodeId]
-        "point" -> if (guide.x in 0.0..1.0 && guide.y in 0.0..1.0) {
-            Box.around(
-                snap.shotBox.left + (guide.x * snap.shotBox.width).toInt(),
-                snap.shotBox.top + (guide.y * snap.shotBox.height).toInt(),
-                POINT_RADIUS_PX,
-            )
-        } else null
-        else -> null
+    private fun sameScreen(a: Snapshot, b: Snapshot): Boolean =
+        a.app == b.app && sameTree(a.tree, b.tree) && a.secure == b.secure &&
+            a.screenW == b.screenW && a.screenH == b.screenH && a.shotBox == b.shotBox
+
+    private fun sameTree(a: String, b: String): Boolean {
+        if (a == b) return true
+        val before = ScreenText.parse(a).nodes
+        val after = ScreenText.parse(b).nodes
+        if (before.isEmpty() || before.size != after.size) return false
+        return before.zip(after).all { (old, now) ->
+            old == now || (!old.clickable && !now.clickable &&
+                CLOCK_LABEL.matches(old.label) && CLOCK_LABEL.matches(now.label) &&
+                old.copy(label = "") == now.copy(label = ""))
+        }
+    }
+
+    private fun sensitiveTarget(guide: Guide, snap: Snapshot): Boolean {
+        if (ScreenSafety.isSensitiveTarget(guide.label)) return true
+        val nodes = ScreenText.parse(snap.tree).nodes
+        return when (guide.targetKind) {
+            "node" -> nodes.any { it.id == guide.nodeId && ScreenSafety.isSensitiveTarget(it.label) }
+            "point" -> {
+                val x = snap.shotBox.left + guide.x * snap.shotBox.width
+                val y = snap.shotBox.top + guide.y * snap.shotBox.height
+                nodes.any {
+                    x >= it.box.left && x < it.box.right && y >= it.box.top && y < it.box.bottom &&
+                        ScreenSafety.isSensitiveTarget(it.label)
+                }
+            }
+            else -> false
+        }
+    }
+
+    /** Enforce this on the phone too: old caches and Worker versions may still contain targets. */
+    private fun safeGuide(guide: Guide, snap: Snapshot): Guide {
+        val sensitive = snap.secure || guide.danger == Danger.SENSITIVE ||
+            guide.status == Status.USER_MUST_DO || sensitiveTarget(guide, snap)
+        if (!sensitive && guide.danger != Danger.SCAM) return guide
+        val safe = guide.copy(targetKind = "none", nodeId = "", x = -1.0, y = -1.0, action = "", actionArg = "")
+        return if (guide.danger == Danger.SCAM) safe else safe.copy(
+            say = lines().sensitive, status = Status.USER_MUST_DO, danger = Danger.SENSITIVE,
+        )
+    }
+
+    internal fun targetBox(guide: Guide, snap: Snapshot): Box? {
+        if (snap.secure || guide.danger != Danger.NONE || guide.status == Status.USER_MUST_DO || sensitiveTarget(guide, snap)) return null
+        return when (guide.targetKind) {
+            "node" -> snap.boxes[guide.nodeId]
+            "point" -> if (guide.x in 0.0..1.0 && guide.y in 0.0..1.0) {
+                Box.around(
+                    snap.shotBox.left + (guide.x * snap.shotBox.width).toInt(),
+                    snap.shotBox.top + (guide.y * snap.shotBox.height).toInt(),
+                    POINT_RADIUS_PX,
+                )
+            } else null
+            else -> null
+        }
     }
 
     internal val currentGoal get() = goal

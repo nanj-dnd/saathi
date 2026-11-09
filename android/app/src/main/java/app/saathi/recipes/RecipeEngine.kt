@@ -9,6 +9,7 @@ import app.saathi.net.PastStep
 import app.saathi.net.Status
 import app.saathi.net.TurnRequest
 import app.saathi.safety.ScreenSafety
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Runs [RecipeBook] recipes against one turn. Returns null whenever it is not sure, and the
@@ -91,8 +92,7 @@ class RecipeEngine(
      */
     private fun fits(asked: Set<String>, r: Recipe): Boolean {
         val covers = book.covers.getValue(r.id)
-        val exclusive = book.common.concepts.filterValues { it.exclusive }.keys
-        if (asked.any { it in exclusive && it !in covers }) return false
+        if (asked.any { it in book.exclusive && it !in covers }) return false
         return book.common.opposites.none { pair ->
             pair.size == 2 && (pair[0] in asked && pair[1] in covers && pair[0] !in covers ||
                 pair[1] in asked && pair[0] in covers && pair[1] !in covers)
@@ -106,10 +106,7 @@ class RecipeEngine(
      */
     private fun negated(text: String, r: Recipe): Boolean {
         var rest = text
-        for (phrase in book.triggers.getValue(r.id).flatMap { t -> t.all.flatten() }) {
-            val p = ScreenText.norm(phrase)
-            if (' ' in p) rest = rest.replace(p, " ")
-        }
+        for (p in book.spacedPhrases.getValue(r.id)) rest = rest.replace(p, " ")
         return book.common.unless.any { contains(rest, it, wordStart = false) }
     }
 
@@ -279,7 +276,7 @@ class RecipeEngine(
 
         /** Hindi is feminine: the voice is a woman's. */
         val NOT_INSTALLED = mapOf(
-            "hi-IN" to "'{app}' अभी इस फ़ोन में नहीं है। Play Store में उसका पेज खोल रही हूँ।",
+            "hi-IN" to "'{app}' अभी इस फ़ोन में नहीं है। Play Store में उसका पेज खोल रहा हूँ।",
             "en-IN" to "'{app}' is not on this phone yet. Opening its page in Play Store.",
             "ta-IN" to "'{app}' இந்த போனில் இன்னும் இல்லை. Play Store-ல் அதன் பக்கத்தைத் திறக்கிறேன்.",
             "te-IN" to "'{app}' ఈ ఫోన్‌లో ఇంకా లేదు. Play Store లో దాని పేజీ తెరుస్తున్నాను.",
@@ -287,7 +284,7 @@ class RecipeEngine(
             "ml-IN" to "'{app}' ഈ ഫോണിൽ ഇതുവരെ ഇല്ല. Play Store-ൽ അതിന്റെ പേജ് തുറക്കുന്നു.",
         )
         val ALREADY = mapOf(
-            "hi-IN" to "'{app}' पहले से इस फ़ोन में है। उसे खोल रही हूँ।",
+            "hi-IN" to "'{app}' पहले से इस फ़ोन में है। उसे खोल रहा हूँ।",
             "en-IN" to "'{app}' is already on this phone. Opening it for you.",
             "ta-IN" to "'{app}' ஏற்கனவே இந்த போனில் இருக்கிறது. அதைத் திறக்கிறேன்.",
             "te-IN" to "'{app}' ఇప్పటికే ఈ ఫోన్‌లో ఉంది. దాన్ని తెరుస్తున్నాను.",
@@ -297,7 +294,7 @@ class RecipeEngine(
 
         /** Said while Saathi opens the app; a recipe bundle's "opening" common line overrides it. Hindi is feminine: the voice is a woman's. */
         val OPENING = mapOf(
-            "hi-IN" to "'{app}' खोल रही हूँ।",
+            "hi-IN" to "'{app}' खोल रहा हूँ।",
             "en-IN" to "Opening '{app}' for you.",
             "ta-IN" to "'{app}' ஐத் திறக்கிறேன்.",
             "te-IN" to "'{app}' తెరుస్తున్నాను.",
@@ -338,7 +335,7 @@ class RecipeEngine(
          * Dravidian negations are word endings: Tamil செய்யவில்லை, Malayalam വരുന്നില്ല.
          */
         fun contains(text: String, phrase: String, wordStart: Boolean = true): Boolean {
-            val p = ScreenText.norm(phrase)
+            val p = normed(phrase)
             if (p.isEmpty()) return false
             // A phrase written with a trailing space must end a word: "not " is the word "not",
             // and must not fire inside "notifications" or "note".
@@ -432,6 +429,11 @@ class RecipeEngine(
          * becomes "ബ്ലിങ്കിറ്റിൽ" (on Blinkit), Tamil "கூகுள்" becomes "கூகுளில்". A phrase that
          * ends in a virama, a Malayalam chillu letter or an anusvara is matched by its stem.
          */
+        /** [ScreenText.norm] of a script's phrase, worked out once: matching asks about each one on every request. */
+        fun normed(phrase: String): String = NORMED.getOrPut(phrase) { ScreenText.norm(phrase) }
+
+        private val NORMED = ConcurrentHashMap<String, String>()
+
         fun stem(p: String): String {
             val last = p.lastOrNull() ?: return p
             val s = when {

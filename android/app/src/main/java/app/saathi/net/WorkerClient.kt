@@ -4,12 +4,9 @@ import app.saathi.Prefs
 import app.saathi.session.Brain
 import app.saathi.voice.VoiceUnavailable
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import okhttp3.Call
-import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -18,8 +15,6 @@ import okhttp3.Response
 import java.io.File
 import java.io.IOException
 import java.util.concurrent.TimeUnit
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 class WorkerClient(
     private val baseUrl: String,
@@ -124,16 +119,6 @@ class WorkerClient(
             File(dir, "$name.json").writeText(json.encodeToString(request.copy(screenshotB64 = null)))
         }
     }
-}
-
-private suspend fun Call.await(): Response = suspendCancellableCoroutine { cont ->
-    enqueue(object : Callback {
-        override fun onResponse(call: Call, response: Response) = cont.resume(response)
-        override fun onFailure(call: Call, e: IOException) {
-            if (cont.isActive) cont.resumeWithException(e)
-        }
-    })
-    cont.invokeOnCancellation { cancel() }
 }
 
 @kotlinx.serialization.Serializable

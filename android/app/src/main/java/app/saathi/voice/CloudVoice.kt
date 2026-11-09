@@ -12,11 +12,11 @@ import java.io.File
 import java.security.MessageDigest
 import kotlin.coroutines.resume
 
-/** The Worker has no natural voice configured (no Sarvam key). */
+/** The Worker has no natural voice configured (no ElevenLabs key). */
 class VoiceUnavailable : Exception("no natural voice configured")
 
 /**
- * The natural voice: each line is fetched once from the Worker's /speak (Sarvam), kept on the
+ * The natural voice: each line is fetched once from the Worker's /speak (ElevenLabs), kept on the
  * phone, and played from there every time after. Returns nothing when the line can't be had
  * quickly (offline, slow network, no voice configured), and the caller uses the phone's own voice.
  */
@@ -25,7 +25,7 @@ class CloudVoice(
     /** Fetches MP3 bytes for (text, language, pace), or null. */
     private val fetch: suspend (text: String, language: String, pace: Float) -> ByteArray?,
 ) {
-    private val dir = File(context.cacheDir, "speech").apply { mkdirs() }
+    private val dir = File(context.cacheDir, "speech-elevenlabs-eric-v1").apply { mkdirs() }
     private var player: MediaPlayer? = null
     /** Set when the Worker says it has no voice, so the phone stops asking for a while. */
     private var offUntil = 0L

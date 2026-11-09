@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { buildUserText, SYSTEM_PROMPT } from "./prompt.ts";
+import { buildUserText, systemPromptFor } from "./prompt.ts";
 import {
   GUIDE_JSON_SCHEMA,
   normaliseGuide,
@@ -23,6 +23,7 @@ export async function askGuide(
   cfg: GuideConfig,
   req: TurnRequest,
 ): Promise<Guide> {
+  if (!req.tree.trim() && !req.screenshot_b64) return unreadableGuide(req);
   const client = new Anthropic({ apiKey: cfg.apiKey, maxRetries: 1, timeout: 20_000 });
 
   const content: Anthropic.Beta.BetaContentBlockParam[] = [];
@@ -37,7 +38,7 @@ export async function askGuide(
   const response = await client.beta.messages.create({
     model: cfg.model,
     max_tokens: 4000,
-    system: [{ type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
+    system: [{ type: "text", text: systemPromptFor(req), cache_control: { type: "ephemeral" } }],
     messages: [{ role: "user", content }],
     output_config: {
       effort: cfg.effort,
@@ -65,7 +66,57 @@ export async function askGuide(
   }
   const guide = normaliseGuide(raw, nodeIdsFromTree(req.tree));
   if (!guide.say) return safeFallback(req);
+  // Enforced server-side as well as in the iOS prompt. Existing Android behavior is unchanged.
+  if (req.platform === "ios") return { ...guide, action: "", action_arg: "", target_kind: "none", node_id: "", x: -1, y: -1 };
+  const groups = new Map<string, NonNullable<TurnRequest["installed_apps"]>>();
+  for (const app of req.installed_apps ?? []) {
+    const name = app.label.trim().normalize("NFC").toLowerCase();
+    groups.set(name, [...(groups.get(name) ?? []), app]);
+  }
+  const task = [req.utterance, req.goal].filter(Boolean).join(" ").normalize("NFC").toLowerCase();
+  for (const [name, apps] of groups) {
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const mentioned = new RegExp(`(^|[^\\p{L}\\p{N}\\p{M}])${escaped}(?=$|[^\\p{L}\\p{N}\\p{M}])`, "u").test(task);
+    if (apps.length > 1 && mentioned && !apps.some((app) => app.package === req.app || task.includes(app.package)) &&
+        guide.danger === "none" && guide.status !== "user_must_do") return chooseAppGuide(req);
+  }
+  if (guide.target_kind === "point" && !req.screenshot_b64) return safeFallback(req);
+  if (guide.action === "open_app" && req.installed_apps?.length) {
+    const label = guide.label.trim().normalize("NFC").toLowerCase();
+    const matches = req.installed_apps.filter((app) => app.label.trim().normalize("NFC").toLowerCase() === label);
+    if (!req.installed_apps.some((app) => app.package === guide.action_arg)) {
+      if (matches.length !== 1) return safeFallback(req);
+      return { ...guide, action_arg: matches[0].package };
+    }
+  }
   return guide;
+}
+
+const APP_CHOICE: Record<TurnRequest["language"], string> = {
+  "hi-IN": "इस नाम के एक से ज़्यादा ऐप हैं। जो चाहिए, उसे खुद खोलिए।",
+  "en-IN": "More than one app has that name. Please open the one you mean.",
+  "ta-IN": "இந்தப் பெயரில் ஒன்றுக்கு மேற்பட்ட செயலிகள் உள்ளன. நீங்கள் விரும்புவதைத் திறக்கவும்.",
+  "te-IN": "ఈ పేరుతో ఒకటి కంటే ఎక్కువ యాప్‌లు ఉన్నాయి. మీకు కావలసినది తెరవండి.",
+  "kn-IN": "ಈ ಹೆಸರಿನ ಒಂದಕ್ಕಿಂತ ಹೆಚ್ಚು ಆ್ಯಪ್‌ಗಳಿವೆ. ನಿಮಗೆ ಬೇಕಾದುದನ್ನು ತೆರೆಯಿರಿ.",
+  "ml-IN": "ഈ പേരിൽ ഒന്നിലധികം ആപ്പുകളുണ്ട്. നിങ്ങൾ ഉദ്ദേശിക്കുന്നത് തുറക്കുക.",
+};
+
+function chooseAppGuide(req: TurnRequest): Guide {
+  return { ...safeFallback(req), say: APP_CHOICE[req.language], goal: req.goal || req.utterance || "",
+    status: "next_step", expect: "the senior opens the intended app" };
+}
+
+const UNREADABLE: Record<TurnRequest["language"], string> = {
+  "hi-IN": "यह स्क्रीन पढ़ नहीं पा रहा हूँ। ऐप खोलकर फिर मदद दबाइए।",
+  "en-IN": "I can't read this screen. Open the app and tap Help again.",
+  "ta-IN": "இந்தத் திரையைப் படிக்க முடியவில்லை. செயலியைத் திறந்து மீண்டும் உதவியை அழுத்துங்கள்.",
+  "te-IN": "ఈ స్క్రీన్ చదవలేకపోతున్నాను. యాప్ తెరిచి మళ్ళీ సహాయం నొక్కండి.",
+  "kn-IN": "ಈ ಪರದೆಯನ್ನು ಓದಲು ಆಗುತ್ತಿಲ್ಲ. ಆ್ಯಪ್ ತೆರೆದು ಮತ್ತೆ ಸಹಾಯ ಒತ್ತಿ.",
+  "ml-IN": "ഈ സ്ക്രീൻ വായിക്കാൻ കഴിയുന്നില്ല. ആപ്പ് തുറന്ന് വീണ്ടും സഹായം അമർത്തുക.",
+};
+
+export function unreadableGuide(req: TurnRequest): Guide {
+  return { ...safeFallback(req), say: req.platform === "ios" ? SORRY[req.language] : UNREADABLE[req.language], status: "cannot_help" };
 }
 
 const SORRY: Record<TurnRequest["language"], string> = {

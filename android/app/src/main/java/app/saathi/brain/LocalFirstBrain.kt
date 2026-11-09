@@ -1,6 +1,7 @@
 package app.saathi.brain
 
 import app.saathi.capture.ScreenText
+import app.saathi.apps.AppCatalog
 import app.saathi.net.Action
 import app.saathi.net.Danger
 import app.saathi.net.Guide
@@ -10,6 +11,7 @@ import app.saathi.net.TurnRequest
 import app.saathi.net.TurnResponse
 import app.saathi.recipes.RecipeBook
 import app.saathi.recipes.RecipeEngine
+import app.saathi.recipes.anyApp
 import app.saathi.safety.ScreenSafety
 import app.saathi.session.Brain
 import kotlinx.coroutines.CancellationException
@@ -37,12 +39,14 @@ class LocalFirstBrain(
     private val log: (String) -> Unit = {},
     /** True if this phone can open a package directly; recipes then open apps themselves. Null: unknown. */
     private val canOpen: ((String) -> Boolean)? = null,
+    private val resolveApp: ((label: String) -> String?)? = null,
+    private val unreadableLine: ((language: String) -> String)? = null,
 ) : Brain {
 
     override suspend fun turn(request: TurnRequest): TurnResponse {
         val start = clock()
         fun local(guide: Guide, source: String): TurnResponse {
-            log("turn ${request.app} via $source: ${guide.expect.ifBlank { guide.label }}")
+            log("turn ${request.app} via $source: ${guide.expect.ifBlank { guide.label }} (${clock() - start}ms)")
             return TurnResponse(guide, mapOf("local" to clock() - start), source)
         }
 
@@ -59,11 +63,31 @@ class LocalFirstBrain(
             )
         }
 
+        if (ScreenText.parse(request.tree).labelled == 0 && request.screenshotB64.isNullOrBlank() && unreadableLine != null) {
+            return local(Guide(
+                say = unreadableLine.invoke(request.language), goal = request.goal,
+                status = Status.CANNOT_HELP, expect = "unreadable screen",
+            ), Source.LOCAL)
+        }
+
         val risky = ScreenSafety.scamCue(request.tree) || ScreenSafety.scamCue(request.utterance.orEmpty())
         if (!risky) {
-            val engine = RecipeEngine(recipes(), canOpen)
-            engine.guide(request)?.let { return local(it, Source.RECIPE) }
-            log("no recipe step: matched ${engine.match(request.utterance ?: request.goal, request.app)?.id ?: "none"} in ${request.app}")
+            val book = recipes()
+            val engine = RecipeEngine(book, canOpen)
+            val namedApps = AppCatalog(request.installedApps).mentioned(request.utterance ?: request.goal)
+            val active = engine.active(request)
+            // "Send a photo in Signal" must not start a WhatsApp/Gallery script just because
+            // it shares the verb. Any-app safety warnings still take precedence.
+            val elsewhere = active != null && request.history.isNotEmpty() && !RecipeEngine.isLauncher(request.app) &&
+                request.app !in active.apps && active.steps.none { request.app in it.apps }
+            val unfamiliarForeground = request.appName.isNotBlank() && !RecipeEngine.isLauncher(request.app) &&
+                book.recipes.none { request.app in it.apps }
+            val preferCurrent = unfamiliarForeground && namedApps.isEmpty() &&
+                (request.utterance != null || request.history.isEmpty()) && active?.apps?.contains("com.android.settings") != true
+            if (active == null || active.anyApp || (!elsewhere && !preferCurrent && namedApps.all { it.packageName in active.apps })) {
+                engine.guide(request)?.let { return local(it, Source.RECIPE) }
+            }
+            log("no recipe step: matched ${active?.id ?: "none"} in ${request.app}")
         } else {
             log("scam cue on screen or in words: straight to the model")
         }
@@ -96,6 +120,13 @@ class LocalFirstBrain(
      */
     private fun checked(g: Guide, language: String): Guide {
         val open = canOpen ?: return g
+        if (g.action == Action.OPEN_APP && !open(g.actionArg)) {
+            val resolved = resolveApp?.invoke(g.label)
+            if (resolved != null && open(resolved)) return g.copy(actionArg = resolved)
+            // The catalogue is available: a missing or ambiguous match is not a reason to
+            // install an app the model guessed. The senior can open the intended app instead.
+            if (resolveApp != null) return findInstead(g, language)
+        }
         return when (g.action) {
             "", Action.SCROLL_DOWN -> g
             Action.OPEN_APP -> when {
@@ -115,7 +146,7 @@ class LocalFirstBrain(
     private fun findInstead(g: Guide, language: String): Guide {
         val line = recipes().common.lines["drawer"]?.get(language)
         val say = if (line != null && g.label.isNotBlank()) line.replace("{app}", g.label) else g.say
-        return g.copy(action = "", actionArg = "", say = say)
+        return g.copy(action = "", actionArg = "", say = say, status = if (g.status == Status.DONE) Status.NEXT_STEP else g.status)
     }
 
     /** The scripted scam warning that fits what was said, ignoring ordinary scripts that might outrank it in this app. */
@@ -125,7 +156,8 @@ class LocalFirstBrain(
 
     internal companion object {
         /** Screens whose answer is safe to reuse: enough text to identify them, and no codes on them. */
-        fun cacheable(req: TurnRequest): Boolean = ScreenKey.informative(req.tree) && !ScreenSafety.sensitive(req.tree)
+        fun cacheable(req: TurnRequest): Boolean = ScreenKey.informative(req.tree) && !ScreenSafety.sensitive(req.tree) &&
+            !AppCatalog(req.installedApps).ambiguousSelection(listOfNotNull(req.utterance, req.goal).joinToString(" "), req.app)
 
         /**
          * Only plain steps are kept. Warnings and sensitive screens are always re-checked, questions

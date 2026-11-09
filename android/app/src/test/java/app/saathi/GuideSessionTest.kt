@@ -42,19 +42,23 @@ class GuideSessionTest {
         val pointed = mutableListOf<Pair<Box?, String>>()
         val replies = ArrayDeque<Guide>()
         var failNext = false
+        var replyDelay = 0L
+        var speechDelay = 0L
         var heard: Heard = Heard.Words("ब्लिंकिट से दूध मंगाना है")
         var finished = false
         var calling = false
         val slowSaid = mutableListOf<String>()
         var tree = "n2 Button \"ADD\" [800,300,1000,380] click"
+        var app = "com.grofers.customerapp"
+        var secure = false
         var looks = 0
 
         val eyes = object : Eyes {
             override suspend fun look(): Snapshot {
                 looks++
                 return Snapshot(
-                    app = "com.grofers.customerapp", screenshotB64 = "jpg", screenW = 1080, screenH = 2400,
-                    tree = tree, boxes = mapOf("n2" to Box(800, 300, 1000, 380)), secure = false,
+                    app = app, screenshotB64 = "jpg", screenW = 1080, screenH = 2400,
+                    tree = tree, boxes = mapOf("n2" to Box(800, 300, 1000, 380)), secure = secure,
                 )
             }
         }
@@ -69,6 +73,7 @@ class GuideSessionTest {
             override suspend fun say(text: String, slow: Boolean) {
                 said += text
                 if (slow) slowSaid += text
+                kotlinx.coroutines.delay(speechDelay)
             }
             override fun stop() {}
         }
@@ -80,6 +85,7 @@ class GuideSessionTest {
         val brain = object : Brain {
             override suspend fun turn(request: TurnRequest): TurnResponse {
                 requests += request
+                kotlinx.coroutines.delay(replyDelay)
                 if (failNext) { failNext = false; throw IOException("down") }
                 return TurnResponse(guide = replies.removeFirst())
             }
@@ -221,9 +227,8 @@ class GuideSessionTest {
         advanceTimeBy(ScreenEvent.CLICK.settleMs + GuideSession.SETTLE_STEP_MS + 1)
         runCurrent()
         assertEquals(2, f.requests.size)
-        // One look for the first turn, then two for the settle check (the screen read the same
-        // twice); that settled look is reused for the turn rather than taken a third time.
-        assertEquals(3, f.looks)
+        // First capture, two settling reads, and a fresh validation before each reply is applied.
+        assertEquals(5, f.looks)
     }
 
     @Test fun `a page that fills in after opening is judged once it has settled`() = runTest {
@@ -278,6 +283,251 @@ class GuideSessionTest {
         advanceTimeBy(ScreenEvent.SCROLLED.settleMs + GuideSession.SETTLE_STEP_MS + 1)
         runCurrent()
         assertEquals(2, f.requests.size)
+    }
+
+    @Test fun `dynamic content changes advance unfamiliar apps without click events`() = runTest {
+        val f = Fakes().apply {
+            app = "example.unfamiliar.app"; tree = fullScreen
+            replies += step("first step"); replies += step("next step")
+        }
+        val s = f.session(this)
+        s.onBubbleTap()
+        runCurrent()
+        f.tree = fullScreen.replace("Item 6", "Loaded result")
+        s.onScreenEvent(ScreenEvent.CONTENT_CHANGED)
+        advanceTimeBy(1200)
+        runCurrent()
+        assertEquals(listOf("first step", "next step"), f.said)
+        assertEquals("example.unfamiliar.app", f.requests.last().app)
+    }
+
+    @Test fun `unchanged content notifications do not ask the model again`() = runTest {
+        val f = Fakes().apply { tree = fullScreen; replies += step("first step") }
+        val s = f.session(this)
+        s.onBubbleTap()
+        runCurrent()
+        repeat(5) {
+            s.onScreenEvent(ScreenEvent.CONTENT_CHANGED)
+            advanceTimeBy(100)
+        }
+        advanceTimeBy(1200)
+        runCurrent()
+        assertEquals(1, f.requests.size)
+        assertEquals(listOf("first step"), f.said)
+    }
+
+    @Test fun `content notifications wait for speech and preserve a typing pause`() = runTest {
+        val f = Fakes().apply {
+            tree = fullScreen; speechDelay = 2000
+            replies += step("finish this instruction"); replies += step("new screen")
+        }
+        val s = f.session(this)
+        s.onBubbleTap()
+        runCurrent()
+        assertEquals(GuideState.SPEAKING, s.state.value)
+        f.tree = fullScreen.replace("Item 6", "Loaded result")
+        s.onScreenEvent(ScreenEvent.CONTENT_CHANGED)
+        advanceTimeBy(1000)
+        runCurrent()
+        assertEquals(1, f.requests.size)
+        assertEquals(GuideState.SPEAKING, s.state.value)
+        advanceTimeBy(4500)
+        runCurrent()
+        assertEquals(listOf("finish this instruction", "new screen"), f.said)
+        s.stop()
+
+        val typing = Fakes().apply { tree = fullScreen; replies += step("type here"); replies += step("search result") }
+        val t = typing.session(this)
+        t.onBubbleTap()
+        runCurrent()
+        t.onScreenEvent(ScreenEvent.TYPED)
+        typing.tree = fullScreen.replace("Item 6", "Search result")
+        advanceTimeBy(1000)
+        t.onScreenEvent(ScreenEvent.CONTENT_CHANGED)
+        advanceTimeBy(1000)
+        runCurrent()
+        assertEquals(1, typing.requests.size)
+        advanceTimeBy(1300)
+        runCurrent()
+        assertEquals(2, typing.requests.size)
+    }
+
+    @Test fun `content notifications during a pending turn do not discard unchanged replies`() = runTest {
+        val f = Fakes().apply { tree = fullScreen; replyDelay = 1500; replies += step("next step") }
+        val s = f.session(this)
+        s.onBubbleTap()
+        runCurrent()
+        repeat(5) {
+            s.onScreenEvent(ScreenEvent.CONTENT_CHANGED)
+            advanceTimeBy(100)
+        }
+        advanceTimeBy(1100)
+        runCurrent()
+        assertEquals(1, f.requests.size)
+        assertEquals(listOf("next step"), f.said)
+    }
+
+    @Test fun `a ticking noninteractive clock does not starve or repeat guidance`() = runTest {
+        val f = Fakes().apply {
+            tree = fullScreen.replace("Item 6", "00:01")
+            replyDelay = 1500
+            replies += step("Press ADD")
+        }
+        val s = f.session(this)
+        s.onBubbleTap()
+        runCurrent()
+        f.tree = f.tree.replace("00:01", "00:02")
+        s.onScreenEvent(ScreenEvent.CONTENT_CHANGED)
+        advanceTimeBy(1600)
+        runCurrent()
+        assertEquals(listOf("Press ADD"), f.said)
+        assertEquals(1, f.requests.size)
+        f.tree = f.tree.replace("00:02", "00:03")
+        s.onScreenEvent(ScreenEvent.CONTENT_CHANGED)
+        advanceTimeBy(1200)
+        runCurrent()
+        assertEquals(1, f.requests.size)
+    }
+
+    @Test fun `pressing Home in the middle of a task ends it instead of reopening the app`() = runTest {
+        val f = Fakes().apply { replies += step("ADD दबाइए"); replies += step("Blinkit खोल रही हूँ") }
+        val s = f.session(this)
+        s.onBubbleTap()
+        runCurrent()
+        assertEquals(GuideState.WATCHING, s.state.value)
+
+        f.app = "com.android.launcher3"
+        f.tree = "n1 TextView \"Blinkit\" [0,0,200,200] click"
+        s.onScreenEvent(ScreenEvent.NAVIGATED)
+        advanceTimeBy(ScreenEvent.NAVIGATED.settleMs + GuideSession.SETTLE_STEP_MS * (GuideSession.SETTLE_TRIES + 1) + 1)
+        runCurrent()
+        assertEquals(1, f.requests.size)
+        assertEquals(GuideState.IDLE, s.state.value)
+        assertEquals("", s.currentGoal)
+    }
+
+    @Test fun `Home during a pending turn drops its pointer and automatic action`() = runTest {
+        for (reply in listOf(
+            step("stale pointer"),
+            Guide(say = "stale launch", action = Action.OPEN_APP, actionArg = "com.whatsapp"),
+        )) {
+            val f = Fakes().apply { replyDelay = 2000; replies += reply }
+            val s = f.session(this)
+            s.onBubbleTap()
+            runCurrent()
+            assertEquals(GuideState.THINKING, s.state.value)
+            f.app = "com.android.launcher3"
+            s.onScreenEvent(ScreenEvent.NAVIGATED)
+            advanceTimeBy(2001)
+            runCurrent()
+            assertTrue(f.pointed.isEmpty())
+            assertTrue(f.said.isEmpty())
+            assertTrue(f.opened.isEmpty())
+            assertEquals(GuideState.IDLE, s.state.value)
+            assertEquals("", s.currentGoal)
+        }
+    }
+
+    @Test fun `a screen change without an event retries with the original request`() = runTest {
+        val f = Fakes().apply {
+            replyDelay = 2000
+            replies += step("stale step")
+            replies += step("fresh step")
+        }
+        val s = f.session(this)
+        s.onBubbleTap()
+        runCurrent()
+        f.tree = f.tree.replace("ADD", "New item")
+        advanceTimeBy(5000)
+        runCurrent()
+        assertEquals(listOf("fresh step"), f.said)
+        assertEquals(2, f.requests.size)
+        assertEquals(f.requests.first().utterance, f.requests.last().utterance)
+        assertTrue(f.requests.last().history.isEmpty())
+        assertEquals("", f.requests.last().goal)
+        assertEquals(f.tree, f.requests.last().tree)
+    }
+
+    @Test fun `a tap while thinking invalidates an answer even when labels stay the same`() = runTest {
+        val f = Fakes().apply {
+            replyDelay = 2000
+            replies += step("stale step")
+            replies += step("fresh step")
+        }
+        val s = f.session(this)
+        s.onBubbleTap()
+        runCurrent()
+        s.onScreenEvent(ScreenEvent.CLICK)
+        advanceTimeBy(5000)
+        runCurrent()
+        assertEquals(listOf("fresh step"), f.said)
+        assertEquals(2, f.requests.size)
+    }
+
+    @Test fun `Home while a stale screen settles also ends the task`() = runTest {
+        val f = Fakes().apply { replyDelay = 1000; replies += step("stale step") }
+        val s = f.session(this)
+        s.onBubbleTap()
+        runCurrent()
+        f.tree = f.tree.replace("ADD", "Loading")
+        advanceTimeBy(1001)
+        runCurrent()
+        f.app = "com.android.launcher3"
+        advanceTimeBy(1000)
+        runCurrent()
+        assertEquals(1, f.requests.size)
+        assertTrue(f.said.isEmpty())
+        assertEquals(GuideState.IDLE, s.state.value)
+    }
+
+    @Test fun `protected replies cannot draw pointers or perform actions on the phone`() = runTest {
+        for (protected in listOf(
+            step("unsafe").copy(danger = Danger.SENSITIVE),
+            step("unsafe").copy(danger = Danger.SCAM),
+            step("unsafe", status = Status.USER_MUST_DO),
+            Guide(say = "unsafe", danger = Danger.SENSITIVE, action = Action.SCROLL_DOWN),
+            Guide(say = "unsafe", status = Status.USER_MUST_DO, action = Action.OPEN_APP, actionArg = "com.whatsapp"),
+        )) {
+            val f = Fakes().apply { replies += protected }
+            val s = f.session(this)
+            s.onBubbleTap()
+            runCurrent()
+            assertNull(f.pointed.single().first)
+            assertEquals(0, f.scrolls)
+            assertTrue(f.opened.isEmpty())
+            s.stop()
+        }
+    }
+
+    @Test fun `a protected flag in either look hands control back without retrying`() = runTest {
+        for (initiallySecure in listOf(true, false)) {
+            val f = Fakes().apply { secure = initiallySecure; replyDelay = 1000; replies += step("unsafe pointer") }
+            val s = f.session(this)
+            s.onBubbleTap()
+            runCurrent()
+            f.secure = !initiallySecure
+            advanceTimeBy(1100)
+            runCurrent()
+            assertEquals(1, f.requests.size)
+            assertEquals(listOf(f.lines.sensitive), f.said)
+            assertNull(f.pointed.single().first)
+            s.stop()
+        }
+    }
+
+    @Test fun `unflagged payment targets are replaced with the local sensitive warning`() = runTest {
+        for (kind in listOf("node", "point")) {
+            val f = Fakes().apply {
+                tree = tree.replace("ADD", "Pay now")
+                replies += step("Press Pay now").copy(targetKind = kind, label = "", x = 0.83, y = 0.14)
+            }
+            val s = f.session(this)
+            s.onBubbleTap()
+            runCurrent()
+            assertNull(f.pointed.single().first)
+            assertEquals(listOf(f.lines.sensitive), f.said)
+            s.stop()
+        }
     }
 
     @Test fun `done resets goal and history`() = runTest {
@@ -494,6 +744,86 @@ class GuideSessionTest {
         s.repeat()
         runCurrent()
         assertEquals(listOf("ADD दबाइए"), f.slowSaid)
+    }
+
+    @Test fun `stopped tasks cannot be repeated`() = runTest {
+        val f = Fakes().apply { replies += step("old task") }
+        val s = f.session(this)
+        s.onBubbleTap()
+        runCurrent()
+        s.stop()
+        s.repeat()
+        runCurrent()
+        assertTrue(f.slowSaid.isEmpty())
+        assertEquals(GuideState.IDLE, s.state.value)
+    }
+
+    @Test fun `repeating a scam warning never resumes the interrupted task`() = runTest {
+        val f = Fakes().apply { replies += step("old task") }
+        val s = f.session(this)
+        s.onBubbleTap()
+        runCurrent()
+        s.warn("Stop, this may be a scam")
+        runCurrent()
+        s.repeat()
+        runCurrent()
+        assertEquals(listOf("Stop, this may be a scam"), f.slowSaid)
+        assertEquals("", s.currentGoal)
+        assertEquals(GuideState.IDLE, s.state.value)
+        s.onScreenEvent(ScreenEvent.CLICK)
+        runCurrent()
+        assertEquals(1, f.requests.size)
+    }
+
+    @Test fun `failed screen capture recovers the session`() = runTest {
+        val f = Fakes()
+        val s = GuideSession(this, object : Eyes {
+            override suspend fun look(): Snapshot = throw IOException("screen unavailable")
+        }, f.ears, f.mouth, f.pointer, f.brain, { "" }, { "hi-IN" }, { f.lines }, { true })
+        s.onBubbleTap()
+        runCurrent()
+        assertEquals(listOf("network"), f.said)
+        assertEquals(GuideState.IDLE, s.state.value)
+    }
+
+    @Test fun `speech playback failure leaves the session idle`() = runTest {
+        val f = Fakes().apply { replies += step("next step") }
+        val failures = mutableListOf<Exception>()
+        val s = GuideSession(this, f.eyes, f.ears, object : Mouth {
+            override suspend fun say(text: String, slow: Boolean): Unit = throw IOException("speaker failed")
+            override fun stop() {}
+        }, f.pointer, f.brain, { "" }, { "hi-IN" }, { f.lines }, { true }, reportFailure = { failures += it })
+        s.onBubbleTap()
+        runCurrent()
+        assertEquals(GuideState.IDLE, s.state.value)
+        assertTrue(failures.isNotEmpty())
+        assertEquals("", s.currentGoal)
+    }
+
+    @Test fun `repeating a question listens for an answer again`() = runTest {
+        val f = Fakes().apply {
+            replies += step("Which milk?", status = Status.NEED_INFO)
+            replies += step("fresh step")
+        }
+        var listens = 0
+        val ears = object : Ears {
+            override suspend fun listen(): Heard {
+                listens++
+                if (listens == 2) kotlinx.coroutines.awaitCancellation()
+                return Heard.Words(if (listens == 1) "order milk" else "Amul")
+            }
+            override fun finish() {}
+        }
+        val s = GuideSession(this, f.eyes, ears, f.mouth, f.pointer, f.brain, { "" }, { "hi-IN" }, { f.lines }, { true })
+        s.onBubbleTap()
+        runCurrent()
+        assertEquals(GuideState.LISTENING, s.state.value)
+        s.repeat()
+        runCurrent()
+        assertEquals(3, listens)
+        assertEquals(listOf("Which milk?"), f.slowSaid)
+        assertEquals("Amul", f.requests.last().utterance)
+        s.stop()
     }
 
     @Test fun `finished steps stay up long enough to read`() {

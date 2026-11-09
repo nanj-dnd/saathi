@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { informative, screenSignature, shareable, sharedKey } from "../src/cache.ts";
+import { informative, readShared, screenSignature, shareable, sharedKey } from "../src/cache.ts";
 import { parseTurnRequest, type Guide } from "../src/schema.ts";
 
 const settings = [
@@ -67,6 +67,21 @@ describe("shared cache keys", () => {
     expect(await sharedKey(turn({ tree: settings + '\nn7 TextView "Your KYC is expiring" [0,0,10,10]' }))).toBeNull();
     expect(await sharedKey(turn({ tree: 'n1 View "" [0,0,1080,2400] click' }))).toBeNull();
   });
+
+  it("keeps the full conversation and app hints in the key", async () => {
+    const history = [
+      { say: "Pick the first contact", label: "", status: "next_step", app: "contacts" },
+      { say: "Continue", label: "Continue", status: "next_step", app: "settings" },
+      { say: "Continue", label: "Continue", status: "next_step", app: "settings" },
+    ];
+    const req = turn({ history });
+    const key = await sharedKey(req);
+    expect(await sharedKey({ ...req, history: [{ ...req.history[0], say: "Pick the second contact" }, ...req.history.slice(1)] })).not.toBe(key);
+    expect(await sharedKey({ ...req, history: req.history.map((h) => ({ ...h, app: "other" })) })).not.toBe(key);
+    expect(await sharedKey({ ...req, playbook: "new app instructions" })).not.toBe(key);
+    expect(await sharedKey({ ...req, app_name: "Different display name" })).not.toBe(key);
+    expect(await sharedKey({ ...req, installed_apps: [{ package: "example.reader", label: "Reader" }] })).not.toBe(key);
+  });
 });
 
 describe("shareable answers", () => {
@@ -79,6 +94,26 @@ describe("shareable answers", () => {
     expect(shareable({ ...step, target_kind: "point", x: 0.5, y: 0.5 })).toBe(false);
     expect(shareable({ ...step, say: "₹1499 वाला ADD दबाइए" })).toBe(false);
     expect(shareable({ ...step, label: "Flat 402, MG Road" })).toBe(false);
+    expect(shareable({ ...step, say: "Select the ₹49 item" })).toBe(false);
+    expect(shareable({ ...step, say: "₹४९ वाला चुनिए" })).toBe(false);
+  });
+});
+
+describe("cached answer validation", () => {
+  const read = (entry: unknown) => readShared({ get: async () => JSON.stringify(entry) } as never, "key", turn());
+
+  it("rejects corrupt, protected and mismatched cached answers", async () => {
+    for (const entry of [
+      null, {}, { ...step, say: 123 }, { ...step, target_kind: "invalid" },
+      { ...step, danger: "sensitive_screen" }, { ...step, status: "need_info" },
+      { ...step, node_id: "n99" }, { ...step, label: "A different button" },
+    ]) expect(await read(entry)).toBeNull();
+  });
+
+  it("revalidates cached actions before returning them", async () => {
+    expect(await read({ ...step, action: "tap", action_arg: "com.whatsapp" })).toMatchObject({
+      target_kind: "node", node_id: "n6", action: "", action_arg: "",
+    });
   });
 });
 
@@ -92,5 +127,11 @@ describe("screen helpers", () => {
     expect(screenSignature('n1 Switch "Wi-Fi" [0,0,100,100] click checked', 1000, 1000)).toBe(
       screenSignature('n1 Switch "Wi-Fi" [0,0,100,100] checked click', 1000, 1000),
     );
+  });
+});
+
+describe("platform cache isolation", () => {
+  it("does not reuse Android replies for an iOS request with otherwise identical context", async () => {
+    expect(await sharedKey(turn({ platform: "ios" }))).not.toBe(await sharedKey(turn()));
   });
 });

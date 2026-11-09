@@ -52,6 +52,82 @@ class TreeSerializerTest {
         assertEquals("Order total 249", TreeSerializer.redactCodes("Order total 249"))
     }
 
+    @Test fun `OTP context masks sibling and individual digit views`() {
+        for (digits in listOf(listOf("482913"), listOf("4", "8", "2", "9", "1", "3"), listOf("४८२९१३"))) {
+            val root = RawNode(bounds = full, children = (digits + "Your OTP").mapIndexed { i, text ->
+                RawNode(text = text, bounds = Box(0, i * 100, 500, i * 100 + 80))
+            })
+            val tree = TreeSerializer.serialize(root, 1080, 2400)
+            for (digit in digits) assertFalse(tree.text.contains("\"$digit\""))
+            assertTrue(tree.text.contains("••••"))
+            assertTrue(tree.omitScreenshot)
+        }
+    }
+
+    @Test fun `privacy checks happen before label truncation and output limits`() {
+        val rows = (0 until TreeSerializer.MAX_NODES).map {
+            RawNode(text = if (it == 0) "482913" else "row", bounds = Box(0, 100, 500, 180))
+        }
+        val root = RawNode(bounds = full, children = rows + RawNode(
+            text = "x".repeat(100) + " OTP", bounds = Box(0, 200, 500, 280),
+        ))
+        val tree = TreeSerializer.serialize(root, 1080, 2400)
+        assertFalse(tree.text.contains("482913"))
+        assertTrue(tree.omitScreenshot)
+    }
+
+    @Test fun `screenshots cannot expose redacted inputs even without sensitive keywords`() {
+        for (field in listOf(
+            RawNode(text = "9876543210", hint = "Mobile number", editable = true, bounds = full),
+            RawNode(text = "private message", desc = "private message", editable = true, bounds = full),
+            RawNode(text = "private child", editable = true, bounds = full, children = listOf(
+                RawNode(text = "private child", bounds = full),
+            )),
+            RawNode(text = "secret", password = true, bounds = full),
+        )) {
+            val tree = TreeSerializer.serialize(RawNode(bounds = full, children = listOf(field)), 1080, 2400)
+            assertTrue(tree.omitScreenshot)
+            assertFalse(tree.text.contains(field.text!!))
+        }
+        val lateField = RawNode(bounds = full, children = List(TreeSerializer.MAX_NODES) {
+            RawNode(text = "row", bounds = full)
+        } + RawNode(text = "private", editable = true, bounds = full))
+        assertTrue(TreeSerializer.serialize(lateField, 1080, 2400).omitScreenshot)
+    }
+
+    @Test fun `ordinary screens keep screenshots and unrelated hidden fields do not block them`() {
+        val tree = TreeSerializer.serialize(RawNode(bounds = full, children = listOf(
+            RawNode(text = "Shopping", bounds = full),
+            RawNode(text = "Order total 249", bounds = full),
+            RawNode(editable = true, visible = false, bounds = full),
+            RawNode(editable = true, bounds = Box(0, 3000, 500, 3080)),
+        )), 1080, 2400)
+        assertFalse(tree.omitScreenshot)
+        assertTrue(tree.text.contains("249"))
+    }
+
+    @Test fun `web views never send a picture before or after their document is ready`() {
+        for (className in listOf("android.webkit.WebView", "org.mozilla.geckoview.GeckoView")) {
+            val loading = RawNode(className = className, clickable = true, bounds = full)
+            val first = TreeSerializer.serialize(loading, 1080, 2400)
+            assertTrue(first.omitScreenshot)
+            assertTrue(first.opaqueWebView)
+            val ready = TreeSerializer.serialize(loading.copy(children = listOf(
+                RawNode(text = "Sample portal", bounds = full),
+                RawNode(text = "PRIVATE-WEB-5678", hint = "Reference", editable = true, bounds = full),
+            )), 1080, 2400)
+            assertTrue(ready.omitScreenshot)
+            assertFalse(ready.opaqueWebView)
+            assertFalse(ready.text.contains("PRIVATE-WEB-5678"))
+            assertTrue(ready.text.contains("Reference"))
+            val noFieldsYet = TreeSerializer.serialize(loading.copy(children = listOf(
+                RawNode(text = "Portal loaded", bounds = full),
+            )), 1080, 2400)
+            assertTrue(noFieldsYet.omitScreenshot) // a field may be painted before its new node
+        }
+        assertFalse(TreeSerializer.serialize(RawNode(className = "android.view.View", bounds = full), 1080, 2400).omitScreenshot)
+    }
+
     @Test fun `clickable containers borrow their children's text`() {
         val root = RawNode(
             bounds = full,

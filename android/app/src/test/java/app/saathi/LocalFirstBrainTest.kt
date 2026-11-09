@@ -8,6 +8,7 @@ import app.saathi.brain.LocalFirstBrain
 import app.saathi.brain.ScreenKey
 import app.saathi.brain.TurnCache
 import app.saathi.net.Action
+import app.saathi.net.AppInfo
 import app.saathi.net.Danger
 import app.saathi.net.Guide
 import app.saathi.net.PastStep
@@ -63,6 +64,8 @@ class LocalFirstBrainTest {
         clock: () -> Long = { 0L },
         books: RecipeBook = RecipeBook.EMPTY,
         canOpen: ((String) -> Boolean)? = null,
+        resolveApp: ((String) -> String?)? = null,
+        unreadableLine: ((String) -> String)? = null,
     ) =
         LocalFirstBrain(
             recipes = { books },
@@ -70,6 +73,8 @@ class LocalFirstBrainTest {
             remote = remote,
             sensitiveLine = { "yourself:$it" },
             canOpen = canOpen,
+            resolveApp = resolveApp,
+            unreadableLine = unreadableLine,
         )
 
     private fun auto(tree: String = blinkitHome, history: List<PastStep> = emptyList()) =
@@ -84,7 +89,7 @@ class LocalFirstBrainTest {
     )
 
     private fun openWhatsApp() = Guide(
-        say = "WhatsApp खोल रही हूँ।", goal = "call on WhatsApp", label = "WhatsApp",
+        say = "WhatsApp खोल रहा हूँ।", goal = "call on WhatsApp", label = "WhatsApp",
         action = Action.OPEN_APP, actionArg = "com.whatsapp",
     )
 
@@ -95,11 +100,81 @@ class LocalFirstBrainTest {
         assertEquals("com.whatsapp", r.guide.actionArg)
     }
 
+    @Test fun `an explicit unfamiliar app is not replaced by a matching recipe for another app`() = runTest {
+        val outlook = AppInfo("com.microsoft.office.outlook", "Outlook")
+        val remote = FakeRemote(Guide(say = "Press New mail", goal = "send mail in Outlook"))
+        val request = req(launcher, app = "com.android.launcher3", utterance = "send an email in Outlook")
+            .copy(installedApps = listOf(outlook))
+        assertEquals("gmail-send", RecipeEngine(book).active(request)?.id)
+        assertEquals(Source.MODEL, brain(remote, books = book).turn(request).source)
+        assertEquals(outlook, remote.calls.single().installedApps.single())
+    }
+
+    @Test fun `a wrong model package is repaired using a unique installed name`() = runTest {
+        val remote = FakeRemote(Guide(say = "Opening Signal", label = "Signal", action = Action.OPEN_APP, actionArg = "com.guessed.signal"))
+        val response = brain(remote, canOpen = { it == "org.thoughtcrime.securesms" },
+            resolveApp = { if (it == "Signal") "org.thoughtcrime.securesms" else null }).turn(modelTurn())
+        assertEquals(Action.OPEN_APP, response.guide.action)
+        assertEquals("org.thoughtcrime.securesms", response.guide.actionArg)
+    }
+
+    @Test fun `ambiguous app selection never reuses a cached launcher instruction`() = runTest {
+        val remote = FakeRemote(addMilk)
+        val b = brain(remote)
+        val request = auto().copy(utterance = "open Reader", installedApps = listOf(
+            AppInfo("example.reader.one", "Reader"), AppInfo("example.reader.two", "Reader"),
+        ))
+        b.turn(request)
+        b.turn(request)
+        assertEquals(2, remote.calls.size)
+    }
+
+    @Test fun `generic requests inside an unfamiliar app stay in that app`() = runTest {
+        val outlook = AppInfo("com.microsoft.office.outlook", "Outlook")
+        val remote = FakeRemote(Guide(say = "Press New mail"))
+        val request = req(launcher, app = outlook.packageName, utterance = "send an email")
+            .copy(appName = outlook.label, installedApps = listOf(outlook))
+        assertEquals("gmail-send", RecipeEngine(book).active(request)?.id)
+        assertEquals(Source.MODEL, brain(remote, books = book).turn(request).source)
+        assertEquals(outlook.packageName, remote.calls.single().app)
+    }
+
+    @Test fun `a task that enters an unscripted share destination continues with the model`() = runTest {
+        val remote = FakeRemote(Guide(say = "Choose a recipient"))
+        val request = req(launcher, app = "org.thoughtcrime.securesms", goal = "send a photo from the gallery",
+            history = listOf(PastStep("Press Share", "Share", Status.NEXT_STEP, "com.google.android.apps.photos")))
+            .copy(appName = "Signal")
+        assertEquals("gallery-share", RecipeEngine(book).active(request)?.id)
+        assertEquals(Source.MODEL, brain(remote, books = book).turn(request).source)
+        assertEquals(request.goal, remote.calls.single().goal)
+    }
+
+    @Test fun `an unknown or ambiguous app never causes an automatic store redirect`() = runTest {
+        val remote = FakeRemote(openWhatsApp().copy(label = "Unknown app", actionArg = "com.guessed.app"))
+        val response = brain(remote, books = book, canOpen = { it == RecipeEngine.PLAY_STORE }, resolveApp = { null }).turn(modelTurn())
+        assertEquals("", response.guide.action)
+        assertEquals("", response.guide.actionArg)
+        assertTrue(response.guide.say.contains("Unknown app"))
+    }
+
+    @Test fun `unreadable screens stop locally while image-only apps reach the model`() = runTest {
+        val remote = FakeRemote(Guide(say = "Press the visible button"))
+        val b = brain(remote, unreadableLine = { "cannot read:$it" })
+        val empty = req("", app = "example.canvas.app")
+        val blocked = b.turn(empty)
+        assertEquals(Source.LOCAL, blocked.source)
+        assertEquals(Status.CANNOT_HELP, blocked.guide.status)
+        assertTrue(remote.calls.isEmpty())
+        assertEquals(Status.CANNOT_HELP, b.turn(empty.copy(tree = "n1 WebView \"\" [0,0,1080,2400] click")).guide.status)
+        assertTrue(remote.calls.isEmpty())
+        assertEquals(Source.MODEL, b.turn(empty.copy(screenshotB64 = "picture")).source)
+    }
+
     @Test fun `an app the model opens but the phone lacks becomes its Play Store page`() = runTest {
         val r = brain(FakeRemote(openWhatsApp()), books = book, canOpen = { it == "com.android.vending" })
             .turn(modelTurn())
         assertEquals(Action.OPEN_STORE_PAGE, r.guide.action)
-        assertEquals("'WhatsApp' अभी इस फ़ोन में नहीं है। Play Store में उसका पेज खोल रही हूँ।", r.guide.say)
+        assertEquals("'WhatsApp' अभी इस फ़ोन में नहीं है। Play Store में उसका पेज खोल रहा हूँ।", r.guide.say)
         assertEquals(RecipeEngine.STORE_GOAL, r.guide.goal)
     }
 
@@ -158,6 +233,21 @@ class LocalFirstBrainTest {
         assertEquals(keys.size, keys.toSet().size)
         // A pixel of layout jitter is the same screen.
         assertEquals(ScreenKey.turnKey(base), ScreenKey.turnKey(base.copy(tree = base.tree.replace("[800,620,1000,700]", "[801,621,1000,700]"))))
+    }
+
+    @Test fun `cached answers distinguish full conversations and app hints`() = runTest {
+        val remote = FakeRemote(addMilk)
+        val b = brain(remote)
+        val older = PastStep("Choose milk", "", Status.NEXT_STEP, "catalogue")
+        val recent = PastStep("Continue", "Continue", Status.NEXT_STEP, "cart")
+        val request = auto(history = listOf(older, recent, recent))
+        b.turn(request)
+        b.turn(request.copy(history = listOf(older.copy(say = "Choose curd"), recent, recent)))
+        b.turn(request.copy(history = listOf(older, recent, recent.copy(app = "other"))))
+        b.turn(request.copy(playbook = "new app instructions"))
+        b.turn(request.copy(installedApps = listOf(AppInfo("example.reader", "Reader"))))
+        b.turn(request.copy(appName = "Different display name"))
+        assertEquals(6, remote.calls.size)
     }
 
     @Test fun `warnings, questions, point targets and sensitive screens are never reused`() = runTest {
