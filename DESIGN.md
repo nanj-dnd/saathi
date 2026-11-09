@@ -1,370 +1,228 @@
 ---
 name: Bob
-description: A pointing-hand buddy for Indian seniors; one blue hand flies to the exact button while a quiet dark caption says the step.
+description: Station signboards for a phone helper. The step is set black on signboard yellow, the things you press are black boards with yellow lettering, and a black hand with a yellow rim lands on the button.
 colors:
-  saathi-blue: "#1F5FE0"
-  saathi-blue-night-line: "#4D8BFF"
-  on-blue: "#FFFFFF"
-  caption-near-black: "#15171C"
-  caption-night: "#22252B"
-  caption-edge-night: "#FFFFFF1F"
-  caption-ink: "#FFFFFF"
-  caption-ink-soft: "#FFFFFFB3"
-  pill-white: "#FFFFFF"
-  pill-quiet: "#FFFFFF29"
-  hand-edge: "#FFFFFF"
-  veil-day: "#00000038"
-  veil-night: "#00000052"
-  ground-day: "#FFFFFF"
-  ground-night: "#0F1114"
-  ink-day: "#101215"
-  ink-night: "#F3F4F6"
-  ink-soft-day: "#5B616B"
-  ink-soft-night: "#A4AAB3"
-  tile-day: "#F2F3F5"
-  tile-night: "#1C1F24"
-  raised-day: "#FFFFFF"
-  raised-night: "#33373F"
-  track-day: "#E3E6EA"
-  track-night: "#2A2E35"
-  done-green: "#1E9E5A"
-  caution-amber: "#F5A524"
-  danger-red: "#E5484D"
+  signboard-yellow: "#FFD200"
+  board-ink: "#121212"
+  paper: "#FFFFFF"
+  icon-yellow: "#FDD202"
+  frame-grey: "#F4F4F4"
+  track-grey: "#D9D9D9"
+  veil: "#00000040"
+  done-green: "#1E8A4C"
+  danger-red: "#D7262E"
 typography:
-  display:
-    fontFamily: "Roboto, Noto Sans Devanagari, Noto Sans Tamil, Noto Sans Telugu, Noto Sans Kannada, Noto Sans Malayalam, sans-serif"
-    fontSize: "32px"
-    fontWeight: 700
-    lineHeight: "38px"
-  headline:
-    fontFamily: "Roboto, Noto Sans Devanagari, Noto Sans Tamil, Noto Sans Telugu, Noto Sans Kannada, Noto Sans Malayalam, sans-serif"
+  sign:
+    fontFamily: "Paytone One (Latin only); other scripts: the phone's sans at 800"
+    fontWeight: 400
+  title:
+    fontFamily: "{typography.sign}"
+    fontSize: "31px"
+    lineHeight: "40px"
+  label-button:
+    fontFamily: "{typography.sign}"
+    fontSize: "21px"
+    lineHeight: 1.4
+  label:
+    fontFamily: "{typography.sign}"
+    fontSize: "19px"
+    lineHeight: 1.4
+  strip-count:
+    fontFamily: "{typography.sign}"
+    fontSize: "16px"
+    letterSpacing: "0.5px"
+  caption-head:
+    fontFamily: "Roboto plus Android's Noto faces"
     fontSize: "24px"
     fontWeight: 700
     lineHeight: 1.3
-  title:
-    fontFamily: "Roboto, Noto Sans Devanagari, Noto Sans Tamil, Noto Sans Telugu, Noto Sans Kannada, Noto Sans Malayalam, sans-serif"
-    fontSize: "24px"
-    fontWeight: 600
-    lineHeight: 1.4
-  body-caption:
-    fontFamily: "Roboto, Noto Sans Devanagari, Noto Sans Tamil, Noto Sans Telugu, Noto Sans Kannada, Noto Sans Malayalam, sans-serif"
+  caption-sub:
+    fontFamily: "Roboto plus Android's Noto faces"
     fontSize: "18px"
-    fontWeight: 400
+    fontWeight: 500
     lineHeight: 1.38
   body:
-    fontFamily: "Roboto, Noto Sans Devanagari, Noto Sans Tamil, Noto Sans Telugu, Noto Sans Kannada, Noto Sans Malayalam, sans-serif"
+    fontFamily: "Roboto plus Android's Noto faces"
     fontSize: "18px"
     fontWeight: 400
     lineHeight: 1.45
-  body-small:
-    fontFamily: "Roboto, Noto Sans Devanagari, Noto Sans Tamil, Noto Sans Telugu, Noto Sans Kannada, Noto Sans Malayalam, sans-serif"
-    fontSize: "16px"
+  language-native:
+    fontFamily: "Roboto plus Android's Noto faces"
+    fontSize: "23px"
+    fontWeight: 600
+  language-english:
+    fontFamily: "Roboto plus Android's Noto faces"
+    fontSize: "15px"
     fontWeight: 400
-    lineHeight: "24px"
-  label-button:
-    fontFamily: "Roboto, Noto Sans Devanagari, Noto Sans Tamil, Noto Sans Telugu, Noto Sans Kannada, Noto Sans Malayalam, sans-serif"
-    fontSize: "20px"
-    fontWeight: 600
-    lineHeight: 1.4
-  label:
-    fontFamily: "Roboto, Noto Sans Devanagari, Noto Sans Tamil, Noto Sans Telugu, Noto Sans Kannada, Noto Sans Malayalam, sans-serif"
-    fontSize: "19px"
-    fontWeight: 600
-    lineHeight: 1.4
-  label-help:
-    fontFamily: "Roboto, Noto Sans Devanagari, Noto Sans Tamil, Noto Sans Telugu, Noto Sans Kannada, Noto Sans Malayalam, sans-serif"
-    fontSize: "19px"
-    fontWeight: 700
-    lineHeight: 1.4
 rounded:
+  board: "8px"
+  help-board: "10px"
+  face: "5px"
   spotlight: "18px"
-  tile: "20px"
-  frame: "24px"
-  card: "28px"
-  pill: "9999px"
 spacing:
-  track: "4px"
-  hair: "6px"
-  sm: "8px"
-  md: "12px"
-  gutter: "14px"
-  lg: "16px"
-  card: "20px"
+  keyline-inset: "5px"
+  keyline: "2px"
+  rivet: "2.4px"
   page: "24px"
-  step-top: "36px"
+  block: "16px"
+  card-pad: "22px"
 components:
-  help-pill:
-    backgroundColor: "{colors.saathi-blue}"
-    textColor: "{colors.on-blue}"
-    typography: "{typography.label-help}"
-    rounded: "{rounded.pill}"
-    padding: "0 22px 0 18px"
-    height: "56px"
-  help-pill-busy:
-    backgroundColor: "{colors.caption-near-black}"
-    textColor: "{colors.caption-ink}"
-    typography: "{typography.label-help}"
-    rounded: "{rounded.pill}"
-    height: "56px"
-  caption-card:
-    backgroundColor: "{colors.caption-near-black}"
-    textColor: "{colors.caption-ink}"
-    typography: "{typography.headline}"
-    rounded: "{rounded.card}"
-    padding: "20px 20px 16px"
-  caption-card-night:
-    backgroundColor: "{colors.caption-night}"
-    textColor: "{colors.caption-ink}"
-    rounded: "{rounded.card}"
-    padding: "20px 20px 16px"
-  pill-repeat:
-    backgroundColor: "{colors.pill-white}"
-    textColor: "{colors.caption-near-black}"
-    typography: "{typography.label}"
-    rounded: "{rounded.pill}"
-    padding: "0 16px"
-    height: "56px"
-  pill-close:
-    backgroundColor: "{colors.pill-quiet}"
-    textColor: "{colors.caption-ink}"
-    typography: "{typography.label}"
-    rounded: "{rounded.pill}"
-    padding: "0 16px"
-    height: "56px"
-  badge-done:
-    backgroundColor: "{colors.done-green}"
-    textColor: "{colors.on-blue}"
-    rounded: "{rounded.pill}"
-    size: "36px"
-  badge-caution:
-    backgroundColor: "{colors.caution-amber}"
-    textColor: "{colors.caption-near-black}"
-    rounded: "{rounded.pill}"
-    size: "36px"
-  badge-danger:
-    backgroundColor: "{colors.danger-red}"
-    textColor: "{colors.on-blue}"
-    rounded: "{rounded.pill}"
-    size: "36px"
-  primary-pill:
-    backgroundColor: "{colors.saathi-blue}"
-    textColor: "{colors.on-blue}"
+  strip:
+    backgroundColor: "{colors.signboard-yellow}"
+    textColor: "{colors.board-ink}"
+    rounded: "{rounded.board}"
+    height: "68px"
+  primary-board:
+    backgroundColor: "{colors.board-ink}"
+    textColor: "{colors.signboard-yellow}"
     typography: "{typography.label-button}"
-    rounded: "{rounded.pill}"
-    padding: "14px 24px"
+    rounded: "{rounded.board}"
+    height: "64px"
+  quiet-board:
+    backgroundColor: "{colors.paper}"
+    textColor: "{colors.board-ink}"
+    rounded: "{rounded.board}"
     height: "60px"
-  quiet-button:
-    backgroundColor: "{colors.tile-day}"
-    textColor: "{colors.ink-day}"
-    typography: "{typography.label}"
-    rounded: "{rounded.pill}"
-    padding: "12px 20px"
+  language-row:
+    backgroundColor: "{colors.paper}"
+    textColor: "{colors.board-ink}"
+    height: "64px"
+  language-row-selected:
+    backgroundColor: "{colors.board-ink}"
+    textColor: "{colors.signboard-yellow}"
+  section-label:
+    backgroundColor: "{colors.board-ink}"
+    textColor: "{colors.signboard-yellow}"
+  caption-board:
+    backgroundColor: "{colors.signboard-yellow}"
+    textColor: "{colors.board-ink}"
+    rounded: "{rounded.board}"
+    padding: "22px 22px 20px"
+  repeat-board:
+    backgroundColor: "{colors.board-ink}"
+    textColor: "{colors.signboard-yellow}"
     height: "56px"
-  text-action:
-    textColor: "{colors.saathi-blue}"
-    rounded: "{rounded.pill}"
-    padding: "8px 12px"
-    height: "48px"
-  language-tile:
-    backgroundColor: "{colors.tile-day}"
-    textColor: "{colors.ink-day}"
-    typography: "{typography.title}"
-    rounded: "{rounded.tile}"
-    padding: "12px 18px"
-    height: "76px"
-  language-tile-selected:
-    backgroundColor: "{colors.saathi-blue}"
-    textColor: "{colors.on-blue}"
-    typography: "{typography.title}"
-    rounded: "{rounded.tile}"
-    padding: "12px 18px"
-    height: "76px"
-  segmented-track:
-    backgroundColor: "{colors.tile-day}"
-    rounded: "{rounded.pill}"
-    padding: "4px"
-  segmented-selected:
-    backgroundColor: "{colors.raised-day}"
-    textColor: "{colors.ink-day}"
-    typography: "{typography.label}"
-    rounded: "{rounded.pill}"
+  close-board:
+    backgroundColor: "{colors.paper}"
+    textColor: "{colors.board-ink}"
     height: "56px"
-  progress-segment:
-    backgroundColor: "{colors.track-day}"
-    rounded: "{rounded.pill}"
-    height: "6px"
-  progress-segment-reached:
-    backgroundColor: "{colors.saathi-blue}"
-    rounded: "{rounded.pill}"
-    height: "6px"
+  help-board:
+    backgroundColor: "{colors.signboard-yellow}"
+    textColor: "{colors.board-ink}"
+    rounded: "{rounded.board}"
+    size: "68px"
 ---
 
 # Design System: Bob
 
 ## Overview
 
-**Creative North Star: "The Pointing Hand"**
+**Creative North Star: "The Platform Board"**
 
-Bob is a pointer and a voice, not a signboard. Over any app, one blue pointing hand flies on an upward arc from the Help pill and lands with its fingertip inside the exact button, then taps it with a ripple; the app is only lightly dimmed and the target sits in a soft rounded spotlight with a faint blue halo. A near-black caption card floats above it all and says the step in white system sans: the first sentence large and bold, the rest smaller at 70% white. Everything the senior might press is a full pill.
+Bob talks like a station signboard: the step in your own script, black on signboard yellow, telling you exactly where to press next. Every board is a flat rectangle with slightly rounded corners, a 2dp black keyline set 5dp in from its edge, and a small rivet in each corner. Things you press are black boards with yellow lettering. Over another app, a black hand with a thick yellow rim flies to the button and taps it inside a spotlight ringed in yellow and keylined in black. The face of the product is a clay mark: two black dot eyes and a tick for a smile on yellow.
 
-The system is clean, modern and calm. Blue is spent only where to press (the hand, the spotlight halo and its tap ripple) and on what can be pressed (the Help pill, the primary pill, a selected tile). The caption is pure contrast, white on near-black, with no grey panels and no borders by day. Setup is the same world on a white ground: one step per screen, five progress segments, a big title, soft grey tiles and one pinned blue pill at the bottom.
+There is **one theme**. Setup and the overlay look the same whatever the phone's dark-mode setting (the user's instruction, 2026-11-09): setup is a white page under a yellow strip, and the overlay's yellow and black read on light and dark apps alike.
 
-The build explicitly refuses the instructional-UI vocabulary of the superseded world: bordered signboards, edge bands and boxy outline buttons.
+This world replaced the blue Clicky-style minimal look on 2026-11-09 (direction seed cc8f7b37, the Platform Board card). It refuses the soft grey-tile Material helper it replaced: no grey text, no pastel tiles, no pill-shaped everything.
 
-Bob's spoken voice is the calm male ElevenLabs Eric (`cjVigY5qzO86Huf0OWal`), using `eleven_v3_conversational` across all six app languages. Speech is cached on the Worker and phone, with native Android speech fallback; recognition stays on Android.
+Bob speaks every language Eleven v3 speaks (85, in `shared/languages.json`), in the calm male ElevenLabs Eric voice; the picker lists India first and then the world.
 
-**Key Characteristics:**
-- The logo is an unmistakable lowercase b: white on Bob Blue, with a tall stem and one clear open counter. The background is flat, with no gradient. Independently authored vector geometry in `branding/bob-mark.svg` supplies the setup mark, adaptive launcher and monochrome themed icon; no font dependency or generated raster ships as the mark.
-- One blue pointing hand (48dp, white edge, soft shadow) is the system's in-use mark: pointer and Help pill glyph.
-- Light veil (22% black by day, 32% at night) with a rounded spotlight; the app stays readable.
-- Near-black floating caption card, two type sizes ranked by weight and opacity.
-- Every action is a full pill; containers are softly rounded rectangles (18 to 28dp).
-- State reads by badge shape (tick, lock, warning) and word, never colour alone.
-- The phone's own sans (Roboto plus Android's Noto Indic faces), with explicit line heights for Indic scripts.
+**Key characteristics:**
+- Signboard yellow and board black carry everything; white is the page.
+- Text is full ink or full yellow, never grey. Rank comes from size and weight.
+- State reads by fill and shape as well as colour: a chosen row floods black and carries a drawn tick; badges are a tick, a lock or a warning triangle.
+- The word itself is the control. A language row is just the language's name, set large in its own script.
+- Steps change as whole pages with a short slide; nothing sits half-scrolled between steps.
+- Latin board lettering is Paytone One. Every other script uses the phone's own face at extra-bold, so Hindi, Arabic or Thai boards are never thin.
 
 ## Colors
 
-One saturated blue on a near-black and white base, with three badge colours that only ever appear as round fills behind a glyph.
+Two inks and a page.
 
-### Primary
-- **Bob Blue** (#1F5FE0): the hand, the Help pill, the primary pill, the selected language tile, reached progress segments, the setup wordmark disc and the launcher background. The same fill in light and dark.
-- **Night Line Blue** (#4D8BFF): blue as a line or text on a dark ground at night (spotlight halo and hairline, listening pulse, segmented tick, text actions). By day the line colour is Bob Blue itself.
-
-### Neutral
-- **Caption Near-Black** (#15171C): the caption card by day, the Help pill while listening or looking, and the ink on white pills and on the amber badge.
-- **Caption Night** (#22252B): the caption card at night, lifted off dark apps by a 1dp hairline (#FFFFFF at 12%).
-- **Caption Ink** (#FFFFFF) and **Caption Ink Soft** (white at 70%): the caption's first sentence and the rest.
-- **Pill White** (#FFFFFF) and **Pill Quiet** (white at 16%): Repeat and Close inside the card.
-- **Hand Edge** (#FFFFFF): the white rim around the hand and the Help pill that keeps them visible on any app colour.
-- **Veil** (black at 22% by day, 32% at night): the dim over everything except the spotlight.
-- **Setup ground, ink and tiles**: white ground (#FFFFFF / night #0F1114), ink (#101215 / #F3F4F6), soft ink for body copy (#5B616B / #A4AAB3), tiles and quiet buttons (#F2F3F5 / #1C1F24), the raised segment (#FFFFFF / #33373F), the unreached progress track (#E3E6EA / #2A2E35).
-
-### Status (badge fills only)
-- **Done Green** (#1E9E5A) with a white tick.
-- **Caution Amber** (#F5A524) with a near-black lock: steps the senior must do alone (PIN, OTP, payment).
-- **Danger Red** (#E5484D) with a white knocked-out warning triangle: scam warnings.
+- **Signboard Yellow** (#FFD200): the setup strip, the caption board, lettering on black boards, the hand's rim, the Help board (Bob's face on yellow), the spotlight halo.
+- **Board Ink** (#121212): every word on white or yellow, the black boards (primary, Repeat, section labels), the chosen language row, keylines and rivets, the hand itself.
+- **Paper** (#FFFFFF): the setup page, the Close board, the language list.
+- **Icon Yellow** (#FDD202): the launcher and in-app mark's ground, sampled from the clay render so the adaptive layers meet without a seam.
+- **Frame Grey** (#F4F4F4) and **Track Grey** (#D9D9D9): the panel that stages the Help board in setup, and unreached progress bars. Never text.
+- **Veil** (black at 25%): the dim over an app outside the spotlight.
+- **Done Green** (#1E8A4C) and **Danger Red** (#D7262E): badge fills only, always with a white glyph. "Yours alone" (PIN, OTP, payment) is a black badge with a yellow lock, because amber would vanish on the yellow board.
 
 ### Named Rules
-**The Press-Here Rule.** Outside the approved logo treatment, blue marks only where to press or what can be pressed. Body copy, headings, cards and decoration are never blue.
+**The Two Inks Rule.** Black and yellow do all the talking. Nothing that can be read is grey.
 
-**The Pure Contrast Rule.** The caption is white on near-black. No grey panels, tinted cards or coloured caption backgrounds; rank is carried by size, weight and the 70% white of the second line.
-
-**The Shape-Not-Hue Rule.** Every state carries a glyph or word as well as a colour: tick, lock, warning triangle, voice bars, spinning arc, the tick inside a selected tile or segment.
+**The Press-Here Rule.** Black boards are for pressing. Yellow on white marks the strip and the caption, never a button.
 
 ## Typography
 
-**Display Font:** Roboto (system default sans)
-**Body Font:** Roboto, with Android's Noto Sans Devanagari, Tamil, Telugu, Kannada and Malayalam shaping each script
-**Label/Mono Font:** none distinct
+**Board lettering:** Paytone One (OFL, `android/app/src/main/res/font/paytone_one.ttf`), chosen by measuring the approved comp's headline. It covers Latin only; `SaathiType.signFor` and the setup screen's `signFamily` switch any non-Latin text to the phone's sans at weight 800.
 
-**Character:** The phone's own voice, plain and familiar, so a mixed line like "'Display & touch' पर दबाइए" sets as one sentence. Hierarchy comes from weight (400 / 600 / 700) and size, not from a display face.
+**Captions and body:** the phone's own sans (Roboto plus Android's Noto faces), so a mixed line like "नीचे 'Alarm' पर दबाइए" sets as one sentence.
 
 ### Hierarchy
-- **Display** (700, 32sp, 38sp line): setup step titles, one per screen.
-- **Headline** (700, 24sp, 1.3 line height): the caption's first sentence; scales with system font size up to 1.3x.
-- **Title** (600, 24sp): language names in their own script on the language tiles.
-- **Body Caption** (400, 18sp, 1.38 line height, 70% white): the rest of the caption beneath the headline, 6dp below it.
-- **Body** (400, 18sp, 1.45 line height, soft ink): setup explanations. The access disclosure uses **Body Small** (400, 16sp, 24sp line).
-- **Label Button** (600, 20sp): the pinned primary pill.
-- **Label** (600, 19sp): Repeat, Close, quiet buttons, segment labels (700 when selected), confirmation rows.
-- **Label Help** (700, 19sp): the Help pill's word; shrinks in 0.5sp steps to fit a 240dp pill, never below 15sp.
+- **Title** (sign, 31sp, 40sp line): one per setup step.
+- **Label Button** (sign, 21sp): primary boards. **Label** (sign, 19sp): Repeat, Close, quiet boards, segments, Help.
+- **Strip count** (sign, 16sp): "STEP 1 OF 5", localised.
+- **Caption head** (700, 24sp) and **caption sub** (500, 18sp), both full black; the split is at the first sentence end. Both scale with the system font up to 1.3x.
+- **Language native** (600, 23sp) above **language English** (400, 15sp) when the two differ.
+- **Body** (400, 18sp, full ink).
 
 ### Named Rules
-**The Two Sizes Rule.** A caption uses exactly two sizes: the first sentence large and bold, everything after it small and regular. The split happens at the first `.`, `!`, `?` or `।`.
-
-**The Indic Line Rule.** Line heights are always explicit (about 1.3 to 1.45x) with trimming off, so Devanagari matras and Dravidian vowel signs are never clipped and a two-line instruction never falls apart into two lines. Pill words shrink to fit (to 13sp) rather than truncate.
+**The Indic Line Rule.** Line heights are explicit (1.3 to 1.45x) with trimming off, so matras and vowel signs are never clipped.
 
 ## Layout
 
-Overlay: three windows over the app. The caption spans the screen width with a 14dp margin around the card, sits just below the status bar by default, and moves to the bottom (above the navigation bar or an open keyboard) only when it would cover the target. The Help pill is side-anchored: it starts on the right at 62% of screen height, snaps to the nearer edge after a drag, keeps its outer edge on the screen edge as its word changes width, and slides to the opposite side (or above/below a full-width target) whenever it comes within 24dp of the target. The spotlight pads the target by 6dp, grows small targets to at least 56dp, and stays 12dp in from screen edges. On a wide row the hand lands at 78% of the row's width, past the label and short of a trailing switch; near the right or bottom edge it mirrors.
+Setup: a yellow strip (12dp in from the sides, at least 68dp tall) holds the 46dp face, "bob" and the step count. Five progress bars (6dp, black up to the current step) sit under it, then one scrolling column with 24dp margins and 16dp between blocks. A "Back" text action and the 64dp primary board are pinned at the bottom. The language step is a 60dp search field, then up to three keylined lists (On this phone, India, World), each topped by a black section label.
 
-Setup: one step per screen in a single column with 24dp side margins. A 64dp top bar (wordmark on the first step, a 48dp back target after), five progress segments (6dp tall, 6dp gaps), then content starting 36dp below with 16dp between blocks. The primary pill is pinned at the bottom (8dp above, 16dp below). The language grid is two columns with 12dp gaps. Steps change with a short horizontal slide of a sixth of the width plus fade (320ms in, 220ms out).
+Overlay: the caption board spans the screen width with 14dp around it, under the status bar unless it would cover the target. The Help board sits on a side edge and moves off the target. The spotlight pads the target by 6dp, grows small targets to 56dp and stays 12dp in from the screen edges.
 
-Touch targets are at least 56dp for every overlay control and setup button (60dp for the primary pill, 48dp minimum for text actions and back).
+Right-to-left languages (Arabic, Urdu, Persian, Hebrew, Pashto, Sindhi) mirror the whole of setup and the caption board.
+
+Touch targets: 64dp primary board, 60dp rows, segments and quiet boards, 56dp overlay controls, 48dp text actions.
 
 ## Elevation & Depth
 
-Soft, ambient shadows on the few things that float over someone else's app, plus a dim-and-spotlight that pushes the app back. Setup is flat apart from the raised segment and the illustrative pills.
-
-### Shadow Vocabulary
-- **Hand lift** (blur 6dp, y 2dp, black at 35%): under the hand's white edge.
-- **Help pill lift** (blur 8dp, y 3dp, black at 25%): under the Help pill, overlay and setup alike.
-- **Caption float** (Android elevation 10dp): the caption card.
-- **Spotlight halo** (18dp outer blur in the line blue at about 78%, plus a 1dp hairline at about 59%): the target's edge.
-- **Raised segment** (elevation 2dp): the selected half of the segmented control.
-
-### Named Rules
-**The Light Veil Rule.** The app underneath is dimmed, never blacked out (22% by day, 32% at night), so the senior still recognises their own screen.
+Flat boards. Depth only where something floats over someone else's app: the caption board (elevation 10dp, cast from the board's own outline), the Help board (8dp blur, 3dp drop), the hand (6dp blur under its yellow rim), the primary board (3dp). The spotlight halo is an 18dp yellow outer blur plus a 2dp black keyline.
 
 ## Shapes
 
-Round and soft. Every pressable control is a full pill (Help, Repeat, Close, primary, quiet, segments, progress). Containers are generously rounded rectangles: the caption card at 28dp, illustrative frames at 24dp, tiles and notices at 20dp, the spotlight at 18dp. Badges and the wordmark disc are circles. Icons are drawn on a 24-unit grid with one 2.4-unit rounded stroke (round caps and joins); the hand is a filled silhouette of rounded shapes (index finger up, three folded fingers, palm, thumb). White edges exist only where something must separate from an unknown background: the hand's rim, the Help pill's 1.5dp rim, the night caption hairline.
+Boards are 8dp rectangles, the Help board included. The spotlight is 18dp. Badges and rivets are circles. Glyphs keep their 24-unit grid and 2.4-unit round stroke. The hand is a filled silhouette.
 
 ## Components
 
-### Bob Logo
-The product label is **Bob**; the mark is lowercase **b**.
-- **Geometry:** reuse the authored path in `branding/bob-mark.svg`: tall left stem, rounded lower bowl and one clear open counter. Never substitute a typed glyph.
-- **Treatment:** white mark on flat Bob Blue in the setup disc and launcher; the standalone master is blue on transparent. Setup uses a 34dp disc with a 24dp mark, a 10dp gap and the 21sp bold Bob label.
-- **Variants:** setup `logo_mark.xml`, adaptive `ic_launcher_foreground.xml` and themed `ic_launcher_monochrome.xml` share the same path. The launcher uses a solid background; the monochrome layer is tinted by Android.
-- **Provenance:** `branding/bob-logo-concept.png` is a critique reference only. Its exact prompt is embedded and preserved in `branding/bob-logo.prompt.txt`; production vectors are independently authored.
+### Bob Mark
+A clay face: two round black eyes and a black tick for a smile, slightly 3D, on yellow. The source is `branding/bob-clay-face-source.png` (Figma AI render); `branding/make_face.py` recomposes it with the user's adjustments (eyes 400px apart, smile at 70%, lower and to the right) and writes the launcher foreground, the in-app mark (`res/drawable-nodpi/bob_mark.png`) and `branding/bob-icon-1024.png`. Every one carries its provenance in the file. The themed icon is a flat vector of the same face (`branding/bob-face.svg`, `ic_launcher_monochrome.xml`).
 
-### Help Pill (signature)
-The senior's way in: a blue pill carrying the hand glyph and the word "Help".
-- **Shape:** full pill, 56dp tall, 18dp start / 22dp end padding, 24dp glyph with 8dp gap, 240dp maximum width.
-- **Idle:** Bob Blue fill, white glyph and word, 1.5dp white rim (black at 40% at night), soft lift shadow.
-- **Listening:** near-black fill, four white voice bars rising and falling out of step, two soft line-blue halos breathing outward; a haptic tap when the mic opens.
-- **Looking:** near-black fill, a line-blue arc spinning on a faint white ring.
-- **Behaviour:** draggable, snaps to the nearer edge, reported to TalkBack as a button.
+### Strip (setup)
+Yellow board with keyline and rivets: mark, "bob" in Paytone One, step count at the far end.
 
-### Pointing Hand and Spotlight (signature)
-The one signature motion. The hand (48dp, blue, white edge, soft shadow) flies on a quadratic arc that bows upward by 22% of its length, 720ms on Material's emphasized curve (0.3, 0, 0.1, 1), trailing 14 fading line-blue dots; it lands with its fingertip inside the target and then taps it every 1.5s: the finger dips 3dp and shrinks 6% while a line-blue ring spreads 24dp from the fingertip and fades. When Bob scrolls or opens an app itself, the caption says so in one short line and no hand is shown. The spotlight morphs from the previous target to the next during the flight; a first step fades the veil in over the first half. With "Remove animations" on, everything cuts instantly.
+### Language Picker
+Search field (white board, black keyline, drawn magnifier) matching native name, English name or tag. Sections: the phone's language when Bob offers it, India, World. Each row shows the language in its own script with its English name under it; the chosen row floods black with yellow type and a drawn yellow tick.
 
-### Caption Card
-- **Corner Style:** 28dp radius.
-- **Background:** Caption Near-Black (Caption Night plus hairline after dark).
-- **Shadow Strategy:** caption float (10dp elevation).
-- **Internal Padding:** 20dp sides and top, 16dp bottom; buttons 18dp below the text, 14dp apart.
-- **Content:** headline plus soft second line, each up to four lines; a 36dp badge leads the text (14dp gap), centred on the first line, for done, do-it-yourself and warning captions. TalkBack reads the whole caption as one announcement.
+### Primary, Quiet and Text actions
+Primary: black board, yellow lettering, rivets. Quiet: white board, black keyline on the edge, black lettering. Text action: black, underlined.
 
-### Buttons
-- **Shape:** full pill everywhere.
-- **Repeat (in caption):** white fill, near-black word and drawn repeat glyph (22dp, 8dp gap), 56dp tall.
-- **Close (in caption):** white at 16% on the card, white word and drawn close glyph.
-- **Primary (setup):** Bob Blue, white 20sp semibold word, 60dp minimum, full width, pinned at the bottom; exactly one per step.
-- **Quiet (setup):** tile grey fill, ink word with an optional 22dp glyph, 56dp, full width.
-- **Text action:** line-blue 18sp semibold word, no fill, offset 12dp left so the word aligns with the column while its padding holds overhanging matras.
+### Help Board (overlay signature)
+Bob himself: a 68dp square yellow board with the keyline and rivets, and the clay face sitting small in the middle (12dp in from each side, 1.5dp low; 44dp in the setup preview), clear of the keyline and rivets, with no word. Listening swaps the face for black voice bars with a soft black pulse; looking, for a black spinning arc. TalkBack still hears "Help", "Listening" or "Looking". Everything Bob says or shows calls the board "Bob" ("Press Bob and speak again"; setup's Ready step: "press the yellow Bob board"), never "Help", since no word is drawn on it. The setup screens never show the floating board over themselves. Keyline and rivets are drawn over the face so the image never hides them.
 
-### Chips / Selection
-- **Language tiles:** two-column grid, 76dp minimum, 20dp radius, tile grey with the name in its own script; selected becomes Bob Blue with a white 26dp disc holding a blue tick.
-- **Segmented control:** tile-grey pill track with 4dp inset; the selected half is a raised white pill with a line-blue tick and bold ink word, the other half medium soft ink.
+### Caption Board
+Yellow board, keyline and rivets. Step large, the rest smaller, both black. Repeat is a black board with yellow lettering; Close is a white board with a black keyline. A badge (tick, lock, warning) leads the text when the caption is more than a step.
 
-### Navigation
-- **Progress:** five pill segments, 6dp tall; blue up to and including the current step, track grey after.
-- **Back:** a drawn chevron (26dp) in a 48dp target; system back steps back too.
-
-### Status Rows
-- **Badge:** 36dp circle in the caption, glyph at 60% of its width.
-- **Done row (setup):** 30dp green disc with white tick, 19sp semibold ink label.
-- **Notice (setup):** amber at 16% on a 20dp-radius block, 18dp padding, warning glyph plus 17sp ink text.
+### Pointing Hand and Spotlight (overlay signature)
+A black hand with a 3dp yellow rim flies on an arc from the Help board and taps the target with a black ripple; the trail is black dots.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** keep blue for where to press and what can be pressed: hand, spotlight halo, Help pill, primary pill, selected tile.
-- **Do** float the caption at the top below the status bar, and move it to the bottom only when it would cover the target.
-- **Do** keep the Help pill against a screen edge and move it to the other side when it comes within 24dp of the target.
-- **Do** split every caption into a large bold first sentence and a smaller 70%-white remainder.
-- **Do** make every pressable control a full pill at least 56dp tall.
-- **Do** pair every state colour with a drawn glyph or word (tick, lock, warning, voice bars, arc).
-- **Do** draw icons from the shared 24-unit glyph set with its one rounded stroke; never mix in an icon font.
-- **Do** set explicit line heights for Indic scripts and shrink pill words to fit instead of truncating.
-- **Do** honour "Remove animations": the hand's flight, tap and pulses become instant cuts.
+- Set every readable word in full black or full yellow.
+- Give non-Latin board text the phone's face at extra-bold.
+- Keep the keyline, the rivets and the 8dp corners on every board.
+- Test right-to-left languages whenever setup or the caption changes.
 
 ### Don't:
-- **Don't** build bordered signboards, edge bands or boxy outline buttons; the caption is a borderless floating card.
-- **Don't** put grey panels, tints or colour inside the caption card; it stays white on near-black.
-- **Don't** dim the app heavily; the veil stays at 22% by day and 32% at night.
-- **Don't** let the hand or the Help pill sit over the next row or the target; the tip rests inside the target.
-- **Don't** use colour alone for any state, selection or warning.
-- **Don't** put more than one primary pill on a setup step.
+- Bring back a dark theme, grey body text or pill-shaped buttons.
+- Use yellow for a button on white, or blue anywhere.
+- Put a coloured bar on the side of a row or card.
+
+## iPhone trial
+
+The shelved iPhone trial (`ios/`) predates this world and still uses the blue lowercase b. It is not maintained.

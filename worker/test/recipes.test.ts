@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { buildBundle } from "../scripts/bundle-recipes.ts";
 import bundle from "../src/recipe-bundle.json";
-import { LANGUAGES } from "../src/schema.ts";
+import { RECIPE_LANGUAGES } from "../src/schema.ts";
 
 // The full behaviour of recipes is tested on the phone side (android RecipeEngineTest), which
 // runs them. Here: the bundle the Worker serves is current and every recipe is complete.
 
-const langs = Object.keys(LANGUAGES);
+const langs: string[] = [...RECIPE_LANGUAGES];
 
 describe("recipe bundle", () => {
   it("matches shared/recipes (run `npm run recipes` after editing a recipe)", () => {

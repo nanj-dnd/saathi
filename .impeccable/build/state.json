@@ -1,53 +1,71 @@
 {
   "tool": "build-phase",
   "version": 2,
-  "startedAt": "2026-10-18T14:33:10.764Z",
-  "comp": ".impeccable/mocks/clicky-1-pointer.png",
-  "direction": null,
-  "breakpoint": "768x1792",
+  "startedAt": "2026-11-09T12:21:34.039Z",
+  "comp": ".impeccable/mocks/board-4-setup-language-world.png",
+  "direction": "cc8f7b37",
+  "breakpoint": "864x1536",
   "artifact": null,
-  "phase": "spec",
+  "phase": "hero",
   "phases": {
     "comps": {
-      "status": "skipped",
-      "openedAt": null,
-      "closedAt": null,
-      "attempts": 0,
-      "notes": [
-        {
-          "at": "2026-10-18T14:33:10.764Z",
-          "text": "started with an approved comp; the comp round happened before this state (surface round or manual)"
-        }
-      ],
-      "gate": null,
+      "status": "closed",
+      "openedAt": "2026-11-09T12:21:34.039Z",
+      "closedAt": "2026-11-09T12:30:04.783Z",
+      "attempts": 2,
+      "notes": [],
+      "gate": {
+        "ok": true,
+        "reasons": [],
+        "summary": "4 comps, 1 approved",
+        "approved": ".impeccable/mocks/board-4-setup-language-world.png",
+        "at": "2026-11-09T12:30:04.783Z"
+      },
       "forced": null
     },
     "spec": {
-      "status": "open",
-      "openedAt": "2026-10-18T14:33:10.764Z",
-      "closedAt": null,
-      "attempts": 0,
+      "status": "closed",
+      "openedAt": "2026-11-09T12:30:04.793Z",
+      "closedAt": "2026-11-09T12:32:03.451Z",
+      "attempts": 2,
       "notes": [],
-      "gate": null,
+      "gate": {
+        "ok": true,
+        "reasons": [],
+        "summary": "13 regions, 1 plates, 3 text regions measured",
+        "at": "2026-11-09T12:32:03.451Z"
+      },
       "forced": null
     },
     "plates": {
-      "status": "pending",
-      "openedAt": null,
-      "closedAt": null,
-      "attempts": 0,
+      "status": "closed",
+      "openedAt": "2026-11-09T12:32:03.451Z",
+      "closedAt": "2026-11-09T12:32:15.807Z",
+      "attempts": 1,
       "notes": [],
-      "gate": null,
+      "gate": {
+        "ok": true,
+        "reasons": [],
+        "summary": "1/1 plates",
+        "at": "2026-11-09T12:32:15.807Z"
+      },
       "forced": null
     },
     "hero": {
-      "status": "pending",
-      "openedAt": null,
+      "status": "open",
+      "openedAt": "2026-11-09T12:32:15.807Z",
       "closedAt": null,
       "attempts": 0,
       "notes": [],
-      "gate": null,
-      "forced": null
+      "gate": {
+        "ok": false,
+        "reasons": [
+          "plate assets/plates/mark.png (region mark) is not referenced by any source file this scan can see: the page draws that region in code while the produced plate sits unused. Place the plate (an <img>, a background-image, or an inlined data URI named for it) and recapture. If the plate IS referenced from a file the scan missed (your page is not index.html, or the reference lives in a stylesheet outside the project walk), re-run with --artifact <your page>: its linked stylesheets are followed exactly."
+        ],
+        "at": "2026-11-09T13:09:42.830Z"
+      },
+      "forced": null,
+      "records": 1
     },
     "sections": {
       "status": "pending",
@@ -86,5 +104,12 @@
       "forced": null
     }
   },
-  "finish": null
+  "finish": null,
+  "plates": {
+    "mark": {
+      "status": "ok",
+      "score": 0.794,
+      "size": "384x384"
+    }
+  }
 }

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-09T00:00:00+05:30",
+  "generatedAt": "2026-11-09T11:06:09.385395+00:00",
   "title": "Design System: Bob",
   "extensions": {
     "colorMeta": {
@@ -527,7 +527,40 @@
         "purpose": "With the system's Remove animations setting, flight, nod and pulses do not animate."
       }
     ],
-    "breakpoints": []
+    "breakpoints": [],
+    "nativePlatforms": {
+      "ios-trial": {
+        "scope": "iPhone-only portrait iOS 17+ technical trial; Android frontmatter tokens and existing component previews remain unchanged.",
+        "sources": [
+          "ios/Bob/BobApp.swift",
+          "ios/Bob/ContentView.swift",
+          "ios/scripts/make-icons.swift"
+        ],
+        "colorBindings": {
+          "tint": "{colors.saathi-blue}",
+          "prominentActionForeground": "{colors.on-blue}",
+          "groupedGround": "SwiftUI Form system grouped background, appearance-resolved",
+          "rowSurface": "SwiftUI Form native row background, appearance-resolved",
+          "readableText": "Explicit Color(uiColor: .label) for supporting, section, status, error and privacy text; prompt uses foregroundColor(Color(uiColor: .label)). System-resolved, not hierarchical foregroundStyle(.primary).",
+          "stopAndWarning": "native destructive button role; Color.red warning symbol plus primary text"
+        },
+        "typeBindings": {
+          "navigation": "native large navigation title",
+          "heading": "Font.headline",
+          "nextStep": "Font.title3 with semibold weight",
+          "status": "Font.subheadline",
+          "privacyFooter": "Font.callout",
+          "bodyAndControls": "native default body/control styles; Dynamic Type"
+        },
+        "layout": "NavigationStack → scrolling grouped Form; native gutters, row shapes, picker and system sheets. Reading order and enlarged-type scrolling are preserved.",
+        "shapesAndIcons": "44pt circular authored mark; native button/row shapes and SF Symbols. Android full-pill and glyph-grid rules do not apply.",
+        "states": "White play/microphone/progress foreground on Bob Blue. Meaningful status remains visible without a caption. Simulator samples explicitly identify synthetic input.",
+        "depthAndMotion": "Native platform behavior only; no authored iPhone shadow, veil, halo, pointer or custom motion.",
+        "assets": "BobMark/AppIcon are deterministic sRGB CoreGraphics renderings of the authored b, with embedded PNG provenance; native sources in ios/Bob/Assets.xcassets.",
+        "limitations": "Signed iPhone build, installation and trusted physical launch succeeded; Bob and BobBroadcast processes were observed. The first live Settings trial produced no voice according to the user, and a diagnostic build is under investigation. Actual cross-app guidance/playback, background audio, runtime App Group access, extension memory and App Store readiness remain unverified.",
+        "status": "shelved by user on 2026-11-09; unfinished prototype; Android is the active target"
+      }
+    }
   },
   "components": [
     {
@@ -612,15 +645,16 @@
   ],
   "narrative": {
     "northStar": "The Pointing Hand",
-    "overview": "Bob is a pointer and a voice, not a signboard. Over any app, one blue pointing hand flies on an upward arc from the Help pill and lands with its fingertip inside the exact button, then taps it with a ripple; the app is only lightly dimmed and the target sits in a soft rounded spotlight with a faint blue halo. A near-black caption card floats above it all and says the step in white system sans: the first sentence large and bold, the rest smaller at 70% white. Everything the senior might press is a full pill.\n\nThe system is clean, modern and calm. Blue is spent only where to press (the hand, the spotlight halo) and on what can be pressed (the Help pill, the primary pill, a selected tile). The caption is pure contrast, white on near-black, with no grey panels and no borders by day. Setup is the same world on a white ground: one step per screen, five progress segments, a big title, soft grey tiles and one pinned blue pill at the bottom.\n\nThe build explicitly refuses the instructional-UI vocabulary of the superseded world: bordered signboards, edge bands and boxy outline buttons.\n\nBob's spoken voice is the calm male ElevenLabs Eric (`cjVigY5qzO86Huf0OWal`), using `eleven_v3_conversational` across all six app languages. Speech is cached on the Worker and phone, with native Android speech fallback; recognition stays on Android.",
+    "overview": "The incumbent Android system is described below; its numeric frontmatter tokens and overlay/setup rules remain Android-specific. The iPhone technical trial is a native adaptation within this identity, documented explicitly in each relevant section. It does not replace the Android world or imply cross-app overlay support on iOS.\n\nBob is a pointer and a voice, not a signboard. Over any app, one blue pointing hand flies on an upward arc from the Help pill and lands with its fingertip inside the exact button, then taps it with a ripple; the app is only lightly dimmed and the target sits in a soft rounded spotlight with a faint blue halo. A near-black caption card floats above it all and says the step in white system sans: the first sentence large and bold, the rest smaller at 70% white. Everything the senior might press is a full pill.\n\nThe system is clean, modern and calm. Blue is spent only where to press (the hand, the spotlight halo and its tap ripple) and on what can be pressed (the Help pill, the primary pill, a selected tile). The caption is pure contrast, white on near-black, with no grey panels and no borders by day. Setup is the same world on a white ground: one step per screen, five progress segments, a big title, soft grey tiles and one pinned blue pill at the bottom.\n\nThe build explicitly refuses the instructional-UI vocabulary of the superseded world: bordered signboards, edge bands and boxy outline buttons.\n\nBob's spoken voice is the calm male ElevenLabs Eric (`cjVigY5qzO86Huf0OWal`), using `eleven_v3_conversational` across all six app languages. Speech caching and native Android speech fallback support it; speech recognition uses each platform’s native recognizer. The iPhone trial retains Eric with native iPhone speech fallback and uses native controls rather than recreating Android overlays.",
     "keyCharacteristics": [
-      "The logo is an unmistakable lowercase b: white on Bob Blue, with a tall stem and one clear open counter. The background is flat, with no gradient. Independently authored vector geometry in `branding/bob-mark.svg` supplies the setup mark, adaptive launcher and monochrome themed icon; no font dependency or generated raster ships as the mark.",
-      "One blue pointing hand (48dp, white edge, soft shadow) is the in-use mark: pointer and Help pill glyph.",
+      "The logo is an unmistakable lowercase b: white on Bob Blue, with a tall stem and one clear open counter. The background is flat, with no gradient. Independently authored vector geometry in `branding/bob-mark.svg` supplies the setup mark, adaptive launcher and monochrome themed icon; the Android mark has no font dependency or generated concept raster. iPhone icon/mark assets are deterministic sRGB CoreGraphics rasterizations of that authored geometry, with embedded provenance in `ios/Bob/Assets.xcassets` and renderer `ios/scripts/make-icons.swift`.",
+      "One blue pointing hand (48dp, white edge, soft shadow) is the system's in-use mark: pointer and Help pill glyph.",
       "Light veil (22% black by day, 32% at night) with a rounded spotlight; the app stays readable.",
       "Near-black floating caption card, two type sizes ranked by weight and opacity.",
       "Every action is a full pill; containers are softly rounded rectangles (18 to 28dp).",
       "State reads by badge shape (tick, lock, warning) and word, never colour alone.",
-      "The phone's own sans (Roboto plus Android's Noto Indic faces), with explicit line heights for Indic scripts."
+      "The phone's own sans (Roboto plus Android's Noto Indic faces), with explicit line heights for Indic scripts.",
+      "The iPhone trial uses native SF Dynamic Type, grouped Form surfaces, pickers and SF Symbols; it preserves the blue lowercase b and a single prominent entry action."
     ],
     "rules": [
       {
@@ -655,6 +689,9 @@
       }
     ],
     "dos": [
+      "Do retain native iPhone Form/navigation, pickers, SF Symbols, semantic `UIColor.label` text and Dynamic Type; keep white text, symbols and loading foreground on the blue prominent action.",
+      "Do retain standalone iPhone status when no next-step caption exists, and label Simulator guidance as synthetic.",
+      "Do use Bob as the product label and the shared authored lowercase b for the logo, with one clear open counter on the existing flat blue.",
       "Do keep blue for where to press and what can be pressed: hand, spotlight halo, Help pill, primary pill, selected tile.",
       "Do float the caption at the top below the status bar, and move it to the bottom only when it would cover the target.",
       "Do keep the Help pill against a screen edge and move it to the other side when it comes within 24dp of the target.",
@@ -666,6 +703,8 @@
       "Do honour \"Remove animations\": the hand flight, nod and pulses become instant cuts."
     ],
     "donts": [
+      "Don't imply that iPhone has Android overlays, pointer motion or automatic actions; native grouped controls are the scoped adaptation.",
+      "Don't replace the lowercase b with an uppercase B, a font glyph or the generated concept raster, or add a gradient to its background.",
       "Don't build bordered signboards, edge bands or boxy outline buttons; the caption is a borderless floating card.",
       "Don't put grey panels, tints or colour inside the caption card; it stays white on near-black.",
       "Don't dim the app heavily; the veil stays at 22% by day and 32% at night.",

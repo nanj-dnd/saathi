@@ -79,7 +79,7 @@ export async function sharedKey(req: TurnRequest): Promise<string | null> {
   if (req.secure_screen || !informative(req.tree)) return null;
   if (SENSITIVE.test(req.tree) || SCAM.test(req.tree)) return null;
   const parts = [
-    "g4-bob",
+    "g5-bob",
     req.platform ?? "android",
     req.language,
     req.app,

@@ -161,7 +161,7 @@ describe("speak requests", () => {
   it("rejects empty, overlong and unknown-language lines", () => {
     expect(() => parseSpeakRequest({ text: "", language: "hi-IN" })).toThrow();
     expect(() => parseSpeakRequest({ text: "x".repeat(601), language: "hi-IN" })).toThrow();
-    expect(() => parseSpeakRequest({ text: "hi", language: "fr-FR" })).toThrow();
+    expect(() => parseSpeakRequest({ text: "hi", language: "xx-XX" })).toThrow();
     expect(() => parseSpeakRequest({ text: "hi", language: "toString" })).toThrow();
     expect(() => parseSpeakRequest({ text: "hi", language: "valueOf" })).toThrow();
   });

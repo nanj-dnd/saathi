@@ -25,8 +25,12 @@ class RecipeEngine(
     private val canOpen: ((pkg: String) -> Boolean)? = null,
 ) {
 
-    fun guide(req: TurnRequest): Guide? {
+    fun guide(asked: TurnRequest): Guide? {
+        // English recipes serve English anywhere, not only English (India).
+        val req = if (asked.language == "en-US") asked.copy(language = "en-IN") else asked
         if (book.recipes.isEmpty()) return null
+        // Recipes are written in six languages; every other language goes to the model.
+        if (req.language !in app.saathi.Languages.RECIPES) return null
         // No app means the screen couldn't be read (Android 14+ hides "data sensitive" pages such
         // as Wi-Fi from non-tool accessibility services). That is not "outside the app": leave it
         // to the model, which still gets the screenshot.
@@ -274,33 +278,13 @@ class RecipeEngine(
 
         private val UNINSTALL_WORDS = listOf("uninstall", "अनइंस्टॉल", "அன்இன்ஸ்டால்", "అన్‌ఇన్‌స్టాల్", "ಅನ್‌ಇನ್‌ಸ್ಟಾಲ್", "അൺഇൻസ്റ്റാൾ")
 
-        /** Hindi is feminine: the voice is a woman's. */
-        val NOT_INSTALLED = mapOf(
-            "hi-IN" to "'{app}' अभी इस फ़ोन में नहीं है। Play Store में उसका पेज खोल रहा हूँ।",
-            "en-IN" to "'{app}' is not on this phone yet. Opening its page in Play Store.",
-            "ta-IN" to "'{app}' இந்த போனில் இன்னும் இல்லை. Play Store-ல் அதன் பக்கத்தைத் திறக்கிறேன்.",
-            "te-IN" to "'{app}' ఈ ఫోన్‌లో ఇంకా లేదు. Play Store లో దాని పేజీ తెరుస్తున్నాను.",
-            "kn-IN" to "'{app}' ಈ ಫೋನ್‌ನಲ್ಲಿ ಇನ್ನೂ ಇಲ್ಲ. Play Store ನಲ್ಲಿ ಅದರ ಪುಟ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.",
-            "ml-IN" to "'{app}' ഈ ഫോണിൽ ഇതുവരെ ഇല്ല. Play Store-ൽ അതിന്റെ പേജ് തുറക്കുന്നു.",
-        )
-        val ALREADY = mapOf(
-            "hi-IN" to "'{app}' पहले से इस फ़ोन में है। उसे खोल रहा हूँ।",
-            "en-IN" to "'{app}' is already on this phone. Opening it for you.",
-            "ta-IN" to "'{app}' ஏற்கனவே இந்த போனில் இருக்கிறது. அதைத் திறக்கிறேன்.",
-            "te-IN" to "'{app}' ఇప్పటికే ఈ ఫోన్‌లో ఉంది. దాన్ని తెరుస్తున్నాను.",
-            "kn-IN" to "'{app}' ಈಗಾಗಲೇ ಈ ಫೋನ್‌ನಲ್ಲಿದೆ. ಅದನ್ನು ತೆರೆಯುತ್ತಿದ್ದೇನೆ.",
-            "ml-IN" to "'{app}' ഇതിനകം ഈ ഫോണിലുണ്ട്. അത് തുറക്കുന്നു.",
-        )
+        /** Every language's line, from shared/i18n (generated into [LanguageList]). */
+        val NOT_INSTALLED = app.saathi.LanguageList.NOT_INSTALLED
+        /** Every language's line, from shared/i18n (generated into [LanguageList]). */
+        val ALREADY = app.saathi.LanguageList.ALREADY
 
-        /** Said while Saathi opens the app; a recipe bundle's "opening" common line overrides it. Hindi is feminine: the voice is a woman's. */
-        val OPENING = mapOf(
-            "hi-IN" to "'{app}' खोल रहा हूँ।",
-            "en-IN" to "Opening '{app}' for you.",
-            "ta-IN" to "'{app}' ஐத் திறக்கிறேன்.",
-            "te-IN" to "'{app}' తెరుస్తున్నాను.",
-            "kn-IN" to "'{app}' ತೆರೆಯುತ್ತಿದ್ದೇನೆ.",
-            "ml-IN" to "'{app}' തുറക്കുന്നു.",
-        )
+        /** Every language's line, from shared/i18n (generated into [LanguageList]). */
+        val OPENING = app.saathi.LanguageList.OPENING
 
         private const val READ_LIMIT = 700
 

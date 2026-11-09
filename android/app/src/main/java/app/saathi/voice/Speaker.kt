@@ -54,7 +54,7 @@ class Speaker(
             }
         }
         val engine = engine() ?: return
-        val locale = Locale.forLanguageTag(language())
+        val locale = Locale.forLanguageTag(app.saathi.Languages.speechTag(language()))
         val result = engine.setLanguage(locale)
         if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
             // Speaking Tamil text with an English voice is noise. The caption still shows it, and
@@ -89,7 +89,7 @@ class Speaker(
      */
     suspend fun warmUp() {
         val engine = engine() ?: return
-        val locale = Locale.forLanguageTag(language())
+        val locale = Locale.forLanguageTag(app.saathi.Languages.speechTag(language()))
         if (engine.setLanguage(locale) >= TextToSpeech.LANG_AVAILABLE) VoicePicker.apply(context, engine, locale)
     }
 
@@ -104,7 +104,7 @@ class Speaker(
     /** Whether this phone can speak [tag]; setup uses it to offer the voice download. */
     suspend fun voiceStatus(tag: String): VoiceStatus {
         val engine = engine() ?: return VoiceStatus.NO_ENGINE
-        return when (engine.isLanguageAvailable(Locale.forLanguageTag(tag))) {
+        return when (engine.isLanguageAvailable(Locale.forLanguageTag(app.saathi.Languages.speechTag(tag)))) {
             TextToSpeech.LANG_MISSING_DATA, TextToSpeech.LANG_NOT_SUPPORTED -> VoiceStatus.MISSING
             else -> VoiceStatus.OK
         }

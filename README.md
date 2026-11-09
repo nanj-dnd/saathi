@@ -81,3 +81,7 @@ cd worker && npm run fixtures -- --lang ta-IN [--say "पढ़ने के ल
 - **Abuse protection on `/register`**: it is open today. Gate it with Play Integrity. Set the real KV namespace ids (`USAGE`, `GUIDE_CACHE`) in `wrangler.toml`.
 - **Play Store accessibility declaration**: this is a non-"accessibility tool" app using AccessibilityService. The disclosure screen exists. A review video and privacy policy are still needed. Fallbacks are a direct APK download or the Indus App Store. Sideloaded installs on Android 13+ need "Allow restricted settings", and onboarding explains this.
 - **iOS**: voice-only version (ReplayKit broadcast plus spoken directions, no pointer).
+
+## iPhone experiment (shelved)
+
+The iPhone experiment was shelved by the user after a poor live trial; Android is the active target. Its unfinished SwiftUI + ReplayKit prototype remains in [ios/](ios/README.md). The Simulator can try synthetic Settings guidance through the live Worker and ElevenLabs. Cross-app broadcasting/background voice still needs a signed build and physical iPhone test; it does not have Android's floating pointer or accessibility access.

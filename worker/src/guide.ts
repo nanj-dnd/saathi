@@ -1,3 +1,4 @@
+import FIXED from "../../shared/fixed-lines.json";
 import Anthropic from "@anthropic-ai/sdk";
 import { buildUserText, systemPromptFor } from "./prompt.ts";
 import {
@@ -92,41 +93,26 @@ export async function askGuide(
   return guide;
 }
 
-const APP_CHOICE: Record<TurnRequest["language"], string> = {
-  "hi-IN": "इस नाम के एक से ज़्यादा ऐप हैं। जो चाहिए, उसे खुद खोलिए।",
-  "en-IN": "More than one app has that name. Please open the one you mean.",
-  "ta-IN": "இந்தப் பெயரில் ஒன்றுக்கு மேற்பட்ட செயலிகள் உள்ளன. நீங்கள் விரும்புவதைத் திறக்கவும்.",
-  "te-IN": "ఈ పేరుతో ఒకటి కంటే ఎక్కువ యాప్‌లు ఉన్నాయి. మీకు కావలసినది తెరవండి.",
-  "kn-IN": "ಈ ಹೆಸರಿನ ಒಂದಕ್ಕಿಂತ ಹೆಚ್ಚು ಆ್ಯಪ್‌ಗಳಿವೆ. ನಿಮಗೆ ಬೇಕಾದುದನ್ನು ತೆರೆಯಿರಿ.",
-  "ml-IN": "ഈ പേരിൽ ഒന്നിലധികം ആപ്പുകളുണ്ട്. നിങ്ങൾ ഉദ്ദേശിക്കുന്നത് തുറക്കുക.",
-};
+const APP_CHOICE = lines("app_choice");
+
+/** A fixed line in every language (shared/fixed-lines.json), English where one is somehow missing. */
+function lines(key: keyof typeof FIXED): Record<string, string> {
+  const table = FIXED[key] as Record<string, string>;
+  return new Proxy(table, { get: (t, tag: string) => t[tag] ?? t["en-US"] ?? t["en-IN"] });
+}
 
 function chooseAppGuide(req: TurnRequest): Guide {
   return { ...safeFallback(req), say: APP_CHOICE[req.language], goal: req.goal || req.utterance || "",
     status: "next_step", expect: "the senior opens the intended app" };
 }
 
-const UNREADABLE: Record<TurnRequest["language"], string> = {
-  "hi-IN": "यह स्क्रीन पढ़ नहीं पा रहा हूँ। ऐप खोलकर फिर मदद दबाइए।",
-  "en-IN": "I can't read this screen. Open the app and tap Help again.",
-  "ta-IN": "இந்தத் திரையைப் படிக்க முடியவில்லை. செயலியைத் திறந்து மீண்டும் உதவியை அழுத்துங்கள்.",
-  "te-IN": "ఈ స్క్రీన్ చదవలేకపోతున్నాను. యాప్ తెరిచి మళ్ళీ సహాయం నొక్కండి.",
-  "kn-IN": "ಈ ಪರದೆಯನ್ನು ಓದಲು ಆಗುತ್ತಿಲ್ಲ. ಆ್ಯಪ್ ತೆರೆದು ಮತ್ತೆ ಸಹಾಯ ಒತ್ತಿ.",
-  "ml-IN": "ഈ സ്ക്രീൻ വായിക്കാൻ കഴിയുന്നില്ല. ആപ്പ് തുറന്ന് വീണ്ടും സഹായം അമർത്തുക.",
-};
+const UNREADABLE = lines("unreadable");
 
 export function unreadableGuide(req: TurnRequest): Guide {
   return { ...safeFallback(req), say: req.platform === "ios" ? SORRY[req.language] : UNREADABLE[req.language], status: "cannot_help" };
 }
 
-const SORRY: Record<TurnRequest["language"], string> = {
-  "hi-IN": "माफ़ कीजिए, मैं अभी समझ नहीं पाया। फिर से बोलिए।",
-  "en-IN": "Sorry, I didn't understand that. Please say it again.",
-  "ta-IN": "மன்னிக்கவும், எனக்குப் புரியவில்லை. மீண்டும் சொல்லுங்கள்.",
-  "te-IN": "క్షమించండి, నాకు అర్థం కాలేదు. మళ్ళీ చెప్పండి.",
-  "kn-IN": "ಕ್ಷಮಿಸಿ, ನನಗೆ ಅರ್ಥವಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಹೇಳಿ.",
-  "ml-IN": "ക്ഷമിക്കണം, എനിക്ക് മനസ്സിലായില്ല. വീണ്ടും പറയൂ.",
-};
+const SORRY = lines("sorry");
 
 export function safeFallback(req: TurnRequest): Guide {
   return {

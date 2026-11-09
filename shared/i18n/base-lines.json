@@ -1,0 +1,56 @@
+{
+ "app_choice": {
+  "hi-IN": "इस नाम के एक से ज़्यादा ऐप हैं। जो चाहिए, उसे खुद खोलिए।",
+  "en-IN": "More than one app has that name. Please open the one you mean.",
+  "ta-IN": "இந்தப் பெயரில் ஒன்றுக்கு மேற்பட்ட செயலிகள் உள்ளன. நீங்கள் விரும்புவதைத் திறக்கவும்.",
+  "te-IN": "ఈ పేరుతో ఒకటి కంటే ఎక్కువ యాప్‌లు ఉన్నాయి. మీకు కావలసినది తెరవండి.",
+  "kn-IN": "ಈ ಹೆಸರಿನ ಒಂದಕ್ಕಿಂತ ಹೆಚ್ಚು ಆ್ಯಪ್‌ಗಳಿವೆ. ನಿಮಗೆ ಬೇಕಾದುದನ್ನು ತೆರೆಯಿರಿ.",
+  "ml-IN": "ഈ പേരിൽ ഒന്നിലധികം ആപ്പുകളുണ്ട്. നിങ്ങൾ ഉദ്ദേശിക്കുന്നത് തുറക്കുക.",
+  "en-US": "More than one app has that name. Please open the one you mean."
+ },
+ "unreadable": {
+  "hi-IN": "यह स्क्रीन पढ़ नहीं पा रहा हूँ। ऐप खोलकर फिर Bob दबाइए।",
+  "en-IN": "I can't read this screen. Open the app and tap Bob again.",
+  "ta-IN": "இந்தத் திரையைப் படிக்க முடியவில்லை. செயலியைத் திறந்து மீண்டும் Bobயை அழுத்துங்கள்.",
+  "te-IN": "ఈ స్క్రీన్ చదవలేకపోతున్నాను. యాప్ తెరిచి మళ్ళీ Bob నొక్కండి.",
+  "kn-IN": "ಈ ಪರದೆಯನ್ನು ಓದಲು ಆಗುತ್ತಿಲ್ಲ. ಆ್ಯಪ್ ತೆರೆದು ಮತ್ತೆ Bob ಒತ್ತಿ.",
+  "ml-IN": "ഈ സ്ക്രീൻ വായിക്കാൻ കഴിയുന്നില്ല. ആപ്പ് തുറന്ന് വീണ്ടും Bob അമർത്തുക.",
+  "en-US": "I can't read this screen. Open the app and tap Bob again."
+ },
+ "sorry": {
+  "hi-IN": "माफ़ कीजिए, मैं अभी समझ नहीं पाया। फिर से बोलिए।",
+  "en-IN": "Sorry, I didn't understand that. Please say it again.",
+  "ta-IN": "மன்னிக்கவும், எனக்குப் புரியவில்லை. மீண்டும் சொல்லுங்கள்.",
+  "te-IN": "క్షమించండి, నాకు అర్థం కాలేదు. మళ్ళీ చెప్పండి.",
+  "kn-IN": "ಕ್ಷಮಿಸಿ, ನನಗೆ ಅರ್ಥವಾಗಲಿಲ್ಲ. ಮತ್ತೆ ಹೇಳಿ.",
+  "ml-IN": "ക്ഷമിക്കണം, എനിക്ക് മനസ്സിലായില്ല. വീണ്ടും പറയൂ.",
+  "en-US": "Sorry, I didn't understand that. Please say it again."
+ },
+ "not_installed": {
+  "hi-IN": "'{app}' अभी इस फ़ोन में नहीं है। Play Store में उसका पेज खोल रहा हूँ।",
+  "en-IN": "'{app}' is not on this phone yet. Opening its page in Play Store.",
+  "ta-IN": "'{app}' இந்த போனில் இன்னும் இல்லை. Play Store-ல் அதன் பக்கத்தைத் திறக்கிறேன்.",
+  "te-IN": "'{app}' ఈ ఫోన్‌లో ఇంకా లేదు. Play Store లో దాని పేజీ తెరుస్తున్నాను.",
+  "kn-IN": "'{app}' ಈ ಫೋನ್‌ನಲ್ಲಿ ಇನ್ನೂ ಇಲ್ಲ. Play Store ನಲ್ಲಿ ಅದರ ಪುಟ ತೆರೆಯುತ್ತಿದ್ದೇನೆ.",
+  "ml-IN": "'{app}' ഈ ഫോണിൽ ഇതുവരെ ഇല്ല. Play Store-ൽ അതിന്റെ പേജ് തുറക്കുന്നു.",
+  "en-US": "'{app}' is not on this phone yet. Opening its page in Play Store."
+ },
+ "already": {
+  "hi-IN": "'{app}' पहले से इस फ़ोन में है। उसे खोल रहा हूँ।",
+  "en-IN": "'{app}' is already on this phone. Opening it for you.",
+  "ta-IN": "'{app}' ஏற்கனவே இந்த போனில் இருக்கிறது. அதைத் திறக்கிறேன்.",
+  "te-IN": "'{app}' ఇప్పటికే ఈ ఫోన్‌లో ఉంది. దాన్ని తెరుస్తున్నాను.",
+  "kn-IN": "'{app}' ಈಗಾಗಲೇ ಈ ಫೋನ್‌ನಲ್ಲಿದೆ. ಅದನ್ನು ತೆರೆಯುತ್ತಿದ್ದೇನೆ.",
+  "ml-IN": "'{app}' ഇതിനകം ഈ ഫോണിലുണ്ട്. അത് തുറക്കുന്നു.",
+  "en-US": "'{app}' is already on this phone. Opening it for you."
+ },
+ "opening": {
+  "hi-IN": "'{app}' खोल रहा हूँ।",
+  "en-IN": "Opening '{app}' for you.",
+  "ta-IN": "'{app}' ஐத் திறக்கிறேன்.",
+  "te-IN": "'{app}' తెరుస్తున్నాను.",
+  "kn-IN": "'{app}' ತೆರೆಯುತ್ತಿದ್ದೇನೆ.",
+  "ml-IN": "'{app}' തുറക്കുന്നു.",
+  "en-US": "Opening '{app}' for you."
+ }
+}

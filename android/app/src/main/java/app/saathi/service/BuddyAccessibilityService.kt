@@ -171,6 +171,8 @@ class BuddyAccessibilityService : AccessibilityService() {
         // A screen that turns off mid-task means the senior put the phone down: stop talking.
         registerReceiver(screenOff, IntentFilter(Intent.ACTION_SCREEN_OFF))
         overlay.show()
+        // Turned on from setup, which is usually still in front: don't appear over it.
+        overlay.setBubbleVisible(!setupInFront())
         if (BuildConfig.DEBUG) {
             // adb shell "am broadcast -a app.saathi.DEBUG_ASK --es text 'how do I make text bigger'"
             // adb shell "am broadcast -a app.saathi.DEBUG_OPENED --es pkg com.anydesk.anydeskandroid"
@@ -309,6 +311,9 @@ class BuddyAccessibilityService : AccessibilityService() {
             if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED && event.className?.startsWith("$packageName.ui") == true) {
                 session.stop()
                 overlay.setBubbleVisible(false)
+            } else if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED && setupInFront()) {
+                // Back in setup after a permission dialog: that event names a plain view class, not the activity.
+                overlay.setBubbleVisible(false)
             }
             return
         }
@@ -316,7 +321,7 @@ class BuddyAccessibilityService : AccessibilityService() {
         // Events arrive out of order around app switches (the launcher's can land after setup's), so
         // ask which app is really in front rather than trusting the event: never cover setup.
         if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
-            overlay.setBubbleVisible(rootInActiveWindow?.packageName?.toString() != packageName)
+            overlay.setBubbleVisible(!setupInFront())
         }
 
         when (event.eventType) {
@@ -327,6 +332,9 @@ class BuddyAccessibilityService : AccessibilityService() {
             AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> session.onScreenEvent(ScreenEvent.CONTENT_CHANGED)
         }
     }
+
+    /** Bob's own setup is the app in front (the overlay windows never take focus, so they don't count). */
+    private fun setupInFront(): Boolean = runCatching { rootInActiveWindow?.packageName?.toString() == packageName }.getOrDefault(false)
 
     private fun onAppOpened(pkg: String) {
         if (scamGuard.shouldWarn(pkg)) {

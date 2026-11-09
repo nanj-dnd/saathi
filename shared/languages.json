@@ -1,0 +1,693 @@
+{
+ "_note": "Every language Bob offers. Order is display order within each region. elevenlabs = language_code for Eleven v3 (all 85 it lists). Recipes exist only for hi-IN, en-IN, ta-IN, te-IN, kn-IN, ml-IN; other languages are guided by the model.",
+ "languages": [
+  {
+   "tag": "hi-IN",
+   "native": "हिन्दी",
+   "english": "Hindi",
+   "region": "india",
+   "elevenlabs": "hi",
+   "rtl": false
+  },
+  {
+   "tag": "en-IN",
+   "native": "English (India)",
+   "english": "English (India)",
+   "region": "india",
+   "elevenlabs": "en",
+   "rtl": false
+  },
+  {
+   "tag": "bn-IN",
+   "native": "বাংলা",
+   "english": "Bengali",
+   "region": "india",
+   "elevenlabs": "bn",
+   "rtl": false
+  },
+  {
+   "tag": "mr-IN",
+   "native": "मराठी",
+   "english": "Marathi",
+   "region": "india",
+   "elevenlabs": "mr",
+   "rtl": false
+  },
+  {
+   "tag": "te-IN",
+   "native": "తెలుగు",
+   "english": "Telugu",
+   "region": "india",
+   "elevenlabs": "te",
+   "rtl": false
+  },
+  {
+   "tag": "ta-IN",
+   "native": "தமிழ்",
+   "english": "Tamil",
+   "region": "india",
+   "elevenlabs": "ta",
+   "rtl": false
+  },
+  {
+   "tag": "gu-IN",
+   "native": "ગુજરાતી",
+   "english": "Gujarati",
+   "region": "india",
+   "elevenlabs": "gu",
+   "rtl": false
+  },
+  {
+   "tag": "ur-IN",
+   "native": "اردو",
+   "english": "Urdu",
+   "region": "india",
+   "elevenlabs": "ur",
+   "rtl": true
+  },
+  {
+   "tag": "kn-IN",
+   "native": "ಕನ್ನಡ",
+   "english": "Kannada",
+   "region": "india",
+   "elevenlabs": "kn",
+   "rtl": false
+  },
+  {
+   "tag": "or-IN",
+   "native": "ଓଡ଼ିଆ",
+   "english": "Odia",
+   "region": "india",
+   "elevenlabs": "or",
+   "rtl": false
+  },
+  {
+   "tag": "ml-IN",
+   "native": "മലയാളം",
+   "english": "Malayalam",
+   "region": "india",
+   "elevenlabs": "ml",
+   "rtl": false
+  },
+  {
+   "tag": "pa-IN",
+   "native": "ਪੰਜਾਬੀ",
+   "english": "Punjabi",
+   "region": "india",
+   "elevenlabs": "pa",
+   "rtl": false
+  },
+  {
+   "tag": "as-IN",
+   "native": "অসমীয়া",
+   "english": "Assamese",
+   "region": "india",
+   "elevenlabs": "as",
+   "rtl": false
+  },
+  {
+   "tag": "ne-NP",
+   "native": "नेपाली",
+   "english": "Nepali",
+   "region": "india",
+   "elevenlabs": "ne",
+   "rtl": false
+  },
+  {
+   "tag": "sd-IN",
+   "native": "سنڌي",
+   "english": "Sindhi",
+   "region": "india",
+   "elevenlabs": "sd",
+   "rtl": true
+  },
+  {
+   "tag": "en-US",
+   "native": "English",
+   "english": "English",
+   "region": "world",
+   "elevenlabs": "en",
+   "rtl": false
+  },
+  {
+   "tag": "es-MX",
+   "native": "Español",
+   "english": "Spanish",
+   "region": "world",
+   "elevenlabs": "es",
+   "rtl": false
+  },
+  {
+   "tag": "zh-CN",
+   "native": "中文",
+   "english": "Mandarin Chinese",
+   "region": "world",
+   "elevenlabs": "zh",
+   "rtl": false
+  },
+  {
+   "tag": "ar-SA",
+   "native": "العربية",
+   "english": "Arabic",
+   "region": "world",
+   "elevenlabs": "ar",
+   "rtl": true
+  },
+  {
+   "tag": "fr-FR",
+   "native": "Français",
+   "english": "French",
+   "region": "world",
+   "elevenlabs": "fr",
+   "rtl": false
+  },
+  {
+   "tag": "pt-BR",
+   "native": "Português",
+   "english": "Portuguese",
+   "region": "world",
+   "elevenlabs": "pt",
+   "rtl": false
+  },
+  {
+   "tag": "ru-RU",
+   "native": "Русский",
+   "english": "Russian",
+   "region": "world",
+   "elevenlabs": "ru",
+   "rtl": false
+  },
+  {
+   "tag": "id-ID",
+   "native": "Bahasa Indonesia",
+   "english": "Indonesian",
+   "region": "world",
+   "elevenlabs": "id",
+   "rtl": false
+  },
+  {
+   "tag": "de-DE",
+   "native": "Deutsch",
+   "english": "German",
+   "region": "world",
+   "elevenlabs": "de",
+   "rtl": false
+  },
+  {
+   "tag": "ja-JP",
+   "native": "日本語",
+   "english": "Japanese",
+   "region": "world",
+   "elevenlabs": "ja",
+   "rtl": false
+  },
+  {
+   "tag": "tr-TR",
+   "native": "Türkçe",
+   "english": "Turkish",
+   "region": "world",
+   "elevenlabs": "tr",
+   "rtl": false
+  },
+  {
+   "tag": "vi-VN",
+   "native": "Tiếng Việt",
+   "english": "Vietnamese",
+   "region": "world",
+   "elevenlabs": "vi",
+   "rtl": false
+  },
+  {
+   "tag": "ko-KR",
+   "native": "한국어",
+   "english": "Korean",
+   "region": "world",
+   "elevenlabs": "ko",
+   "rtl": false
+  },
+  {
+   "tag": "it-IT",
+   "native": "Italiano",
+   "english": "Italian",
+   "region": "world",
+   "elevenlabs": "it",
+   "rtl": false
+  },
+  {
+   "tag": "fa-IR",
+   "native": "فارسی",
+   "english": "Persian",
+   "region": "world",
+   "elevenlabs": "fa",
+   "rtl": true
+  },
+  {
+   "tag": "sw-KE",
+   "native": "Kiswahili",
+   "english": "Swahili",
+   "region": "world",
+   "elevenlabs": "sw",
+   "rtl": false
+  },
+  {
+   "tag": "th-TH",
+   "native": "ไทย",
+   "english": "Thai",
+   "region": "world",
+   "elevenlabs": "th",
+   "rtl": false
+  },
+  {
+   "tag": "pl-PL",
+   "native": "Polski",
+   "english": "Polish",
+   "region": "world",
+   "elevenlabs": "pl",
+   "rtl": false
+  },
+  {
+   "tag": "uk-UA",
+   "native": "Українська",
+   "english": "Ukrainian",
+   "region": "world",
+   "elevenlabs": "uk",
+   "rtl": false
+  },
+  {
+   "tag": "yue-HK",
+   "native": "粵語",
+   "english": "Cantonese",
+   "region": "world",
+   "elevenlabs": "yue",
+   "rtl": false
+  },
+  {
+   "tag": "fil-PH",
+   "native": "Filipino",
+   "english": "Filipino",
+   "region": "world",
+   "elevenlabs": "fil",
+   "rtl": false
+  },
+  {
+   "tag": "ms-MY",
+   "native": "Bahasa Melayu",
+   "english": "Malay",
+   "region": "world",
+   "elevenlabs": "ms",
+   "rtl": false
+  },
+  {
+   "tag": "nl-NL",
+   "native": "Nederlands",
+   "english": "Dutch",
+   "region": "world",
+   "elevenlabs": "nl",
+   "rtl": false
+  },
+  {
+   "tag": "ro-RO",
+   "native": "Română",
+   "english": "Romanian",
+   "region": "world",
+   "elevenlabs": "ro",
+   "rtl": false
+  },
+  {
+   "tag": "el-GR",
+   "native": "Ελληνικά",
+   "english": "Greek",
+   "region": "world",
+   "elevenlabs": "el",
+   "rtl": false
+  },
+  {
+   "tag": "he-IL",
+   "native": "עברית",
+   "english": "Hebrew",
+   "region": "world",
+   "elevenlabs": "he",
+   "rtl": true
+  },
+  {
+   "tag": "hu-HU",
+   "native": "Magyar",
+   "english": "Hungarian",
+   "region": "world",
+   "elevenlabs": "hu",
+   "rtl": false
+  },
+  {
+   "tag": "cs-CZ",
+   "native": "Čeština",
+   "english": "Czech",
+   "region": "world",
+   "elevenlabs": "cs",
+   "rtl": false
+  },
+  {
+   "tag": "sv-SE",
+   "native": "Svenska",
+   "english": "Swedish",
+   "region": "world",
+   "elevenlabs": "sv",
+   "rtl": false
+  },
+  {
+   "tag": "my-MM",
+   "native": "မြန်မာ",
+   "english": "Burmese",
+   "region": "world",
+   "elevenlabs": "my",
+   "rtl": false
+  },
+  {
+   "tag": "ps-AF",
+   "native": "پښتو",
+   "english": "Pashto",
+   "region": "world",
+   "elevenlabs": "ps",
+   "rtl": true
+  },
+  {
+   "tag": "uz-UZ",
+   "native": "Oʻzbek",
+   "english": "Uzbek",
+   "region": "world",
+   "elevenlabs": "uz",
+   "rtl": false
+  },
+  {
+   "tag": "ha-NG",
+   "native": "Hausa",
+   "english": "Hausa",
+   "region": "world",
+   "elevenlabs": "ha",
+   "rtl": false
+  },
+  {
+   "tag": "yo-NG",
+   "native": "Yorùbá",
+   "english": "Yoruba",
+   "region": "world",
+   "elevenlabs": "yo",
+   "rtl": false
+  },
+  {
+   "tag": "so-SO",
+   "native": "Soomaali",
+   "english": "Somali",
+   "region": "world",
+   "elevenlabs": "so",
+   "rtl": false
+  },
+  {
+   "tag": "af-ZA",
+   "native": "Afrikaans",
+   "english": "Afrikaans",
+   "region": "world",
+   "elevenlabs": "af",
+   "rtl": false
+  },
+  {
+   "tag": "az-AZ",
+   "native": "Azərbaycan",
+   "english": "Azerbaijani",
+   "region": "world",
+   "elevenlabs": "az",
+   "rtl": false
+  },
+  {
+   "tag": "hy-AM",
+   "native": "Հայերեն",
+   "english": "Armenian",
+   "region": "world",
+   "elevenlabs": "hy",
+   "rtl": false
+  },
+  {
+   "tag": "ast-ES",
+   "native": "Asturianu",
+   "english": "Asturian",
+   "region": "world",
+   "elevenlabs": "ast",
+   "rtl": false
+  },
+  {
+   "tag": "be-BY",
+   "native": "Беларуская",
+   "english": "Belarusian",
+   "region": "world",
+   "elevenlabs": "be",
+   "rtl": false
+  },
+  {
+   "tag": "bs-BA",
+   "native": "Bosanski",
+   "english": "Bosnian",
+   "region": "world",
+   "elevenlabs": "bs",
+   "rtl": false
+  },
+  {
+   "tag": "bg-BG",
+   "native": "Български",
+   "english": "Bulgarian",
+   "region": "world",
+   "elevenlabs": "bg",
+   "rtl": false
+  },
+  {
+   "tag": "ca-ES",
+   "native": "Català",
+   "english": "Catalan",
+   "region": "world",
+   "elevenlabs": "ca",
+   "rtl": false
+  },
+  {
+   "tag": "ceb-PH",
+   "native": "Cebuano",
+   "english": "Cebuano",
+   "region": "world",
+   "elevenlabs": "ceb",
+   "rtl": false
+  },
+  {
+   "tag": "ny-MW",
+   "native": "Chichewa",
+   "english": "Chichewa",
+   "region": "world",
+   "elevenlabs": "ny",
+   "rtl": false
+  },
+  {
+   "tag": "hr-HR",
+   "native": "Hrvatski",
+   "english": "Croatian",
+   "region": "world",
+   "elevenlabs": "hr",
+   "rtl": false
+  },
+  {
+   "tag": "da-DK",
+   "native": "Dansk",
+   "english": "Danish",
+   "region": "world",
+   "elevenlabs": "da",
+   "rtl": false
+  },
+  {
+   "tag": "et-EE",
+   "native": "Eesti",
+   "english": "Estonian",
+   "region": "world",
+   "elevenlabs": "et",
+   "rtl": false
+  },
+  {
+   "tag": "fi-FI",
+   "native": "Suomi",
+   "english": "Finnish",
+   "region": "world",
+   "elevenlabs": "fi",
+   "rtl": false
+  },
+  {
+   "tag": "gl-ES",
+   "native": "Galego",
+   "english": "Galician",
+   "region": "world",
+   "elevenlabs": "gl",
+   "rtl": false
+  },
+  {
+   "tag": "ka-GE",
+   "native": "ქართული",
+   "english": "Georgian",
+   "region": "world",
+   "elevenlabs": "ka",
+   "rtl": false
+  },
+  {
+   "tag": "is-IS",
+   "native": "Íslenska",
+   "english": "Icelandic",
+   "region": "world",
+   "elevenlabs": "is",
+   "rtl": false
+  },
+  {
+   "tag": "ga-IE",
+   "native": "Gaeilge",
+   "english": "Irish",
+   "region": "world",
+   "elevenlabs": "ga",
+   "rtl": false
+  },
+  {
+   "tag": "jv-ID",
+   "native": "Basa Jawa",
+   "english": "Javanese",
+   "region": "world",
+   "elevenlabs": "jv",
+   "rtl": false
+  },
+  {
+   "tag": "kk-KZ",
+   "native": "Қазақ тілі",
+   "english": "Kazakh",
+   "region": "world",
+   "elevenlabs": "kk",
+   "rtl": false
+  },
+  {
+   "tag": "ky-KG",
+   "native": "Кыргызча",
+   "english": "Kyrgyz",
+   "region": "world",
+   "elevenlabs": "ky",
+   "rtl": false
+  },
+  {
+   "tag": "lv-LV",
+   "native": "Latviešu",
+   "english": "Latvian",
+   "region": "world",
+   "elevenlabs": "lv",
+   "rtl": false
+  },
+  {
+   "tag": "ln-CD",
+   "native": "Lingála",
+   "english": "Lingala",
+   "region": "world",
+   "elevenlabs": "ln",
+   "rtl": false
+  },
+  {
+   "tag": "lt-LT",
+   "native": "Lietuvių",
+   "english": "Lithuanian",
+   "region": "world",
+   "elevenlabs": "lt",
+   "rtl": false
+  },
+  {
+   "tag": "lb-LU",
+   "native": "Lëtzebuergesch",
+   "english": "Luxembourgish",
+   "region": "world",
+   "elevenlabs": "lb",
+   "rtl": false
+  },
+  {
+   "tag": "mk-MK",
+   "native": "Македонски",
+   "english": "Macedonian",
+   "region": "world",
+   "elevenlabs": "mk",
+   "rtl": false
+  },
+  {
+   "tag": "mt-MT",
+   "native": "Malti",
+   "english": "Maltese",
+   "region": "world",
+   "elevenlabs": "mt",
+   "rtl": false
+  },
+  {
+   "tag": "mi-NZ",
+   "native": "Te Reo Māori",
+   "english": "Māori",
+   "region": "world",
+   "elevenlabs": "mi",
+   "rtl": false
+  },
+  {
+   "tag": "mn-MN",
+   "native": "Монгол",
+   "english": "Mongolian",
+   "region": "world",
+   "elevenlabs": "mn",
+   "rtl": false
+  },
+  {
+   "tag": "nb-NO",
+   "native": "Norsk",
+   "english": "Norwegian",
+   "region": "world",
+   "elevenlabs": "no",
+   "rtl": false
+  },
+  {
+   "tag": "oc-FR",
+   "native": "Occitan",
+   "english": "Occitan",
+   "region": "world",
+   "elevenlabs": "oc",
+   "rtl": false
+  },
+  {
+   "tag": "sr-RS",
+   "native": "Српски",
+   "english": "Serbian",
+   "region": "world",
+   "elevenlabs": "sr",
+   "rtl": false
+  },
+  {
+   "tag": "sk-SK",
+   "native": "Slovenčina",
+   "english": "Slovak",
+   "region": "world",
+   "elevenlabs": "sk",
+   "rtl": false
+  },
+  {
+   "tag": "sl-SI",
+   "native": "Slovenščina",
+   "english": "Slovenian",
+   "region": "world",
+   "elevenlabs": "sl",
+   "rtl": false
+  },
+  {
+   "tag": "tg-TJ",
+   "native": "Тоҷикӣ",
+   "english": "Tajik",
+   "region": "world",
+   "elevenlabs": "tg",
+   "rtl": false
+  },
+  {
+   "tag": "cy-GB",
+   "native": "Cymraeg",
+   "english": "Welsh",
+   "region": "world",
+   "elevenlabs": "cy",
+   "rtl": false
+  }
+ ]
+}

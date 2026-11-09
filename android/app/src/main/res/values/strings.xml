@@ -2,34 +2,34 @@
 <resources>
     <string name="app_name" translatable="false">Bob</string>
     <string name="onb_subtitle">Bob helps your parent use their phone, one spoken step at a time. Setup takes 2 minutes.</string>
-    <string name="step_language">1. Choose language</string>
+    <string name="step_language">1. Choose your language</string>
     <string name="step_mic">2. Allow the microphone</string>
     <string name="btn_allow">Allow</string>
     <string name="done">Done</string>
     <string name="step_access">3. Turn on Bob</string>
-    <string name="disclosure">Bob reads the text on the screen and takes a picture of it only when the Help button is pressed or while it is guiding a task. Common tasks are guided on the phone itself. Otherwise these are sent to Bob\'s server to decide the next step and are not stored, except that the step given for a screen of a shopping or settings app may be kept for a few days, with nothing that identifies your phone. Bob never taps anything itself, and it cannot see PIN or payment screens.</string>
+    <string name="disclosure">Bob reads the text on the screen and takes a picture of it only when Bob is pressed or while it is guiding a task. Common tasks are guided on the phone itself. Otherwise these are sent to Bob\'s server to decide the next step and are not stored, except that the step given for a screen of a shopping or settings app may be kept for a few days, with nothing that identifies your phone. Bob never taps anything itself, and it cannot see PIN or payment screens.</string>
     <string name="btn_open_settings">Agree and open settings</string>
     <string name="access_on">Bob is on</string>
     <string name="access_hint">In Settings, open \"Downloaded apps\" or \"Installed apps\", choose Bob and turn it on.</string>
     <string name="access_restricted">If the switch is greyed out, open App info, tap ⋮ at the top and choose \"Allow restricted settings\".</string>
     <string name="btn_app_info">App info</string>
     <string name="step_ready">5. Ready</string>
-    <string name="ready_body">In any app, press the blue \"Help\" button and say what you want to do. For example: \"I want to order milk on Blinkit\".</string>
+    <string name="ready_body">In any app, press the yellow Bob board and say what you want to do. For example: \"I want to video call my son on WhatsApp\".</string>
     <string name="bubble_help">Help</string>
     <string name="bubble_listening">Listening</string>
     <string name="bubble_looking">Looking</string>
     <string name="btn_repeat">Repeat</string>
     <string name="btn_close">Close</string>
-    <string name="say_no_speech">I could not hear you. Press Help and speak again.</string>
+    <string name="say_no_speech">I could not hear you. Press Bob and speak again.</string>
     <string name="say_network">The internet is not working. Please try again in a little while.</string>
     <string name="say_mic_denied">First, please allow the microphone for Bob.</string>
     <string name="say_scam_remote">Careful! This app lets a stranger control your phone. If someone on a call asked you to open it, close it now and call your family.</string>
     <string name="say_sensitive">This part you do yourself. Never tell this number to anyone, even on the phone.</string>
-    <string name="say_in_call">You are on a call. If anyone asks for an OTP, PIN or money, cut the call now. Press Help again after the call. To hear better, press Speaker on the call screen.</string>
-    <string name="say_mic_busy">Another app is using the microphone. Close it and press Help again.</string>
+    <string name="say_in_call">You are on a call. If anyone asks for an OTP, PIN or money, cut the call now. Press Bob again after the call. To hear better, press Speaker on the call screen.</string>
+    <string name="say_mic_busy">Another app is using the microphone. Close it and press Bob again.</string>
     <string name="say_speech_offline">To understand you I need the internet. Turn on mobile data or Wi-Fi, or ask your family to download offline speech.</string>
     <string name="say_speech_unavailable">This phone cannot listen yet. Ask your family to install or update the Google app.</string>
-    <string name="say_no_speech_again">Hold the phone near your mouth and speak a little louder. Press Help and try again.</string>
+    <string name="say_no_speech_again">Hold the phone near your mouth and speak a little louder. Press Bob and try again.</string>
     <string name="say_wait">One moment, I am looking.</string>
     <string name="say_busy">Bob is busy right now. Please try again in a minute.</string>
     <string name="say_limit">You have asked many questions today. Simple tasks still work; for others, please ask again tomorrow.</string>
@@ -49,10 +49,16 @@
     <string name="access_summary">Bob needs to see the screen to point at buttons. It never presses anything.</string>
     <string name="btn_continue">Continue</string>
     <string name="btn_back">Back</string>
-    <string name="mic_body">Bob listens only after you press the Help button.</string>
+    <string name="mic_body">Bob listens only after you press him.</string>
     <string name="say_scrolling">Let me look further down.</string>
     <!-- After a finished task: Bob listens once more. -->
     <string name="say_anything_else">Anything else I can help with?</string>
-    <string name="say_goodbye">Okay. Press Help whenever you need me.</string>
-    <string name="say_unreadable">I can’t read this screen. Open the app and tap Help again.</string>
+    <string name="say_goodbye">Okay. Press Bob whenever you need me.</string>
+    <string name="say_unreadable">I can’t read this screen. Open the app and tap Bob again.</string>
+    <string name="step_count">STEP %1$d OF %2$d</string>
+    <string name="lang_search">Search languages</string>
+    <string name="lang_phone">On this phone</string>
+    <string name="lang_india">India</string>
+    <string name="lang_world">World</string>
+    <string name="lang_none">No language matches that.</string>
 </resources>

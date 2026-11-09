@@ -91,7 +91,7 @@ class SpeechListener(
 
     private fun intent(preferOffline: Boolean) = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
         putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-        putExtra(RecognizerIntent.EXTRA_LANGUAGE, language())
+        putExtra(RecognizerIntent.EXTRA_LANGUAGE, app.saathi.Languages.speechTag(language()))
         putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
         putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, context.packageName)
         putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, preferOffline)

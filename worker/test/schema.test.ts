@@ -27,7 +27,7 @@ describe("parseTurnRequest", () => {
   });
 
   it("rejects unsupported languages", () => {
-    expect(() => parseTurnRequest({ ...base, language: "fr-FR" })).toThrow(BadRequest);
+    expect(() => parseTurnRequest({ ...base, language: "xx-XX" })).toThrow(BadRequest);
   });
 
   it.each(["toString", "valueOf", "__proto__"])("rejects inherited language key %s", (language) => {
@@ -152,5 +152,24 @@ describe("guide actions", () => {
     expect(normaliseGuide({ ...base, action: "none" }, ids).action).toBe("");
     expect(normaliseGuide({ ...base, status: "cannot_help", action: "scroll_down" }, ids).action).toBe("");
     expect(normaliseGuide({ ...base, status: "need_info", action: "open_app", action_arg: "com.whatsapp" }, ids).action).toBe("");
+  });
+});
+
+describe("languages", () => {
+  it("accepts every language in shared/languages.json, India and world alike", async () => {
+    const { LANGUAGE_ENTRIES } = await import("../src/schema.ts");
+    expect(LANGUAGE_ENTRIES.length).toBe(86);
+    for (const tag of ["fr-FR", "es-MX", "ar-SA", "yue-HK", "fil-PH", "bn-IN", "cy-GB"]) {
+      expect(parseTurnRequest({ ...base, language: tag }).language).toBe(tag);
+    }
+  });
+
+  it("maps tags to Eleven v3 language codes, including the three-letter and Norwegian ones", async () => {
+    const { ELEVENLABS_CODE } = await import("../src/schema.ts");
+    expect(ELEVENLABS_CODE["nb-NO"]).toBe("no");
+    expect(ELEVENLABS_CODE["fil-PH"]).toBe("fil");
+    expect(ELEVENLABS_CODE["yue-HK"]).toBe("yue");
+    expect(ELEVENLABS_CODE["zh-CN"]).toBe("zh");
+    expect(new Set(Object.values(ELEVENLABS_CODE)).size).toBe(85);
   });
 });

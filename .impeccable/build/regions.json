@@ -1,111 +1,84 @@
 {
  "regions": [
   {
-   "id": "status-bar",
+   "id": "header-board",
    "kind": "chrome",
    "grid": "A0:J0",
-   "note": "Android status bar of the host phone (time, signal, battery) (system UI rendered by Android under the overlay)",
-   "codeDrawn": true
+   "note": "yellow strip board, black keyline, rivet dots"
   },
   {
-   "id": "sign-band",
-   "kind": "chrome",
-   "grid": "A0:A1",
-   "note": "thick metro-blue band on the sign panel's leading edge"
+   "id": "mark",
+   "kind": "image",
+   "grid": "A0:B0",
+   "note": "brand mark (now the clay face raster, branding/bob-clay-face-source.png)"
   },
   {
-   "id": "sign-arrow",
-   "kind": "chrome",
-   "grid": "B0:B1",
-   "note": "heavy solid black arrow pointing down toward the target"
-  },
-  {
-   "id": "caption-head",
+   "id": "wordmark",
    "kind": "text",
-   "note": "first sentence of the instruction, large bold near-black signage sans: Press 'Display & touch'",
-   "box": [
-    210,
-    108,
-    610,
-    72
-   ]
+   "grid": "B0:C0",
+   "note": "bob wordmark in black signage lettering on the yellow board"
   },
   {
-   "id": "caption-sub",
+   "id": "step-count",
    "kind": "text",
-   "note": "rest of the instruction, smaller regular weight: The text size is in here.",
-   "box": [
-    210,
-    182,
-    440,
-    52
-   ]
+   "grid": "H0:J0",
+   "note": "step count STEP 1 OF 5 in black signage capitals, right-aligned"
   },
   {
-   "id": "repeat",
+   "id": "title",
+   "kind": "text",
+   "grid": "A1:J1",
+   "note": "screen title Choose your language, heavy black sans on white"
+  },
+  {
+   "id": "search",
    "kind": "control",
-   "grid": "A2:E2",
-   "note": "filled metro-blue pill button labelled Repeat, white bold text"
+   "grid": "A1:J2",
+   "note": "search field, thick black keyline"
   },
   {
-   "id": "close",
+   "id": "section-phone",
+   "kind": "chrome",
+   "grid": "A2:J2",
+   "note": "black label board ON THIS PHONE"
+  },
+  {
+   "id": "row-selected",
    "kind": "control",
-   "grid": "F2:J2",
-   "note": "outline metro-blue pill button labelled Close, blue text, set apart from Repeat"
+   "grid": "A3:J3",
+   "note": "selected row, black flood, yellow text, tick"
   },
   {
-   "id": "host-battery",
+   "id": "section-india",
    "kind": "chrome",
    "grid": "A3:J3",
-   "note": "host app row Battery under the grey veil (system UI rendered by Android under the overlay)",
-   "codeDrawn": true
+   "note": "INDIA label board"
   },
   {
-   "id": "host-storage",
-   "kind": "chrome",
-   "grid": "A4:I4",
-   "note": "host app row Storage under the grey veil (system UI rendered by Android under the overlay)",
-   "codeDrawn": true
-  },
-  {
-   "id": "help-disc",
+   "id": "rows-india",
    "kind": "control",
-   "grid": "J4:J4",
-   "note": "round metro-blue Help disc at the right edge with a white arrow-to-dot glyph"
+   "grid": "A4:J6",
+   "note": "language rows in own script, black rules (a repeated list of identical rows, one list element)",
+   "container": true
   },
   {
-   "id": "host-sound",
+   "id": "section-world",
    "kind": "chrome",
-   "grid": "A5:J5",
-   "note": "host app row Sound & vibration under the grey veil (system UI rendered by Android under the overlay)",
-   "codeDrawn": true
+   "grid": "A6:J6",
+   "note": "WORLD label board"
   },
   {
-   "id": "target-ring",
-   "kind": "chrome",
-   "grid": "A6:I6",
-   "note": "thick metro-blue rounded ring around the undimmed target row Display & touch, solid blue station dot on its left end"
+   "id": "rows-world",
+   "kind": "control",
+   "grid": "A7:J9",
+   "note": "rows incl RTL right-aligned (a repeated list of identical rows, one list element)",
+   "container": true
   },
   {
-   "id": "host-wallpaper",
-   "kind": "chrome",
-   "grid": "A7:J7",
-   "note": "host app row Wallpaper & style under the grey veil (system UI rendered by Android under the overlay)",
-   "codeDrawn": true
-  },
-  {
-   "id": "host-accessibility",
-   "kind": "chrome",
-   "grid": "A8:J8",
-   "note": "host app row Accessibility under the grey veil (system UI rendered by Android under the overlay)",
-   "codeDrawn": true
-  },
-  {
-   "id": "host-navbar",
-   "kind": "chrome",
+   "id": "continue",
+   "kind": "control",
    "grid": "A9:J9",
-   "note": "Android navigation bar of the host phone (system UI rendered by Android under the overlay)",
-   "codeDrawn": true
+   "note": "black Continue board, yellow lettering, rivets"
   }
  ]
 }

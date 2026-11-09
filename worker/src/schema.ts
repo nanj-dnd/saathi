@@ -1,14 +1,23 @@
 // Wire types shared with the Android client (net/Wire.kt mirrors these).
 
-export const LANGUAGES = {
-  "hi-IN": "Hindi",
+import registry from "../../shared/languages.json";
+
+interface LanguageEntry { tag: string; native: string; english: string; region: "india" | "world"; elevenlabs: string; rtl: boolean }
+/** Every language Bob offers (shared/languages.json): the 85 Eleven v3 speaks, plus English for India and the world. */
+export const LANGUAGE_ENTRIES: readonly LanguageEntry[] = (registry as { languages: LanguageEntry[] }).languages;
+const PROMPT_NAME: Record<string, string> = {
   "en-IN": "English (simple Indian English)",
-  "ta-IN": "Tamil",
-  "te-IN": "Telugu",
-  "kn-IN": "Kannada",
-  "ml-IN": "Malayalam",
-} as const;
-export type Language = keyof typeof LANGUAGES;
+  "en-US": "English (simple, plain English)",
+};
+/** Tag to the language's name as the model is told it. */
+export const LANGUAGES: Readonly<Record<string, string>> = Object.fromEntries(
+  LANGUAGE_ENTRIES.map((l) => [l.tag, PROMPT_NAME[l.tag] ?? l.english]),
+);
+/** Tag to Eleven v3's language_code (two letters for most, three for ast, ceb, fil and yue; "no" for Norwegian). */
+export const ELEVENLABS_CODE: Readonly<Record<string, string>> = Object.fromEntries(LANGUAGE_ENTRIES.map((l) => [l.tag, l.elevenlabs]));
+/** Scripted recipes are written in these six; every other language is guided by the model. */
+export const RECIPE_LANGUAGES = ["hi-IN", "en-IN", "ta-IN", "te-IN", "kn-IN", "ml-IN"] as const;
+export type Language = string;
 
 export interface PastStep {
   say: string;

@@ -3,13 +3,13 @@ package app.saathi.overlay
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.graphics.BlurMaskFilter
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PointF
 import android.graphics.RectF
-import android.graphics.drawable.GradientDrawable
 import android.text.TextUtils
 import android.util.TypedValue
 import android.view.Gravity
@@ -23,6 +23,8 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import app.saathi.capture.Box
+import app.saathi.R
+import app.saathi.design.BoardDrawable
 import app.saathi.design.Buddy
 import app.saathi.design.Glyph
 import app.saathi.design.Glyphs
@@ -42,9 +44,10 @@ private fun animationsOn() = ValueAnimator.areAnimatorsEnabled()
 private val SETTLE = PathInterpolator(0.3f, 0f, 0.1f, 1f)
 
 /**
- * The Help button: a blue pill carrying its word, which the senior taps to talk and
- * drags out of the way. Listening and Looking turn it near-black with a moving icon (voice bars, a
- * spinning arc), so the state reads by shape and word, not colour alone.
+ * The Help button: Bob himself. A small square yellow signboard (black keyline set in from the edge,
+ * a rivet in each corner) with the clay face filling it, which the senior taps to talk and drags out
+ * of the way. Listening swaps the face for black voice bars, Looking for a black spinning arc, so the
+ * state reads by shape, not colour alone; TalkBack hears the word ("Help", "Listening", "Looking").
  */
 @SuppressLint("ViewConstructor")
 internal class BubbleView(
@@ -54,32 +57,37 @@ internal class BubbleView(
     private val onDragEnd: () -> Unit,
 ) : View(context) {
     private var buddy = Buddy.of(context)
-    /** Room around the pill for its shadow and the listening pulse. */
+    /** Room around the board for its shadow and the listening pulse. */
     private val pad = context.dp(12f).toInt()
-    private val pillH = context.dp(56f)
-    private val padStart = context.dp(18f)
-    private val padEnd = context.dp(22f)
-    private val icon = context.dp(24f)
-    private val gap = context.dp(8f)
-    private val maxW = context.dp(240f)
-    private var pillW = context.dp(112f)
-    private var textPx = context.dp(19f)
+    private val side = context.dp(68f)
+    private val corner = context.dp(8f)
+    /** The face sits inside the keyline with a little yellow around it. */
+    private val faceInset = context.dp(12f)
+    /** The eyes sit high in the face; nudged down, they clear the top rivets. */
+    private val faceDrop = context.dp(1.5f)
+    private val icon = context.dp(30f)
 
-    private val fill = Paint(Paint.ANTI_ALIAS_FLAG)
-    // The edge keeps the pill visible on blue and orange apps (Paytm, Swiggy, PhonePe).
-    private val edge = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = context.dp(1.5f) }
-    // A soft halo, not a hard ring, breathes out from the pill while the mic is open.
+    private val board = BoardDrawable(context, Buddy.YELLOW, Buddy.INK)
+    /** Keyline and rivets again, over the face, so the image never hides them. */
+    private val trim = BoardDrawable(context, 0x00000000, Buddy.INK)
+    private val shadow = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Buddy.YELLOW
+        setShadowLayer(context.dp(8f), 0f, context.dp(3f), 0x4D000000)
+    }
+    private val face = BitmapFactory.decodeResource(context.resources, R.drawable.bob_mark)
+    private val faceBox = RectF()
+    private val facePaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+    // A soft halo, not a hard ring, breathes out from the board while the mic is open.
     // Its reach (growth, half the stroke, the blur) stays inside the padding, or the window edge clips it square.
     private val pulse = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeWidth = context.dp(3f)
         maskFilter = BlurMaskFilter(context.dp(3f), BlurMaskFilter.Blur.NORMAL)
     }
-    private val bar = Paint(Paint.ANTI_ALIAS_FLAG).apply { strokeCap = Paint.Cap.ROUND; strokeWidth = context.dp(3.2f) }
-    private val arc = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeCap = Paint.Cap.ROUND; strokeWidth = context.dp(3f) }
-    private val label = Paint(Paint.ANTI_ALIAS_FLAG).apply { typeface = SaathiType.typeface(700) }
-    private val pill = RectF()
-    private var text = ""
+    private val bar = Paint(Paint.ANTI_ALIAS_FLAG).apply { strokeCap = Paint.Cap.ROUND; strokeWidth = context.dp(4f) }
+    private val arc = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeCap = Paint.Cap.ROUND; strokeWidth = context.dp(4f) }
+    private val arcBox = RectF()
+    private val box = RectF()
     private var state = GuideState.IDLE
     private var phase = 0f
     private val animator = ValueAnimator.ofFloat(0f, 1f).apply {
@@ -89,64 +97,45 @@ internal class BubbleView(
     }
 
     init {
-        contentDescription = "Saathi"
+        contentDescription = "Bob"
     }
 
-    /** The view's width for the current word, before layout catches up; the caller anchors the pill by it. */
-    val wantedWidth get() = (pillW + pad * 2).toInt()
+    /** The view's width; the caller anchors the board against its screen edge by it. */
+    val wantedWidth get() = (side + pad * 2).toInt()
 
-    /** Shows [state] with its word; the pill fits the word, so the caller keeps it against its screen edge. */
+    /** Shows [state]; [label] is what TalkBack says. */
     fun render(state: GuideState, label: String) {
         this.state = state
-        this.text = label
         buddy = Buddy.of(context)
         contentDescription = label
-        textPx = context.dp(19f)
-        this.label.textSize = textPx
-        // Past the widest pill the word shrinks, but never below 15dp.
-        while (lead() + this.label.measureText(label) + padEnd > maxW && textPx > context.dp(15f)) {
-            textPx -= context.dp(0.5f)
-            this.label.textSize = textPx
-        }
-        val w = (lead() + this.label.measureText(label) + padEnd).coerceAtMost(maxW)
-        if (w != pillW) {
-            pillW = w
-            requestLayout()
-        }
         val moving = state == GuideState.LISTENING || state == GuideState.THINKING
         if (moving && animationsOn()) animator.start() else animator.cancel()
         invalidate()
     }
 
-    /** Room before the word: the moving icon while busy; at rest the word sits alone, centred. */
-    private fun lead() = if (state == GuideState.LISTENING || state == GuideState.THINKING) padStart + icon + gap else padEnd
-
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        setMeasuredDimension(wantedWidth, (pillH + pad * 2).toInt())
+        setMeasuredDimension(wantedWidth, (side + pad * 2).toInt())
     }
 
     override fun onDraw(canvas: Canvas) {
-        pill.set(pad.toFloat(), pad.toFloat(), pad + pillW, pad + pillH)
-        val r = pillH / 2
-        val busy = state == GuideState.LISTENING || state == GuideState.THINKING
+        box.set(pad.toFloat(), pad.toFloat(), pad + side, pad + side)
+        val r = corner
         if (state == GuideState.LISTENING) {
             // Two soft rings travel outward while the mic is open.
-            pulse.color = buddy.accentLine
+            pulse.color = buddy.cardInk
             for (k in 0..1) {
                 val t = (phase + k * 0.5f) % 1f
-                pulse.alpha = ((1 - t) * 170).toInt()
+                pulse.alpha = ((1 - t) * 150).toInt()
                 val grow = t * (pad - context.dp(7f))
-                canvas.drawRoundRect(pill.left - grow, pill.top - grow, pill.right + grow, pill.bottom + grow, r + grow, r + grow, pulse)
+                canvas.drawRoundRect(box.left - grow, box.top - grow, box.right + grow, box.bottom + grow, r + grow, r + grow, pulse)
             }
         }
-        fill.color = if (busy) buddy.card else buddy.accent
-        fill.setShadowLayer(context.dp(8f), 0f, context.dp(3f), 0x40000000)
-        canvas.drawRoundRect(pill, r, r, fill)
-        edge.color = if (buddy.dark) 0x66000000 else 0xE6FFFFFF.toInt()
-        canvas.drawRoundRect(pill, r, r, edge)
+        canvas.drawRoundRect(box, r, r, shadow)
+        board.setBounds(box.left.toInt(), box.top.toInt(), box.right.toInt(), box.bottom.toInt())
+        board.draw(canvas)
 
-        val cy = pill.centerY()
-        val ix = pill.left + padStart
+        val cx = box.centerX()
+        val cy = box.centerY()
         when (state) {
             GuideState.LISTENING -> {
                 // Four voice bars, each rising and falling a little out of step.
@@ -155,24 +144,25 @@ internal class BubbleView(
                 for (k in 0..3) {
                     val wave = 0.35f + 0.65f * abs(sin((phase * 2f + k * 0.27f) * PI)).toFloat()
                     val h = icon * (if (animationsOn()) wave else 0.6f) / 2
-                    val x = ix + step * (k + 0.5f)
+                    val x = cx - icon / 2 + step * (k + 0.5f)
                     canvas.drawLine(x, cy - h, x, cy + h, bar)
                 }
             }
             GuideState.THINKING -> {
-                val inset = context.dp(2f)
-                val box = RectF(ix + inset, cy - icon / 2 + inset, ix + icon - inset, cy + icon / 2 - inset)
-                arc.color = 0x33FFFFFF
-                canvas.drawOval(box, arc)
-                arc.color = buddy.accentLine
-                canvas.drawArc(box, phase * 360f - 90f, 110f, false, arc)
+                arcBox.set(cx - icon / 2, cy - icon / 2, cx + icon / 2, cy + icon / 2)
+                arc.color = 0x33121212
+                canvas.drawOval(arcBox, arc)
+                arc.color = buddy.cardInk
+                canvas.drawArc(arcBox, phase * 360f - 90f, 110f, false, arc)
             }
-            else -> {}
+            else -> {
+                // The mark's own yellow matches the board, so the face simply sits inside the keyline.
+                faceBox.set(box.left + faceInset, box.top + faceInset + faceDrop, box.right - faceInset, box.bottom - faceInset + faceDrop)
+                canvas.drawBitmap(face, null, faceBox, facePaint)
+            }
         }
-        label.color = if (busy) buddy.cardInk else buddy.onAccent
-        label.textSize = textPx
-        val fm = label.fontMetrics
-        canvas.drawText(text, pill.left + lead(), cy - (fm.ascent + fm.descent) / 2, label)
+        trim.setBounds(box.left.toInt(), box.top.toInt(), box.right.toInt(), box.bottom.toInt())
+        trim.draw(canvas)
     }
 
     private var downX = 0f
@@ -228,7 +218,7 @@ internal class PointerView(context: Context) : View(context) {
     private val veil = Paint()
     // The halo carries the target; the hairline only gives the spotlight a crisp edge.
     private val glow = Paint(Paint.ANTI_ALIAS_FLAG).apply { maskFilter = BlurMaskFilter(context.dp(18f), BlurMaskFilter.Blur.OUTER) }
-    private val outline = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = context.dp(1f) }
+    private val outline = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = context.dp(2f) }
     /** A full-width row's spotlight stays this far in from the screen edges. */
     private val inset = context.dp(12f)
     private val trail = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -370,13 +360,14 @@ internal class PointerView(context: Context) : View(context) {
         glow.color = buddy.accentLine
         glow.alpha = (200 * fade).toInt()
         canvas.drawRoundRect(currentSpot, corner, corner, glow)
-        outline.color = buddy.accentLine
-        outline.alpha = (150 * fade).toInt()
+        // Black keyline: the yellow halo alone vanishes on a white app.
+        outline.color = buddy.cardInk
+        outline.alpha = (255 * fade).toInt()
         canvas.drawRoundRect(currentSpot, corner, corner, outline)
 
         if (trailAlpha > 0f) {
             // Dots along the path already flown, brighter nearer the hand.
-            trail.color = buddy.accentLine
+            trail.color = buddy.cardInk
             val n = 14
             for (k in 1 until n) {
                 val t = travel * k / n
@@ -392,14 +383,14 @@ internal class PointerView(context: Context) : View(context) {
         val press = if (landed && beat < 0.3f) sin(beat / 0.3f * PI).toFloat() else 0f
         if (landed) {
             val t = beat
-            ripple.color = buddy.accentLine
+            ripple.color = buddy.cardInk
             ripple.alpha = ((1 - t) * 200).toInt()
             canvas.drawCircle(at.x, at.y, context.dp(5f) + t * context.dp(24f), ripple)
         }
         drawHand(canvas, at.x, at.y, press)
     }
 
-    /** The hand with its fingertip at (x, y): a white edge and soft shadow, then the blue hand. */
+    /** The hand with its fingertip at (x, y): a yellow rim and soft shadow, then the black hand. */
     private fun drawHand(canvas: Canvas, x: Float, y: Float, press: Float) {
         val s = handSize / 24f * (1 - 0.06f * press)
         canvas.save()
@@ -407,7 +398,7 @@ internal class PointerView(context: Context) : View(context) {
         canvas.scale(flipX * s, flipY * s)
         canvas.translate(-Glyphs.TIP_X, -Glyphs.TIP_Y)
         handEdge.color = buddy.edge
-        handEdge.strokeWidth = 2 * context.dp(2.5f) / s
+        handEdge.strokeWidth = 2 * context.dp(3f) / s
         handEdge.setShadowLayer(context.dp(6f) / s, 0f, context.dp(2f) / s, 0x59000000)
         canvas.drawPath(hand, handEdge)
         handFill.color = buddy.accent
@@ -420,8 +411,8 @@ internal class PointerView(context: Context) : View(context) {
 internal enum class SignKind { STEP, NOTE, DONE, YOURSELF, WARNING }
 
 /**
- * The caption: a near-black card floating over the app, the first sentence large and white, the
- * rest smaller beneath, Repeat and Close as pills inside it. A badge (tick, lock, warning) leads
+ * The caption: a yellow signboard floating over the app, the first sentence large and black, the
+ * rest smaller beneath, Repeat and Close as boards inside it. A badge (tick, lock, warning) leads
  * the text when the caption is more than a step.
  */
 @SuppressLint("ViewConstructor")
@@ -446,7 +437,7 @@ internal class CaptionView(
         ellipsize = TextUtils.TruncateAt.END
         includeFontPadding = false
     }
-    private val cardBg = GradientDrawable().apply { cornerRadius = context.dp(28f) }
+    private val cardBg = BoardDrawable(context, Buddy.YELLOW, Buddy.INK)
     private val repeat = PillButton(context, Glyph.REPEAT, primary = true, onRepeat)
     private val close = PillButton(context, Glyph.CLOSE, primary = false, onClose)
     private val card = LinearLayout(context).apply {
@@ -460,8 +451,8 @@ internal class CaptionView(
         val margin = context.dp(14f).toInt()
         setPadding(margin, margin, margin, margin)
         clipToPadding = false
-        val p = context.dp(20f).toInt()
-        card.setPadding(p, p, p, context.dp(16f).toInt())
+        val p = context.dp(22f).toInt()
+        card.setPadding(p, p, p, context.dp(20f).toInt())
         val texts = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             addView(head)
@@ -488,17 +479,19 @@ internal class CaptionView(
         addView(card, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
     }
 
-    fun render(caption: String, kind: SignKind, repeatLabel: String, closeLabel: String) {
+    fun render(caption: String, kind: SignKind, repeatLabel: String, closeLabel: String, rtl: Boolean = false) {
         buddy = Buddy.of(context)
+        layoutDirection = if (rtl) LAYOUT_DIRECTION_RTL else LAYOUT_DIRECTION_LTR
         val (first, rest) = split(caption)
         head.text = first
         sub.text = rest
         sub.visibility = if (rest.isEmpty()) GONE else VISIBLE
         head.setTextColor(buddy.cardInk)
-        sub.setTextColor(buddy.cardInkSoft)
+        // Both lines in full black: rank comes from size and weight, never a faded grey.
+        sub.setTextColor(buddy.cardInk)
         // Typeface first: setLineHeight is computed from the current font's metrics.
         head.typeface = SaathiType.typeface(700)
-        sub.typeface = SaathiType.typeface(400)
+        sub.typeface = SaathiType.typeface(500)
         val headSize = context.dp(24f * fontScale)
         val subSize = context.dp(18f * fontScale)
         head.setTextSize(TypedValue.COMPLEX_UNIT_PX, headSize)
@@ -509,8 +502,7 @@ internal class CaptionView(
         sub.isFallbackLineSpacing = false
         head.lineHeight = (headSize * 1.3f).toInt()
         sub.lineHeight = (subSize * 1.38f).toInt()
-        cardBg.setColor(buddy.card)
-        cardBg.setStroke(if (buddy.cardEdge != 0) context.dp(1f).toInt() else 0, buddy.cardEdge)
+        cardBg.set(buddy.card, buddy.cardEdge)
 
         when (kind) {
             SignKind.DONE -> badge.show(Glyph.CHECK, buddy.done, buddy.onDone)
@@ -596,8 +588,9 @@ internal class GlyphView(context: Context) : View(context) {
 }
 
 /**
- * A caption button: a full pill, white for Repeat and translucent for Close. The drawn glyph stays
- * beside the word for seniors who recognise ↻ and ✕ faster than they read; the word shrinks to fit.
+ * A caption button: a black board with yellow lettering for Repeat, a white keylined board for
+ * Close. The drawn glyph stays beside the word for seniors who recognise ↻ and ✕ faster than they
+ * read; the word shrinks to fit.
  */
 @SuppressLint("ViewConstructor")
 internal class PillButton(
@@ -606,7 +599,7 @@ internal class PillButton(
     private val primary: Boolean,
     onClick: () -> Unit,
 ) : FrameLayout(context) {
-    private val bg = GradientDrawable().apply { cornerRadius = context.dp(28f) }
+    private val bg = BoardDrawable(context, Buddy.INK, Buddy.INK, rivets = false, outer = !primary)
     private val icon = GlyphView(context)
     private val text = TextView(context).apply { maxLines = 1; includeFontPadding = false }
     private val iconSize = context.dp(22f).toInt()
@@ -630,11 +623,11 @@ internal class PillButton(
     }
 
     fun render(label: String, buddy: Buddy, fontScale: Float) {
-        val fg = if (primary) buddy.pillInk else buddy.cardInk
-        bg.setColor(if (primary) buddy.pill else buddy.pillQuiet)
+        val fg = if (primary) buddy.pillInk else buddy.pillQuietInk
+        bg.set(if (primary) buddy.pill else buddy.pillQuiet, buddy.cardInk)
         text.text = label
         text.setTextColor(fg)
-        text.typeface = SaathiType.typeface(600)
+        text.typeface = SaathiType.signFor(context, label)
         targetPx = context.dp(19f * fontScale)
         icon.show(glyph, fg)
         // Screen readers should say "Repeat", not describe the icon.

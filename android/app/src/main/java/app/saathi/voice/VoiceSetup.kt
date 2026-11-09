@@ -65,7 +65,7 @@ class VoiceSetup(
                 onResult(Speaker.VoiceStatus.NO_ENGINE)
                 return@run
             }
-            val locale = Locale.forLanguageTag(tag)
+            val locale = Locale.forLanguageTag(app.saathi.Languages.speechTag(tag))
             when (engine.setLanguage(locale)) {
                 TextToSpeech.LANG_MISSING_DATA, TextToSpeech.LANG_NOT_SUPPORTED -> onResult(Speaker.VoiceStatus.MISSING)
                 else -> {
@@ -93,7 +93,7 @@ class VoiceSetup(
         if (!canDownloadOfflineSpeech || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return false
         return runCatching {
             val sr = SpeechRecognizer.createOnDeviceSpeechRecognizer(context)
-            sr.triggerModelDownload(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).putExtra(RecognizerIntent.EXTRA_LANGUAGE, tag))
+            sr.triggerModelDownload(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).putExtra(RecognizerIntent.EXTRA_LANGUAGE, app.saathi.Languages.speechTag(tag)))
             sr.destroy()
             true
         }.getOrElse {

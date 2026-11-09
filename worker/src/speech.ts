@@ -1,10 +1,10 @@
-import { LANGUAGES, type Language } from "./schema.ts";
+import { ELEVENLABS_CODE, LANGUAGES, type Language } from "./schema.ts";
 
 // ElevenLabs speech, for the phone to play instead of its own text-to-speech.
 // Every line is cached (src/speech-store.ts): recipe steps are fixed sentences, so each one is paid
 // for once, ever, across every phone. Only the model's own replies are new text.
 
-// Conversational v3 supports all six app languages, including Telugu, Kannada and Malayalam.
+// Conversational v3 speaks every language in shared/languages.json (its full list of 85).
 export const SPEECH_MODEL = "eleven_v3_conversational";
 /** Eric: a calm, conversational premade male voice. */
 export const DEFAULT_SPEAKER = "cjVigY5qzO86Huf0OWal";
@@ -64,7 +64,7 @@ export async function synthesize(apiKey: string, req: SpeakRequest, speaker: str
     signal: AbortSignal.timeout(12_000),
     body: JSON.stringify({
       text: req.text,
-      language_code: req.language.split("-")[0],
+      language_code: ELEVENLABS_CODE[req.language] ?? req.language.split("-")[0],
       model_id: model,
       voice_settings: { speed: req.pace, stability: 0.5, similarity_boost: 0.75 },
     }),

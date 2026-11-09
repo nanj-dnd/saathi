@@ -121,7 +121,10 @@ class OverlayController(
             target == null -> SignKind.NOTE
             else -> SignKind.STEP
         }
-        this.caption.render(caption, kind, res.getString(R.string.btn_repeat), res.getString(R.string.btn_close))
+        this.caption.render(
+            caption, kind, res.getString(R.string.btn_repeat), res.getString(R.string.btn_close),
+            rtl = res.resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL,
+        )
         placeCaption(if (danger == Danger.SCAM) null else target)
         this.caption.visibility = View.VISIBLE
         moveBubbleOffCaption()
