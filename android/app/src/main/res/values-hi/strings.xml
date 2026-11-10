@@ -49,7 +49,7 @@
     <string name="btn_continue">आगे बढ़ें</string>
     <string name="btn_back">पीछे</string>
     <string name="mic_body">Bob तभी सुनता है जब आप Bob बटन दबाते हैं।</string>
-    <string name="say_scrolling">नीचे देखती हूँ।</string>
+    <string name="say_scrolling">नीचे देखता हूँ।</string>
     <!-- After a finished task: Bob listens once more. -->
     <string name="say_anything_else">और कुछ मदद चाहिए?</string>
     <string name="say_goodbye">ठीक है। जब भी ज़रूरत हो, Bob बटन दबाइए।</string>

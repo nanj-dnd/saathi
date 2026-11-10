@@ -3,6 +3,7 @@ package app.saathi.session
 import app.saathi.brain.ScreenKey
 import app.saathi.capture.Box
 import app.saathi.capture.ScreenText
+import app.saathi.capture.TreeNode
 import app.saathi.net.Action
 import app.saathi.net.Danger
 import app.saathi.net.Guide
@@ -22,6 +23,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 /** What the phone sees at one moment. */
 class Snapshot(
@@ -172,6 +174,12 @@ class GuideSession(
         /** A beat after "done" before asking for anything else. */
         const val FOLLOW_UP_PAUSE_MS = 1_500L
         private val CLOCK_LABEL = Regex("\\p{Nd}{1,2}:\\p{Nd}{2}(?::\\p{Nd}{2})?")
+        /** From the first opening quote to the end: the example a search box cycles through. */
+        private val QUOTED_TAIL = Regex("[\"“‘'].*$")
+        /** How long a moving page gets to stop before the hand follows its button. */
+        const val FOLLOW_SETTLE_MS = 450L
+        /** Looks, [SETTLE_STEP_MS] apart, that check a freshly shown hand is still on its button. */
+        const val POINT_GUARD_LOOKS = 6
 
         /** How long a finished step stays up: long enough for a slow reader, not forever. */
         fun readingTimeMs(text: String): Long = (2_500L + text.length * 60L).coerceIn(3_000L, 12_000L)
@@ -198,6 +206,10 @@ class GuideSession(
     private var screenVersion = 0L
     private var pendingContent = false
     private var settlingEvent: ScreenEvent? = null
+    /** Moves the hand after its button while a step is being said: see [followTarget]. */
+    private var follow: Job? = null
+    /** Takes the hand away if its button disappears just after it was shown: see [guardPoint]. */
+    private var pointGuard: Job? = null
 
     fun onBubbleTap() {
         if (_state.value == GuideState.LISTENING) {
@@ -223,6 +235,7 @@ class GuideSession(
             if (s == GuideState.THINKING) return
             if (s == GuideState.SPEAKING) {
                 pendingContent = true
+                followTarget()
                 return
             }
             if (settlingEvent != null && settlingEvent != ScreenEvent.CONTENT_CHANGED) return
@@ -233,6 +246,7 @@ class GuideSession(
         }
         if (autoTurns >= MAX_AUTO_TURNS) return
         // The senior acted, so the old spotlight is probably pointing at something that moved or is gone.
+        pointGuard?.cancel()
         pointer.clear()
         launchPipeline(settleEvent = event) {
             setState(GuideState.WATCHING)
@@ -250,7 +264,7 @@ class GuideSession(
                 // A scroll that went nowhere or a dialog that flickered: keep the same step on
                 // screen, without asking again or repeating it out loud.
                 val guide = lastGuide!!
-                pointer.point(targetBox(guide, snap), guide.say, guide.danger)
+                showStep(guide, snap)
                 enterWatching()
                 return@launchPipeline
             }
@@ -466,7 +480,7 @@ class GuideSession(
 
         if (guide.action.isNotEmpty() && act(guide)) return
 
-        pointer.point(targetBox(guide, current), guide.say, guide.danger, done = guide.status == Status.DONE)
+        showStep(guide, current, done = guide.status == Status.DONE)
         setState(GuideState.SPEAKING)
         mouth.say(guide.say)
 
@@ -607,6 +621,8 @@ class GuideSession(
 
     private fun reset() {
         watchTimeout?.cancel()
+        pointGuard?.cancel()
+        follow?.cancel()
         ownChange?.cancel()
         ownChange = null
         mouth.stop()
@@ -640,7 +656,85 @@ class GuideSession(
         return before.zip(after).all { (old, now) ->
             old == now || (!old.clickable && !now.clickable &&
                 CLOCK_LABEL.matches(old.label) && CLOCK_LABEL.matches(now.label) &&
-                old.copy(label = "") == now.copy(label = ""))
+                old.copy(label = "") == now.copy(label = "")) ||
+                rotatingHint(old, now)
+        }
+    }
+
+    /**
+     * A search box cycling its example ("Search "milk"" → "Search "stationery"", typed out a letter
+     * at a time) in the same place: not something the senior did, and not a new screen.
+     */
+    private fun rotatingHint(old: TreeNode, now: TreeNode): Boolean {
+        val a = QUOTED_TAIL.find(old.label) ?: return false
+        val b = QUOTED_TAIL.find(now.label) ?: return false
+        val stem = old.label.substring(0, a.range.first)
+        return stem.isNotBlank() && stem == now.label.substring(0, b.range.first) &&
+            old.copy(label = "") == now.copy(label = "")
+    }
+
+    /**
+     * The page moved under a step while it was being said (a banner collapsing above it): put the
+     * hand back on the same button where it is now, without saying the step again. The pending
+     * look after speaking then compares against the moved page, so it isn't taken as a new screen.
+     */
+    private fun followTarget() {
+        val guide = lastGuide ?: return
+        val before = lastLook ?: return
+        if (guide.targetKind != "node") return
+        val old = ScreenText.parse(before.tree).nodes.firstOrNull { it.id == guide.nodeId } ?: return
+        follow?.cancel()
+        follow = scope.launch {
+            delay(FOLLOW_SETTLE_MS)
+            if (_state.value != GuideState.SPEAKING || lastGuide !== guide) return@launch
+            val snap = eyes.look()
+            if (snap.app != before.app || snap.secure) return@launch
+            val moved = ScreenText.parse(snap.tree).nodes
+                .filter { it.label == old.label && it.role == old.role && it.clickable }
+                .minByOrNull { abs(it.box.top - old.box.top) + abs(it.box.left - old.box.left) } ?: return@launch
+            if (moved.box == old.box) return@launch
+            val updated = guide.copy(nodeId = moved.id)
+            val box = targetBox(updated, snap) ?: return@launch
+            if (_state.value != GuideState.SPEAKING || lastGuide !== guide) return@launch
+            lastGuide = updated
+            lastLook = snap
+            pointer.point(box, guide.say, guide.danger)
+            guardPoint(updated, snap)
+        }
+    }
+
+    /** Shows [guide] with its hand on the target found in [snap], then keeps checking the hand is still right. */
+    private fun showStep(guide: Guide, snap: Snapshot, done: Boolean = false) {
+        pointer.point(targetBox(guide, snap), guide.say, guide.danger, done)
+        guardPoint(guide, snap)
+    }
+
+    /**
+     * A look can land in the middle of a page change: the tree still shows the old page while the
+     * new one is drawing. Blinkit's "View cart" was re-shown that way as checkout opened, and the
+     * hand sat where "Place Order" then appeared. So for a moment after the hand goes up, look
+     * again: once its button is no longer there (same text, same place), take the hand away and
+     * keep the words. The next screen event brings the right step.
+     */
+    private fun guardPoint(guide: Guide, basis: Snapshot) {
+        pointGuard?.cancel()
+        val box = targetBox(guide, basis) ?: return
+        val target = ScreenText.parse(basis.tree).nodes.firstOrNull { it.id == guide.nodeId && it.box == box }
+        pointGuard = scope.launch {
+            repeat(POINT_GUARD_LOOKS) {
+                delay(SETTLE_STEP_MS)
+                if (lastGuide !== guide) return@launch
+                val now = eyes.look()
+                if (now.app.isEmpty()) return@repeat
+                val still = target != null && now.app == basis.app && !now.secure &&
+                    ScreenText.parse(now.tree).nodes.any {
+                        it.box == target.box && it.clickable && (it.label == target.label || rotatingHint(target, it))
+                    }
+                if (!still) {
+                    if (lastGuide === guide) pointer.point(null, guide.say, guide.danger)
+                    return@launch
+                }
+            }
         }
     }
 
@@ -667,7 +761,12 @@ class GuideSession(
             guide.status == Status.USER_MUST_DO || sensitiveTarget(guide, snap)
         if (!sensitive && guide.danger != Danger.SCAM) return guide
         val safe = guide.copy(targetKind = "none", nodeId = "", x = -1.0, y = -1.0, action = "", actionArg = "")
-        return if (guide.danger == Danger.SCAM) safe else safe.copy(
+        if (guide.danger == Danger.SCAM) return safe
+        // A recipe's own hand-back line was written for this screen ("check the address, pay
+        // yourself, keep your PIN secret") and is kept; anything else gets the fixed line.
+        val scriptedHandBack = guide.expect.startsWith("recipe ") && guide.status == Status.USER_MUST_DO &&
+            guide.danger == Danger.SENSITIVE && guide.targetKind == "none" && guide.action.isEmpty()
+        return if (scriptedHandBack) safe else safe.copy(
             say = lines().sensitive, status = Status.USER_MUST_DO, danger = Danger.SENSITIVE,
         )
     }

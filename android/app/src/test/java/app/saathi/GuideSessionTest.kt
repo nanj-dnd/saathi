@@ -515,6 +515,64 @@ class GuideSessionTest {
         }
     }
 
+    @Test fun `the hand comes off when its button disappears right after it is shown`() = runTest {
+        val f = Fakes().apply { replies += step("Press ADD") }
+        val s = f.session(this)
+        s.onBubbleTap()
+        runCurrent()
+        assertEquals(Box(800, 300, 1000, 380), f.pointed.last().first)
+        // Checkout draws where the cart was, with no screen event yet.
+        f.tree = "n2 Button \"Place Order\" [800,300,1000,380] click"
+        advanceTimeBy(600)
+        runCurrent()
+        assertNull(f.pointed.last().first)
+        assertEquals("Press ADD", f.pointed.last().second)
+        s.stop()
+    }
+
+    @Test fun `the hand stays on a search box cycling its example`() = runTest {
+        val f = Fakes().apply {
+            tree = "n2 EditText \"Search 'milk'\" [800,300,1000,380] click edit"
+            replies += step("Press Search")
+        }
+        val s = f.session(this)
+        s.onBubbleTap()
+        runCurrent()
+        f.tree = "n2 EditText \"Search 'stationery'\" [800,300,1000,380] click edit"
+        advanceTimeBy(2_000)
+        runCurrent()
+        assertEquals(Box(800, 300, 1000, 380), f.pointed.last().first)
+        s.stop()
+    }
+
+    @Test fun `the hand stays while its button is still there`() = runTest {
+        val f = Fakes().apply { replies += step("Press ADD") }
+        val s = f.session(this)
+        s.onBubbleTap()
+        runCurrent()
+        advanceTimeBy(2_000)
+        runCurrent()
+        assertEquals(Box(800, 300, 1000, 380), f.pointed.last().first)
+        s.stop()
+    }
+
+    @Test fun `a recipe's own hand-back line is kept on a protected screen, the model's is not`() = runTest {
+        for ((expect, keeps) in listOf("recipe blinkit-order/pay" to true, "" to false)) {
+            val f = Fakes().apply {
+                secure = true
+                replies += step("Check the address, then pay yourself. Never tell anyone your PIN.")
+                    .copy(targetKind = "none", nodeId = "", status = Status.USER_MUST_DO, danger = Danger.SENSITIVE, expect = expect)
+            }
+            val s = f.session(this)
+            s.onBubbleTap()
+            runCurrent()
+            val expected = if (keeps) "Check the address, then pay yourself. Never tell anyone your PIN." else f.lines.sensitive
+            assertEquals(listOf(expected), f.said)
+            assertNull(f.pointed.single().first)
+            s.stop()
+        }
+    }
+
     @Test fun `unflagged payment targets are replaced with the local sensitive warning`() = runTest {
         for (kind in listOf("node", "point")) {
             val f = Fakes().apply {

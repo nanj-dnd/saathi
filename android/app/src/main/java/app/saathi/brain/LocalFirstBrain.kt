@@ -51,6 +51,16 @@ class LocalFirstBrain(
         }
 
         if (request.secureScreen) {
+            // The picture was refused but the masked tree is still readable: a recipe's own
+            // "do this yourself" step for this screen (Blinkit's checkout: check the address, pay
+            // yourself, keep the PIN secret) says more than the generic line. Only hand-back
+            // steps are taken: nothing is pointed at or done on a protected screen.
+            val scripted = if (ScreenSafety.scamCue(request.tree)) null else
+                RecipeEngine(recipes(), canOpen).guide(request)?.takeIf {
+                    it.status == Status.USER_MUST_DO && it.danger == Danger.SENSITIVE &&
+                        it.targetKind == "none" && it.action.isEmpty()
+                }
+            if (scripted != null) return local(scripted, Source.RECIPE)
             return local(
                 Guide(
                     say = sensitiveLine(request.language),

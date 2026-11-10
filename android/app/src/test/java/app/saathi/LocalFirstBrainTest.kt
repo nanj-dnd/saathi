@@ -196,6 +196,24 @@ class LocalFirstBrainTest {
         assertTrue(remote.calls.isEmpty())
     }
 
+    @Test fun `a readable secure checkout gets the recipe's own hand-back line`() = runTest {
+        val remote = FakeRemote(addMilk)
+        val checkout = """
+            n1 TextView "Checkout" [40,100,400,180]
+            n2 TextView "Delivering to Home" [40,1900,600,1960]
+            n3 Button "Place Order" [600,2000,1040,2100] click
+        """.trimIndent()
+        val r = brain(remote, books = book).turn(
+            req(checkout, app = "com.grofers.customerapp", goal = "order on Blinkit",
+                history = listOf(PastStep("नीचे हरी पट्टी में 'View cart' दबाइए।", "View cart", Status.NEXT_STEP, "com.grofers.customerapp")))
+                .copy(secureScreen = true),
+        )
+        assertTrue(r.guide.say, r.guide.say.contains("PIN"))
+        assertEquals(Status.USER_MUST_DO, r.guide.status)
+        assertEquals("none", r.guide.targetKind)
+        assertTrue(remote.calls.isEmpty())
+    }
+
     @Test fun `recipes answer without the network`() = runTest {
         val remote = FakeRemote(addMilk).apply { fail = true }
         val r = brain(remote, books = book).turn(req(RecipeEngineTest.settingsHome, utterance = "अक्षर बड़े करने हैं"))
