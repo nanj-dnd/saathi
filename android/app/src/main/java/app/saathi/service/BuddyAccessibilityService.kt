@@ -30,6 +30,7 @@ import app.saathi.net.WorkerClient
 import app.saathi.overlay.OverlayController
 import app.saathi.playbooks.PlaybookStore
 import app.saathi.recipes.RecipeSource
+import app.saathi.safety.PaymentGuard
 import app.saathi.safety.ScamGuard
 import app.saathi.session.GuideSession
 import app.saathi.session.Brain
@@ -283,7 +284,7 @@ class BuddyAccessibilityService : AccessibilityService() {
     private val debugAsk = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
-                DEBUG_ASK -> intent.getStringExtra("text")?.let(session::ask)
+                DEBUG_ASK -> if (!overlay.paymentHidden) intent.getStringExtra("text")?.let(session::ask)
                 // Pretend an app came to the front, to exercise the scam guard without installing it.
                 DEBUG_OPENED -> intent.getStringExtra("pkg")?.let(::onAppOpened)
                 DEBUG_STOP -> session.stop()
@@ -323,6 +324,12 @@ class BuddyAccessibilityService : AccessibilityService() {
         if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
             overlay.setBubbleVisible(!setupInFront())
         }
+        // Money is hers alone: on a payment app or page Bob disappears and stays quiet.
+        if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED || event.eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
+            val opened = event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
+            checkPayment(force = opened, openedPkg = if (opened) pkg else null)
+        }
+        if (overlay.paymentHidden) return
 
         when (event.eventType) {
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> onAppOpened(pkg)
@@ -330,6 +337,50 @@ class BuddyAccessibilityService : AccessibilityService() {
             AccessibilityEvent.TYPE_VIEW_SCROLLED -> session.onScreenEvent(ScreenEvent.SCROLLED)
             AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED -> session.onScreenEvent(ScreenEvent.TYPED)
             AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> session.onScreenEvent(ScreenEvent.CONTENT_CHANGED)
+        }
+    }
+
+    private var paymentCheckedAt = 0L
+    private var paymentRecheck: Job? = null
+
+    /**
+     * Hides Bob on a payment app or page and brings the face back once she leaves. Content changes
+     * come many times a second, so the page check runs at most every [PAYMENT_CHECK_MS] unless a
+     * new window just opened. Only the app in front is read; Bob's own windows never are.
+     */
+    private fun checkPayment(force: Boolean, openedPkg: String? = null) {
+        val now = android.os.SystemClock.elapsedRealtime()
+        if (!force && now - paymentCheckedAt < PAYMENT_CHECK_MS) {
+            // Too soon: look once more when the wait is up, so the last change is never missed.
+            schedulePaymentRecheck()
+            return
+        }
+        paymentCheckedAt = now
+        // A payment app that just opened counts at once: its window may not be the active one yet,
+        // and hiding a moment early is always safer than showing a moment late.
+        if (PaymentGuard.isPaymentApp(openedPkg)) {
+            if (!overlay.paymentHidden) session.stop()
+            overlay.setPaymentHidden(true)
+            schedulePaymentRecheck()
+            return
+        }
+        val root = runCatching { rootInActiveWindow }.getOrNull()
+        val front = root?.packageName?.toString()
+        // Can't tell what's in front (a secure window mid-switch): stay as we are and look again soon.
+        if (root == null || front == null) { schedulePaymentRecheck(); return }
+        if (front == packageName) return
+        val pay = PaymentGuard.isPaymentApp(front) || PaymentGuard.PAGE_CUES.any { cue ->
+            runCatching { root.findAccessibilityNodeInfosByText(cue).any { it.isVisibleToUser } }.getOrDefault(false)
+        }
+        if (pay && !overlay.paymentHidden) session.stop()
+        overlay.setPaymentHidden(pay)
+    }
+
+    private fun schedulePaymentRecheck() {
+        if (paymentRecheck?.isActive == true) return
+        paymentRecheck = scope.launch {
+            kotlinx.coroutines.delay(PAYMENT_CHECK_MS)
+            checkPayment(force = true)
         }
     }
 
@@ -367,6 +418,7 @@ class BuddyAccessibilityService : AccessibilityService() {
         private const val DEBUG_STOP = "app.saathi.DEBUG_STOP"
         private const val DEBUG_TREE = "app.saathi.DEBUG_TREE"
         private const val SETTINGS = "com.android.settings"
+        private const val PAYMENT_CHECK_MS = 300L
 
         fun isEnabled(context: Context): Boolean {
             val am = context.getSystemService(AccessibilityManager::class.java)

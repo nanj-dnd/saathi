@@ -44,6 +44,11 @@ class OverlayController(
 
     private var state = GuideState.IDLE
     private var attached = false
+    /** Over Bob's own setup screen. */
+    private var setupHidden = false
+    /** On a payment app or page: see [PaymentGuard]. */
+    var paymentHidden = false
+        private set
 
     fun show() {
         if (attached) return
@@ -74,7 +79,40 @@ class OverlayController(
 
     /** Hidden while Saathi's own setup screen is in front; shown again over every other app. */
     fun setBubbleVisible(visible: Boolean) {
-        if (attached) bubble.visibility = if (visible) View.VISIBLE else View.GONE
+        setupHidden = !visible
+        applyBubble()
+    }
+
+    /**
+     * Payment apps and pages: every Bob window goes, the face fading out, and nothing is drawn
+     * until [hidden] is false again (then only the face returns; guidance has already stopped).
+     */
+    fun setPaymentHidden(hidden: Boolean) {
+        if (hidden == paymentHidden) return
+        paymentHidden = hidden
+        if (BuildConfig.DEBUG) android.util.Log.d("Saathi", if (hidden) "payment hide" else "payment show")
+        if (hidden) {
+            pointer.clear()
+            caption.visibility = View.GONE
+        }
+        applyBubble()
+    }
+
+    private fun applyBubble() {
+        if (!attached) return
+        val show = !setupHidden && !paymentHidden
+        bubble.animate().cancel()
+        if (show) {
+            if (bubble.visibility != View.VISIBLE) {
+                bubble.alpha = 0f
+                bubble.visibility = View.VISIBLE
+            }
+            bubble.animate().alpha(1f).setDuration(FADE_MS).start()
+        } else if (paymentHidden && bubble.visibility == View.VISIBLE) {
+            bubble.animate().alpha(0f).setDuration(FADE_MS).withEndAction { bubble.visibility = View.GONE }.start()
+        } else {
+            bubble.visibility = View.GONE
+        }
     }
 
     /** The mic just opened: a buzz, so the senior knows to start talking even without looking. */
@@ -109,7 +147,7 @@ class OverlayController(
     }
 
     override fun point(target: Box?, caption: String, danger: String, done: Boolean) {
-        if (!attached) return
+        if (!attached || paymentHidden) return
         // Debug builds log what is shown and where, so recordings can be timed and driven.
         if (BuildConfig.DEBUG) android.util.Log.d("Saathi", "point ${target?.let { "${it.left},${it.top},${it.right},${it.bottom}" } ?: "-"} | $caption")
         val res = strings()
@@ -269,5 +307,9 @@ class OverlayController(
     ).apply {
         gravity = Gravity.TOP or Gravity.START
         layoutInDisplayCutoutMode = LP.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+    }
+
+    private companion object {
+        const val FADE_MS = 180L
     }
 }
